@@ -23,6 +23,7 @@ export const collections = {
   production: fb.collection(firestore, "production"),
   products: fb.collection(firestore, "products"),
   productTypes: fb.collection(firestore, "productTypes"),
+  representatives: fb.collection(firestore, "representatives"),
 }
 
 export default app

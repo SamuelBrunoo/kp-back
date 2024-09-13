@@ -4,6 +4,7 @@ import * as ColorsController from "../controllers/colors"
 import * as ModelsController from "../controllers/model"
 import * as ProductsController from "../controllers/product"
 import * as ClientsController from "../controllers/client"
+import * as RepresentativesController from "../controllers/representative"
 
 const routes = Router()
 
@@ -35,5 +36,18 @@ routes.get("/clients", ClientsController.getClients)
 routes.delete("/clients/:id", ClientsController.deleteClient)
 routes.put("/clients/:id", ClientsController.updateClient)
 routes.get("/clients/:id", ClientsController.getClient)
+
+// # Representatives
+routes.post("/representatives", RepresentativesController.addRepresentative)
+routes.get("/representatives", RepresentativesController.getRepresentatives)
+routes.delete(
+  "/representatives/:id",
+  RepresentativesController.deleteRepresentative
+)
+routes.put(
+  "/representatives/:id",
+  RepresentativesController.updateRepresentative
+)
+routes.get("/representatives/:id", RepresentativesController.getRepresentative)
 
 export default routes

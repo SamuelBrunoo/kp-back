@@ -1,3 +1,5 @@
+import { TClient } from "./client"
+
 export type TRepresentative = {
   id: string
   name: string
@@ -14,7 +16,7 @@ export type TRepresentative = {
   }
   email: string
   phone: string
-  clients: string[]
+  clients: TClient[]
   orders: string[]
 }
 
