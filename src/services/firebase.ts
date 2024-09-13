@@ -18,6 +18,7 @@ const firestore = fb.getFirestore(app)
 export const collections = {
   clients: fb.collection(firestore, "clients"),
   colors: fb.collection(firestore, "colors"),
+  emmitters: fb.collection(firestore, "emmitters"),
   models: fb.collection(firestore, "models"),
   orders: fb.collection(firestore, "orders"),
   production: fb.collection(firestore, "production"),

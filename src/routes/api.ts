@@ -4,7 +4,8 @@ import * as ColorsController from "../controllers/colors"
 import * as ModelsController from "../controllers/model"
 import * as ProductsController from "../controllers/product"
 import * as ClientsController from "../controllers/client"
-import * as RepresentativesController from "../controllers/representative"
+import * as RepsController from "../controllers/representative"
+import * as OrderController from "../controllers/order"
 
 const routes = Router()
 
@@ -38,16 +39,17 @@ routes.put("/clients/:id", ClientsController.updateClient)
 routes.get("/clients/:id", ClientsController.getClient)
 
 // # Representatives
-routes.post("/representatives", RepresentativesController.addRepresentative)
-routes.get("/representatives", RepresentativesController.getRepresentatives)
-routes.delete(
-  "/representatives/:id",
-  RepresentativesController.deleteRepresentative
-)
-routes.put(
-  "/representatives/:id",
-  RepresentativesController.updateRepresentative
-)
-routes.get("/representatives/:id", RepresentativesController.getRepresentative)
+routes.post("/representatives", RepsController.addRepresentative)
+routes.get("/representatives", RepsController.getRepresentatives)
+routes.delete("/representatives/:id", RepsController.deleteRepresentative)
+routes.put("/representatives/:id", RepsController.updateRepresentative)
+routes.get("/representatives/:id", RepsController.getRepresentative)
+
+// # Orders
+routes.post("/orders", OrderController.addOrder)
+routes.get("/orders", OrderController.getOrders)
+routes.delete("/orders/:id", OrderController.deleteOrder)
+routes.put("/orders/:id", OrderController.updateOrder)
+routes.get("/orders/:id", OrderController.getOrder)
 
 export default routes

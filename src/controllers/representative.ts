@@ -4,7 +4,7 @@ import * as fb from "firebase/firestore"
 import { collections } from "../services/firebase"
 import { representativeValidator } from "../utils/validators/representative"
 import { parseFbDocs } from "../utils/parsers/fbDoc"
-import parseRepresentatives from "../utils/parsers/representatives"
+import parseRepresentatives from "../utils/parsers/parseRepresentatives"
 import { TRepresentative } from "../utils/types/data/representative"
 import { TClient } from "../utils/types/data/client"
 
