@@ -6,6 +6,7 @@ export type TClient = {
   cnpj?: string
   stateRegister: string
   address: {
+    full: string
     street: string
     city: string
     state: string
@@ -13,4 +14,5 @@ export type TClient = {
   }
   email: string
   phone: string
+  orders: string[]
 }

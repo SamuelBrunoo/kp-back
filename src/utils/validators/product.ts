@@ -1,5 +1,3 @@
-import { TProduct } from "../types/data/product"
-
 export const productValidator = (data: any): boolean => {
   let ok = true
 

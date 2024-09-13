@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 
 import * as fb from "firebase/firestore"
 import { collections } from "../services/firebase"
-import { TNewProduct, TProduct } from "../utils/types/data/product"
+import { TProduct } from "../utils/types/data/product"
 import { productValidator } from "../utils/validators/product"
 import parseProducts from "../utils/parsers/parseProducts"
 import { parseFbDocs } from "../utils/parsers/fbDoc"
