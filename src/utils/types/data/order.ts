@@ -1,41 +1,44 @@
 import { TClient } from "./client"
 import { TProduct } from "./product"
 
-export type TNewOrder = {
+export type TFBOrder = {
   client: string
+  code: string
+  representative?: string
   orderDate: number
   value: number
-  status: string
-  products: TOrderProduct[]
-  total: {
-    products: number
-    value: number
-  }
-  deadline: string
-  representative: string
+  status: TOPStatus
+  products: {
+    id: string
+    quantity: number
+    status: TOPStatus
+  }[]
+  deadline: number
   payment: {
     type: TPayment
     paymentCode: string
     paymentNumber: string
     status: string
+    installments?: number
   }
   shippingType: TShipping
   emmitter: string
 }
 
-export type TFBOrder = {
+export type TNewOrder = {
   client: string
-  representative?: string
   orderDate: number
   value: number
-  status: string
-  products: {
-    id: string
-    quantity: number
-    status: string
-  }[]
-  deadline: string
+  status: TOPStatus
+  products: TOrderProduct[]
+  total: {
+    products: number
+    value: number
+  }
+  deadline: number
+  representative: string
   payment: {
+    installments?: string
     type: TPayment
     paymentCode: string
     paymentNumber: string
@@ -47,18 +50,20 @@ export type TFBOrder = {
 
 export type TOrder = {
   id: string
+  code: string
   client: TClient
   orderDate: number
   value: number
-  status: string
+  status: TOPStatus
   products: TOrderProduct[]
   total: {
     products: number
     value: number
   }
-  deadline: string
+  deadline: number
   representative?: string
   payment: {
+    installments?: number
     type: TPayment
     paymentCode: string
     paymentNumber: string
@@ -70,9 +75,11 @@ export type TOrder = {
 
 type TOrderProduct = TProduct & {
   quantity: number
-  status: string
+  status: TOPStatus
 }
 
-type TPayment = "pix" | "cash" | "slip"
+export type TPayment = "pix" | "cash" | "slip"
 
-type TShipping = "transporter" | "representative" | "mail"
+export type TShipping = "transporter" | "representative" | "mail"
+
+export type TOPStatus = "queued" | "lor" | "doing" | "done"

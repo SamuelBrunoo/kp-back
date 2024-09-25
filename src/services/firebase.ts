@@ -21,7 +21,7 @@ export const collections = {
   emmitters: fb.collection(firestore, "emmitters"),
   models: fb.collection(firestore, "models"),
   orders: fb.collection(firestore, "orders"),
-  production: fb.collection(firestore, "production"),
+  productionLines: fb.collection(firestore, "productionLines"),
   products: fb.collection(firestore, "products"),
   productTypes: fb.collection(firestore, "productTypes"),
   representatives: fb.collection(firestore, "representatives"),

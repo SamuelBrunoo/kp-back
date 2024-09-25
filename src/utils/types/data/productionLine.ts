@@ -1,18 +1,56 @@
+import { TOPStatus } from "./order"
+
+export type TNewProductLine = {
+  order: TProductionOrder
+  status: string
+  quantity: number
+  products: TFBLineProduct[]
+}
+
+export type TFBProductionLine = {
+  id: string
+  order: TProductionOrder
+  status: string
+  quantity: number
+  products: TFBLineProduct[]
+}
+
 export type TProductionLine = {
   id: string
-  order: string
-  client: string
-  date: string
+  order: TProductionOrder
+  status: string
+  quantity: number
   products: TLineProduct[]
 }
 
-type TLineProduct = {
+export type TProductionOrder = {
+  id: string
+  code: string
+  client: {
+    id: string
+    name: string
+    socialRole: string
+  }
+  orderDate: number
+  deadline: number
+}
+
+export type TLineProduct = {
+  id: string
+  productionId: string
   type: string
   model: string
   color: string
-  doing: string
-  qnt: number
-  status: TProductionStatus
+  inCharge: {
+    id: string
+    name: string
+  }
+  status: TOPStatus
 }
 
-type TProductionStatus = "going" | "queue" | "lack" | "done"
+export type TFBLineProduct = {
+  id: string
+  productionId: string
+  inCharge: string
+  status: TOPStatus
+}

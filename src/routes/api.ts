@@ -7,6 +7,8 @@ import * as ClientsController from "../controllers/client"
 import * as RepsController from "../controllers/representative"
 import * as OrderController from "../controllers/order"
 
+import * as PageInfoController from "../controllers/pageInfo"
+
 const routes = Router()
 
 // # Product Types
@@ -51,5 +53,8 @@ routes.get("/orders", OrderController.getOrders)
 routes.delete("/orders/:id", OrderController.deleteOrder)
 routes.put("/orders/:id", OrderController.updateOrder)
 routes.get("/orders/:id", OrderController.getOrder)
+
+// # Page info
+routes.get("/pageInfo/orderForm", PageInfoController.getOrderFormData)
 
 export default routes
