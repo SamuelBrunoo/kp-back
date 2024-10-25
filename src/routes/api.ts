@@ -6,6 +6,7 @@ import * as ProductsController from "../controllers/product"
 import * as ClientsController from "../controllers/client"
 import * as RepsController from "../controllers/representative"
 import * as OrderController from "../controllers/order"
+import * as PLineController from "../controllers/productionLine"
 
 import * as PageInfoController from "../controllers/pageInfo"
 
@@ -53,6 +54,13 @@ routes.get("/orders", OrderController.getOrders)
 routes.delete("/orders/:id", OrderController.deleteOrder)
 routes.put("/orders/:id", OrderController.updateOrder)
 routes.get("/orders/:id", OrderController.getOrder)
+
+// # Production Lines
+routes.post("/productionLines", PLineController.addProductionLine)
+routes.get("/productionLines", PLineController.getProductionLines)
+routes.delete("/productionLines/:id", PLineController.deleteProductionLine)
+routes.put("/productionLines/:id", PLineController.updateProductionLine)
+routes.get("/productionLines/:id", PLineController.getProductionLine)
 
 // # Page info
 routes.get("/pageInfo/orderForm", PageInfoController.getOrderFormData)

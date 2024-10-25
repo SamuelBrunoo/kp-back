@@ -1,10 +1,14 @@
 import { TFBOrder, TNewOrder } from "../../types/data/order"
 
 export const treatNewOrder = (data: TNewOrder, extra: { newCode: string }) => {
-  const prods = data.products.map((p) => ({
+  const prods: TFBOrder["products"] = data.products.map((p) => ({
     id: p.id,
     quantity: p.quantity,
-    status: p.status,
+    status: !p.storage.has
+      ? "done"
+      : p.storage.quantity - p.quantity < 0
+      ? "queued"
+      : "done",
   }))
 
   let obj: TFBOrder = {

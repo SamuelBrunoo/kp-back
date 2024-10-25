@@ -30,7 +30,7 @@ export type TNewOrder = {
   orderDate: number
   value: number
   status: TOPStatus
-  products: TOrderProduct[]
+  products: TNewOrderProduct[]
   total: {
     products: number
     value: number
@@ -73,6 +73,10 @@ export type TOrder = {
   emmitter: string
 }
 
+type TNewOrderProduct = TProduct & {
+  quantity: number
+}
+
 type TOrderProduct = TProduct & {
   quantity: number
   status: TOPStatus
@@ -83,3 +87,10 @@ export type TPayment = "pix" | "cash" | "slip"
 export type TShipping = "transporter" | "representative" | "mail"
 
 export type TOPStatus = "queued" | "lor" | "doing" | "done"
+
+export const TOPStatusWeight = {
+  queued: 1,
+  done: 2,
+  doing: 3,
+  lor: 4,
+}
