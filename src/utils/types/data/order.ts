@@ -13,6 +13,7 @@ export type TFBOrder = {
     quantity: number
     status: TOPStatus
   }[]
+  productsIds: string[]
   deadline: number
   payment: {
     type: TPayment
@@ -31,6 +32,7 @@ export type TNewOrder = {
   value: number
   status: TOPStatus
   products: TNewOrderProduct[]
+  productsIds: string[]
   total: {
     products: number
     value: number
@@ -56,6 +58,7 @@ export type TOrder = {
   value: number
   status: TOPStatus
   products: TOrderProduct[]
+  productsIds: string[]
   total: {
     products: number
     value: number

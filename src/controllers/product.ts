@@ -9,6 +9,7 @@ import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { TColor } from "../utils/types/data/color"
 import { TModel } from "../utils/types/data/model"
 import { TProdType } from "../utils/types/data/prodType"
+import { getCustomError, jsonError } from "../utils/helpers/getCustomError"
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
@@ -50,10 +51,10 @@ export const getProduct = async (req: Request, res: Response) => {
         data: { product: { ...product.data(), id: product.id } },
       })
     } else {
-      throw new Error("Este produto não existe")
+      throw new Error(jsonError("Este produto não existe"))
     }
   } catch (error) {
-    res.json({ success: false, error: { message: error } })
+    res.status(400).json(getCustomError(error))
   }
 }
 
@@ -62,20 +63,24 @@ export const addProduct = async (req: Request, res: Response) => {
     const data = req.body
 
     if (productValidator(data)) {
-      const doc = await fb.addDoc(collections.products, data)
-      const docData = { ...data, id: doc.id }
+      const sameCodeSnap = await fb.getDocs(
+        // @ts-ignore
+        fb.query(collections.products, fb.where("code", "==", data.code))
+      )
 
-      res.status(200).json({ success: true, data: docData })
+      if (sameCodeSnap.docs.length === 0) {
+        const doc = await fb.addDoc(collections.products, data)
+        const docData = { ...data, id: doc.id }
+
+        res.status(200).json({ success: true, data: docData })
+      } else {
+        throw new Error(jsonError("Este produto já existe"))
+      }
     } else {
-      res.status(400).json({
-        success: false,
-        error: "Verifique os campos e tente novamente",
-      })
+      throw new Error(jsonError("Verifique os campos e tente novamente."))
     }
   } catch (error) {
-    res
-      .status(400)
-      .json({ success: false, error: "Houve um erro. Tente novamente" })
+    res.status(400).json(getCustomError(error))
   }
 }
 
@@ -90,15 +95,10 @@ export const updateProduct = async (req: Request, res: Response) => {
 
       res.status(200).json({ success: true, data: docData })
     } else {
-      res.status(400).json({
-        success: false,
-        error: "Verifique os campos e tente novamente",
-      })
+      throw new Error(jsonError("Verifique os campos e tente novamente."))
     }
   } catch (error) {
-    res
-      .status(400)
-      .json({ success: false, error: "Houve um erro. Tente novamente" })
+    res.status(400).json(getCustomError(error))
   }
 }
 
@@ -106,13 +106,51 @@ export const deleteProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
 
-    const ref = fb.doc(collections.products, id)
-    await fb.deleteDoc(ref)
+    // 1. check if it has already been ordered
 
-    res.status(200).json({ success: true })
+    const query = fb.query(
+      collections.orders,
+      fb.where("productsIds", "array-contains", id)
+    )
+    const docsSnap = await fb.getDocs(query)
+
+    if (docsSnap.docs.length === 0) {
+      // 2. if not, delete
+
+      const ref = fb.doc(collections.products, id)
+      await fb.deleteDoc(ref)
+
+      res.status(200).json({ success: true })
+    } else {
+      // 3. if true, it cant be deleted. Just inactivated
+      throw new Error(
+        JSON.stringify({
+          message:
+            "Este produto já foi pedido pelo menos uma vez. Em vez de deletar, inative-o.",
+        })
+      )
+    }
   } catch (error) {
-    res
-      .status(400)
-      .json({ success: false, error: "Houve um erro. Tente novamente" })
+    res.status(400).json(getCustomError(error))
+  }
+}
+
+export const toggleProductStatus = async (req: Request, res: Response) => {
+  try {
+    const data = req.body
+
+    if (productValidator(data)) {
+      const ref = fb.doc(collections.products, data.id)
+      await fb.updateDoc(ref, { active: !data.active })
+      const docData = data
+
+      res.status(200).json({ success: true, data: docData })
+    } else {
+      throw new Error(
+        "Não foi possível alterar o status. Tente novamente mais tarde."
+      )
+    }
+  } catch (error) {
+    res.status(400).json(getCustomError(error))
   }
 }

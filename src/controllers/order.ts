@@ -187,12 +187,15 @@ export const addOrder = async (req: Request, res: Response) => {
 
             if (!newProductLine) {
               newProductLine = {
-                order: info.client,
+                order: doc.id,
+                client: client.id,
                 status: "queued",
                 quantity: 0,
                 products: [],
               }
             }
+
+            // Group by product (id)
 
             let plProdGroup: TFBLineProductGroup = {
               id: prodSubj.id,
@@ -212,20 +215,18 @@ export const addOrder = async (req: Request, res: Response) => {
               plProdGroup.list.push(pToDo)
             }
 
-            if (newProductLine.quantity)
-              newProductLine.quantity += plProdGroup.list.length
-            if (newProductLine.products)
-              newProductLine.products.push(plProdGroup)
+            newProductLine.quantity += plProdGroup.list.length
+            newProductLine.products.push(plProdGroup)
           }
 
           // update product quantity
           const stillTodo = product.quantity - prodSubj.storage.quantity
-          const willBeEmpty = prodSubj.storage.quantity - stillTodo
+          const willBeEmpty = prodSubj.storage.quantity - stillTodo < 0
 
           fb.updateDoc(fb.doc(collections.products, prodSubj.id), {
             storage: {
               has: prodSubj.storage.has,
-              quantity: willBeEmpty ? 0 : stillTodo,
+              quantity: willBeEmpty ? 0 : prodSubj.storage.quantity - stillTodo,
             },
           })
         }

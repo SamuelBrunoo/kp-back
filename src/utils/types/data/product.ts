@@ -1,5 +1,6 @@
 export type TProduct = {
   id: string
+  active: boolean
   code: string
   model: string
   color: string
@@ -12,6 +13,7 @@ export type TProduct = {
 }
 
 export type TNewProduct = {
+  active: boolean
   code: string
   name: string
   color: string

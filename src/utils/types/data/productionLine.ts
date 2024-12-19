@@ -5,6 +5,7 @@ import { TOPStatus } from "./order"
 export type TFBProductionLine = {
   id: string
   order: string
+  client: string
   status: string
   quantity: number
   products: TFBLineProductGroup[]

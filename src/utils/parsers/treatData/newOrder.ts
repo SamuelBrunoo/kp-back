@@ -18,6 +18,7 @@ export const treatNewOrder = (data: TNewOrder, extra: { newCode: string }) => {
     value: data.value,
     status: data.status,
     products: prods,
+    productsIds: prods.map((p) => p.id),
     deadline: data.deadline,
     payment: {
       ...data.payment,

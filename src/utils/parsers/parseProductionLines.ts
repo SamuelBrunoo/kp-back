@@ -37,10 +37,36 @@ const parseProductionLines = (props: Props) => {
 
   let list: TProductionLine[] = []
 
+  console.log("----------")
+  console.log("Parsing production line")
+  console.log("----------")
+  console.log("\n\n")
+  console.log("----------")
+  console.log("\n")
+  console.log("productionLines\n", productionLines)
+  console.log("---")
+  console.log("prodTypes\n", prodTypes)
+  console.log("---")
+  console.log("colors\n", colors)
+  console.log("---")
+  console.log("models\n", models)
+  console.log("---")
+  console.log("products\n", products)
+  console.log("---")
+  console.log(orders)
+  console.log("clients\n", clients)
+  console.log("---")
+  console.log("workers\n", workers)
+  console.log("\n")
+  console.log("\n\n")
+  console.log("----------")
+
   productionLines.forEach((pLine) => {
     const order = orders.find((ord) => pLine.order === ord.id) as TFBOrder & {
       id: string
     }
+
+    console.log(order, pLine)
 
     const client = clients.find(
       (client) => order.client === client.id

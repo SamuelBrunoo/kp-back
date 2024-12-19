@@ -10,6 +10,7 @@ import { TColor } from "../utils/types/data/color"
 import { TProdType } from "../utils/types/data/prodType"
 import parseModels from "../utils/parsers/parseModels"
 import parseModel from "../utils/parsers/parseModel"
+import { getCustomError, jsonError } from "../utils/helpers/getCustomError"
 
 const firestore = fb.getFirestore(app)
 
@@ -84,10 +85,14 @@ export const getModel = async (req: Request, res: Response) => {
         data: { model: info.model, variations: info.variations },
       })
     } else {
-      throw new Error()
+      throw new Error(
+        jsonError(
+          "Não foi possível acessar as informações deste modelo. Tente novamente mais tarde"
+        )
+      )
     }
   } catch (error) {
-    res.status(204).json({ success: false, error: true })
+    res.status(400).json(getCustomError(error))
   }
 }
 
@@ -107,9 +112,7 @@ export const addModel = async (req: Request, res: Response) => {
       })
     }
   } catch (error) {
-    res
-      .status(400)
-      .json({ success: false, error: "Houve um erro. Tente novamente" })
+    res.status(400).json(getCustomError(error))
   }
 }
 
@@ -130,9 +133,7 @@ export const updateModel = async (req: Request, res: Response) => {
       })
     }
   } catch (error) {
-    res
-      .status(400)
-      .json({ success: false, error: "Houve um erro. Tente novamente" })
+    res.status(400).json(getCustomError(error))
   }
 }
 
@@ -140,13 +141,41 @@ export const deleteModel = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
 
-    const ref = fb.doc(collections.models, id)
-    await fb.deleteDoc(ref)
+    const modelSnap = await fb.getDoc(fb.doc(collections.models, id))
 
-    res.status(200).json({ success: true })
+    if (modelSnap.exists()) {
+      const model = modelSnap.data()
+
+      // 1. check if it has product of it
+      const query = fb.query(
+        collections.products,
+        fb.where("model", "==", model.code)
+      )
+      const docsSnap = await fb.getDocs(query)
+
+      if (docsSnap.docs.length === 0) {
+        // 2. if not, delete
+
+        const ref = fb.doc(collections.models, id)
+        await fb.deleteDoc(ref)
+
+        res.status(200).json({ success: true })
+      } else {
+        // 3. if have, return error
+        throw new Error(
+          JSON.stringify({
+            message:
+              "Há produtos referentes a esse modelo. Você não pode excluí-lo diretamente.",
+          })
+        )
+      }
+    } else {
+      // model does not exists
+      throw new Error(
+        JSON.stringify({ message: "Este modelo não existe ou já foi deletado" })
+      )
+    }
   } catch (error) {
-    res
-      .status(400)
-      .json({ success: false, error: "Houve um erro. Tente novamente" })
+    res.status(400).json(getCustomError(error))
   }
 }
