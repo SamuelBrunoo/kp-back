@@ -42,26 +42,30 @@ const parseOrders = (props: Props) => {
     const emmitter = emmitters.find((emt) => order.emmitter === emt.id)
       ?.name as string
 
-    const pds: TOrder["products"] = order.products.map((pd) => {
-      const product = products.find((p) => p.id === pd.id) as TProduct
+    const pds: TOrder["products"] = order.products
+      .map((pd) => {
+        const product = products.find((p) => p.id === pd.id) as TProduct
 
-      if (product) {
-        const c = colors.find((col) => col.code === product.color) as TColor
-        const m = models.find((mod) => mod.code === product.model) as TModel
-        const t = prodTypes.find((pt) => pt.code === m.type) as TProdType
+        if (product) {
+          const c = colors.find((col) => col.code === product.color) as TColor
+          const m = models.find((mod) => mod.code === product.model) as TModel
+          const t = prodTypes.find((pt) => pt.code === m.type) as TProdType
 
-        return {
-          ...{
-            ...product,
-            type: t.name,
-            model: m.name,
-            color: c.name,
-            price: m.price,
-          },
-          ...pd,
-        }
-      } else return null
-    })
+          return {
+            ...{
+              ...product,
+              type: t.name,
+              model: m.name,
+              color: c.name,
+              price: m.price,
+            },
+            ...pd,
+          }
+        } else return null
+      })
+      .filter((i) => i)
+
+    console.log(pds)
 
     const obj: TOrder = {
       ...order,

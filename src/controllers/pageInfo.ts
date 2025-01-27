@@ -10,6 +10,7 @@ import { TProdType } from "../utils/types/data/prodType"
 import { TColor } from "../utils/types/data/color"
 import { TEmmitter } from "../utils/types/data/emmiter"
 import { TModel } from "../utils/types/data/model"
+import { getCustomError } from "../utils/helpers/getCustomError"
 
 export const getOrderFormData = async (req: Request, res: Response) => {
   try {
@@ -60,6 +61,30 @@ export const getOrderFormData = async (req: Request, res: Response) => {
 
     res.json({ success: true, data: data })
   } catch (error) {
-    res.status(204).json({ success: false, error: true })
+    res.status(204).json(getCustomError(error))
+  }
+}
+
+export const getModelFormData = async (req: Request, res: Response) => {
+  try {
+    const colProducts = parseFbDocs(
+      await fb.getDocs(fb.query(collections.products))
+    ) as TProduct[]
+    const colColors = parseFbDocs(
+      await fb.getDocs(fb.query(collections.colors))
+    ) as TColor[]
+    const colProdTypes = parseFbDocs(
+      await fb.getDocs(fb.query(collections.productTypes))
+    ) as TProdType[]
+
+    const result = {
+      colors: colColors,
+      prodTypes: colProdTypes,
+      products: colProducts,
+    }
+
+    res.json({ success: true, data: result })
+  } catch (error) {
+    res.status(204).json(getCustomError(error))
   }
 }

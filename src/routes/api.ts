@@ -12,6 +12,10 @@ import * as PageInfoController from "../controllers/pageInfo"
 
 const routes = Router()
 
+// # Form Bare
+routes.get("/formBare/model", PageInfoController.getModelFormData)
+routes.get("/formBare/order", PageInfoController.getOrderFormData)
+
 // # Product Types
 routes.get("/productTypes", ProductTypesController.getProductTypes)
 routes.post("/productTypes", ProductTypesController.addProductType)
@@ -23,6 +27,7 @@ routes.post("/colors", ColorsController.addColor)
 // # Models
 routes.post("/models", ModelsController.addModel)
 routes.get("/models", ModelsController.getModels)
+routes.get("/models/listPage", ModelsController.getModelsListPage)
 routes.delete("/models/:id", ModelsController.deleteModel)
 routes.put("/models/:id", ModelsController.updateModel)
 routes.get("/models/:id", ModelsController.getModel)

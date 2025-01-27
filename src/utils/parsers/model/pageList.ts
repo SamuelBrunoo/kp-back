@@ -1,8 +1,8 @@
-import { TColor } from "../types/data/color"
-import { TFBModel, TModel } from "../types/data/model"
-import { TOrder } from "../types/data/order"
-import { TProdType } from "../types/data/prodType"
-import { TProduct } from "../types/data/product"
+import { TColor } from "../../types/data/color"
+import { TFBModel, TModel, TPageListModel } from "../../types/data/model"
+import { TOrder } from "../../types/data/order"
+import { TProdType } from "../../types/data/prodType"
+import { TProduct } from "../../types/data/product"
 
 type Props = {
   models: TFBModel[]
@@ -12,13 +12,13 @@ type Props = {
   orders: TOrder[]
 }
 
-const parseModels = ({
+export const parseModelsPageList = ({
   models,
   colors,
   prodTypes,
   products,
   orders,
-}: Props) => {
+}: Props): TPageListModel[] => {
   let list: any[] = []
   try {
     models.forEach((i) => {
@@ -30,9 +30,7 @@ const parseModels = ({
       })
       const t = prodTypes.find((pt) => pt.code === i.type) as TProdType
 
-      // Storage
-      let hasStorage = false
-      let storageQnt = 0
+      // Deletable
 
       const ordersWithModel = orders.filter((o) =>
         o.products.some((p) => p.model === i.code)
@@ -46,13 +44,28 @@ const parseModels = ({
         }
       })
 
+      // Storage
+      let hasStorage = false
+      let storageQnt = 0
+
+      modelsProducts.forEach((p) => {
+        if (p.storage.has) {
+          if (!hasStorage) hasStorage = true
+          storageQnt += p.storage.quantity
+        }
+      })
+
       const storage = { has: hasStorage, quantity: storageQnt }
 
-      const obj: TModel = {
-        ...i,
-        colors: cls,
+      const obj: TPageListModel = {
+        active: i.active,
+        code: i.code,
+        id: i.id,
+        colors: cls.length,
         type: t.name,
         storage,
+        name: i.name,
+        price: !Number.isNaN(i.price) ? +i.price : 0,
         deletable: !(ordersWithModel.length > 0 || modelsProducts.length > 0),
       }
 
@@ -62,5 +75,3 @@ const parseModels = ({
 
   return list
 }
-
-export default parseModels

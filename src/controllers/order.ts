@@ -29,6 +29,9 @@ import { v4 as uuid } from "uuid"
 
 export const getOrders = async (req: Request, res: Response) => {
   try {
+
+    console.log("Listing orders")
+    
     let colOrders: TFBOrder[] = []
     let colClients: TClient[] = []
     let colEmmitters: TEmmitter[] = []
@@ -80,6 +83,7 @@ export const getOrders = async (req: Request, res: Response) => {
 
     res.json({ success: true, data: { list } })
   } catch (error) {
+    console.log(error)
     res.status(204).json({ success: false, error: true })
   }
 }

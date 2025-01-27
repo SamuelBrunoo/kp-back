@@ -3,8 +3,24 @@ export type TFBModel = {
   code: string
   colors: string[]
   name: string
+  active: boolean
   price: number
   type: string
+}
+
+export type TPageListModel = {
+  id: string
+  code: string
+  colors: number
+  name: string
+  price: number
+  type: string
+  storage: {
+    has: boolean
+    quantity: number
+  }
+  deletable: boolean
+  active: boolean
 }
 
 export type TModel = {
@@ -14,6 +30,8 @@ export type TModel = {
   name: string
   price: number
   type: string
+  active: boolean
+  deletable: boolean
   storage: {
     has: boolean
     quantity: number
@@ -25,4 +43,9 @@ export type TNewModel = {
   type: string
   name: string
   price: number
+  colors: string[]
+  storage: {
+    has: boolean
+    quantity: number
+  }
 }

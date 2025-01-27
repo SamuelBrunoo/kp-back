@@ -1,12 +1,10 @@
 export const getCustomError = (error: any) => {
-  console.log(error)
-  
   try {
-    const errorObj = JSON.parse((error as any).message)
+    const msg = error.message
 
     return {
       success: false,
-      error: errorObj.message,
+      error: msg,
     }
   } catch (error) {
     return {

@@ -28,7 +28,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res) => {
 server.use(errorHandler)
 
 server.listen(process.env.PORT, () => {
-  console.log("Running server")
+  console.log("Running server at port ", process.env.PORT)
 })
 
 export default server
