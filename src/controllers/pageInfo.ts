@@ -9,8 +9,10 @@ import { TProduct } from "../utils/types/data/product"
 import { TProdType } from "../utils/types/data/prodType"
 import { TColor } from "../utils/types/data/color"
 import { TEmmitter } from "../utils/types/data/emmiter"
-import { TModel } from "../utils/types/data/model"
+import { TFBModel, TModel, TModelDetails } from "../utils/types/data/model"
 import { getCustomError } from "../utils/helpers/getCustomError"
+import { TOrder } from "../utils/types/data/order"
+import parseModel from "../utils/parsers/parseModel"
 
 export const getOrderFormData = async (req: Request, res: Response) => {
   try {
@@ -67,6 +69,8 @@ export const getOrderFormData = async (req: Request, res: Response) => {
 
 export const getModelFormData = async (req: Request, res: Response) => {
   try {
+    const { modelId } = req.query
+
     const colProducts = parseFbDocs(
       await fb.getDocs(fb.query(collections.products))
     ) as TProduct[]
@@ -77,14 +81,42 @@ export const getModelFormData = async (req: Request, res: Response) => {
       await fb.getDocs(fb.query(collections.productTypes))
     ) as TProdType[]
 
-    const result = {
+    let resultInfo: {
+      colors: TColor[]
+      prodTypes: TProdType[]
+      products: TProduct[]
+      model?: TModelDetails
+    } = {
       colors: colColors,
       prodTypes: colProdTypes,
       products: colProducts,
     }
 
-    res.json({ success: true, data: result })
+    if (modelId) {
+      const colModels = parseFbDocs(
+        await fb.getDocs(fb.query(collections.models))
+      ) as TFBModel[]
+      const colOrders = parseFbDocs(
+        await fb.getDocs(fb.query(collections.orders))
+      ) as TOrder[]
+
+      const model = colModels.find((m) => m.id === modelId)
+
+      const modelInfo = parseModel({
+        model: model,
+        colors: colColors,
+        prodTypes: colProdTypes,
+        products: colProducts,
+        orders: colOrders,
+      })
+
+      resultInfo.model = modelInfo
+    }
+
+    const result = resultInfo
+
+    res.status(200).json({ success: true, data: result })
   } catch (error) {
-    res.status(204).json(getCustomError(error))
+    res.status(400).json(getCustomError(error))
   }
 }

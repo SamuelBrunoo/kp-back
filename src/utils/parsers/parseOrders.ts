@@ -65,8 +65,6 @@ const parseOrders = (props: Props) => {
       })
       .filter((i) => i)
 
-    console.log(pds)
-
     const obj: TOrder = {
       ...order,
       client: client as TClient,

@@ -1,5 +1,5 @@
 import { TColor } from "../types/data/color"
-import { TFBModel, TModel } from "../types/data/model"
+import { TFBModel, TModel, TModelDetails } from "../types/data/model"
 import { TOrder } from "../types/data/order"
 import { TProdType } from "../types/data/prodType"
 import { TProduct } from "../types/data/product"
@@ -12,8 +12,14 @@ type Props = {
   orders: TOrder[]
 }
 
-const parseModel = ({ model, colors, prodTypes, products, orders }: Props) => {
-  let data: { model: TModel; variations: any[] }
+const parseModel = ({
+  model,
+  colors,
+  prodTypes,
+  products,
+  orders,
+}: Props): TModelDetails => {
+  let data: TModelDetails
 
   let cls: string[] = []
 
@@ -40,12 +46,14 @@ const parseModel = ({ model, colors, prodTypes, products, orders }: Props) => {
   let hasStorage = false
   let storageQnt = 0
 
-  const variations = modelsProducts.map((p) => {
-    return {
+  const variations: TModelDetails["variations"] = modelsProducts.map((p) => {
+    const variation: TModelDetails["variations"][number] = {
       ...p,
       color: (colors.find((col) => col.code === p.color) as TColor).name,
       price: model.price,
     }
+
+    return variation
   })
 
   const storage = { has: hasStorage, quantity: storageQnt }

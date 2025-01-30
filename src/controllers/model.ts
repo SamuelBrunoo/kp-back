@@ -10,7 +10,7 @@ import { TColor } from "../utils/types/data/color"
 import { TProdType } from "../utils/types/data/prodType"
 import parseModels from "../utils/parsers/parseModels"
 import parseModel from "../utils/parsers/parseModel"
-import { getCustomError, jsonError } from "../utils/helpers/getCustomError"
+import { getCustomError } from "../utils/helpers/getCustomError"
 import { parseModelsPageList } from "../utils/parsers/model/pageList"
 import { TOrder } from "../utils/types/data/order"
 
@@ -128,9 +128,7 @@ export const getModel = async (req: Request, res: Response) => {
         success: true,
         data: { model: info.model, variations: info.variations },
       })
-    } else {
-      throw new Error("Modelo não encontrado.")
-    }
+    } else throw new Error("Modelo não encontrado.")
   } catch (error) {
     res.status(400).json(getCustomError(error))
   }
@@ -195,7 +193,6 @@ export const updateModel = async (req: Request, res: Response) => {
       }
     } else throw new Error("Este modelo não existe mais.")
   } catch (error) {
-    console.log(error)
     res.status(400).json(getCustomError(error))
   }
 }

@@ -1,3 +1,5 @@
+import { TProduct } from "./product"
+
 export type TFBModel = {
   id: string
   code: string
@@ -36,6 +38,14 @@ export type TModel = {
     has: boolean
     quantity: number
   }
+}
+
+export type TModelDetails = {
+  model: TModel
+  variations: (TProduct & {
+    color: string
+    price: number
+  })[]
 }
 
 export type TNewModel = {
