@@ -11,7 +11,7 @@ import { TProdType } from "../utils/types/data/prodType"
 import parseModels from "../utils/parsers/parseModels"
 import parseModel from "../utils/parsers/parseModel"
 import { getCustomError } from "../utils/helpers/getCustomError"
-import { parseModelsPageList } from "../utils/parsers/model/pageList"
+import { parseModelsPageList } from "../utils/parsers/listsPages/models"
 import { TOrder } from "../utils/types/data/order"
 
 const firestore = fb.getFirestore(app)
@@ -140,7 +140,7 @@ export const addModel = async (req: Request, res: Response) => {
 
     const validation = modelValidator(data)
 
-    if (validation.status) {
+    if (validation.ok) {
       // 1. check if already exists a model with its code
       const query = fb.query(
         collections.models,
@@ -179,7 +179,7 @@ export const updateModel = async (req: Request, res: Response) => {
     if (docsSnap.exists()) {
       const validation = modelValidator(data)
 
-      if (validation.status) {
+      if (validation.ok) {
         await fb.updateDoc(ref, data)
         const docData = data
 

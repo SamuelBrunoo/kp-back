@@ -1,18 +1,14 @@
 import { TNewModel } from "../types/data/model"
+import { TErrorsCheck } from "../types/system/ErrorsCheck"
 
-export const modelValidator = (
-  data: TNewModel
-): {
-  status: boolean
-  fields: string[]
-} => {
-  let res = {
-    status: true,
+export const modelValidator = (data: TNewModel): TErrorsCheck => {
+  let res: TErrorsCheck = {
+    ok: true,
     fields: [],
   }
 
   if (!data.code || typeof data.code !== "string") {
-    res.status = false
+    res.ok = false
     res.fields.push("código")
   }
   if (
@@ -20,19 +16,19 @@ export const modelValidator = (
     typeof data.type !== "string" ||
     !["pendant", "tableNecklace"].includes(data.type)
   ) {
-    res.status = false
+    res.ok = false
     res.fields.push("tipo")
   }
   if (!data.name || typeof data.name !== "string") {
-    res.status = false
+    res.ok = false
     res.fields.push("nome")
   }
   if (!data.colors || !Array.isArray(data.colors)) {
-    res.status = false
+    res.ok = false
     res.fields.push("cores")
   }
   if (!data.storage) {
-    res.status = false
+    res.ok = false
     res.fields.push("estoque")
   }
   if (
@@ -40,7 +36,7 @@ export const modelValidator = (
     Number.isNaN(data.price) ||
     (!Number.isNaN(data.price) && data.price < 1)
   ) {
-    res.status = false
+    res.ok = false
     res.fields.push("preço")
   }
 

@@ -10,21 +10,6 @@ export type TFBModel = {
   type: string
 }
 
-export type TPageListModel = {
-  id: string
-  code: string
-  colors: number
-  name: string
-  price: number
-  type: string
-  storage: {
-    has: boolean
-    quantity: number
-  }
-  deletable: boolean
-  active: boolean
-}
-
 export type TModel = {
   id: string
   code: string
@@ -58,4 +43,21 @@ export type TNewModel = {
     has: boolean
     quantity: number
   }
+}
+
+/* *** ListPage *** */
+
+export type TPageListModel = {
+  id: string
+  code: string
+  colors: number
+  name: string
+  price: number
+  type: string
+  storage: {
+    has: boolean
+    quantity: number
+  }
+  deletable: boolean
+  active: boolean
 }

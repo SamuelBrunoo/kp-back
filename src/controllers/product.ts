@@ -2,16 +2,21 @@ import { Request, Response } from "express"
 
 import * as fb from "firebase/firestore"
 import { collections } from "../services/firebase"
-import { TProduct } from "../utils/types/data/product"
-import { productValidator } from "../utils/validators/product"
+import { TFBProduct, TNewProduct, TProduct } from "../utils/types/data/product"
+import {
+  newProductValidator,
+  productValidator,
+} from "../utils/validators/product"
 import parseProducts from "../utils/parsers/parseProducts"
 import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { TColor } from "../utils/types/data/color"
-import { TModel } from "../utils/types/data/model"
+import { TFBModel, TModel } from "../utils/types/data/model"
 import { TProdType } from "../utils/types/data/prodType"
-import { getCustomError, jsonError } from "../utils/helpers/getCustomError"
+import { getCustomError } from "../utils/helpers/getCustomError"
+import { TOrder } from "../utils/types/data/order"
+import { parseProductsPageList } from "../utils/parsers/listsPages/products"
 
-export const getProducts = async (req: Request, res: Response) => {
+export const getProductslistPage = async (req: Request, res: Response) => {
   try {
     const colProducts = parseFbDocs(
       await fb.getDocs(fb.query(collections.products))
@@ -21,21 +26,45 @@ export const getProducts = async (req: Request, res: Response) => {
     ) as TColor[]
     const colModels = parseFbDocs(
       await fb.getDocs(fb.query(collections.models))
-    ) as TModel[]
+    ) as TFBModel[]
     const colProdTypes = parseFbDocs(
       await fb.getDocs(fb.query(collections.productTypes))
     ) as TProdType[]
+    const colOrders = parseFbDocs(
+      await fb.getDocs(fb.query(collections.orders))
+    ) as TOrder[]
 
-    const list = parseProducts({
+    const list = parseProductsPageList({
       colors: colColors,
       models: colModels,
       prodTypes: colProdTypes,
       products: colProducts,
+      orders: colOrders,
     })
 
-    res.json({ success: true, data: { list } })
+    res.status(200).json({ success: true, data: { list } })
   } catch (error) {
-    res.status(204).json({ success: false, error: true })
+    res.status(400).json(getCustomError(error))
+  }
+}
+
+export const getProducts = async (req: Request, res: Response) => {
+  try {
+    const colProducts = parseFbDocs(
+      await fb.getDocs(fb.query(collections.products))
+    ) as TProduct[]
+    const colModels = parseFbDocs(
+      await fb.getDocs(fb.query(collections.models))
+    ) as TModel[]
+
+    const list = parseProducts({
+      products: colProducts,
+      models: colModels,
+    })
+
+    res.status(200).json({ success: true, data: { list } })
+  } catch (error) {
+    res.status(400).json(getCustomError(error))
   }
 }
 
@@ -46,13 +75,11 @@ export const getProduct = async (req: Request, res: Response) => {
     const product = await fb.getDoc(ref)
 
     if (product.exists()) {
-      res.json({
+      res.status(200).json({
         success: true,
         data: { product: { ...product.data(), id: product.id } },
       })
-    } else {
-      throw new Error(jsonError("Este produto não existe"))
-    }
+    } else throw new Error("Este produto não existe")
   } catch (error) {
     res.status(400).json(getCustomError(error))
   }
@@ -60,24 +87,36 @@ export const getProduct = async (req: Request, res: Response) => {
 
 export const addProduct = async (req: Request, res: Response) => {
   try {
-    const data = req.body
+    const data = req.body as TNewProduct
 
-    if (productValidator(data)) {
-      const sameCodeSnap = await fb.getDocs(
-        // @ts-ignore
-        fb.query(collections.products, fb.where("code", "==", data.code))
-      )
+    const validation = newProductValidator(data)
 
-      if (sameCodeSnap.docs.length === 0) {
-        const doc = await fb.addDoc(collections.products, data)
-        const docData = { ...data, id: doc.id }
+    if (validation.ok) {
+      const modelRef = fb.doc(collections.models, data.model)
 
-        res.status(200).json({ success: true, data: docData })
-      } else {
-        throw new Error(jsonError("Este produto já existe"))
-      }
+      const modelSnap = await fb.getDoc(modelRef)
+
+      if (modelSnap.exists()) {
+        const modelData = modelSnap.data() as TFBModel
+
+        const isColorAvailable = modelData.colors.includes(data.color)
+
+        if (isColorAvailable) {
+          const sameCodeSnap = await fb.getDocs(
+            fb.query(collections.products, fb.where("code", "==", data.code))
+          )
+
+          if (sameCodeSnap.docs.length === 0) {
+            const doc = await fb.addDoc(collections.products, data)
+            const docData = { ...data, id: doc.id }
+
+            res.status(201).json({ success: true, data: docData })
+          } else throw new Error("Este produto já existe")
+        } else throw new Error("Este modelo não permite essa cor.")
+      } else throw new Error("Este modelo não existe mais ou não está ativo")
     } else {
-      throw new Error(jsonError("Verifique os campos e tente novamente."))
+      const fieldsStr = validation.fields.join(", ")
+      throw new Error(`Verifique os campos (${fieldsStr}) e tente novamente.`)
     }
   } catch (error) {
     res.status(400).json(getCustomError(error))
@@ -86,16 +125,70 @@ export const addProduct = async (req: Request, res: Response) => {
 
 export const updateProduct = async (req: Request, res: Response) => {
   try {
-    const data = req.body
+    const incomingData = req.body as TProduct
+    const { id } = req.params
 
-    if (productValidator(data)) {
+    const data = { ...incomingData, id }
+
+    const validation = productValidator(data)
+
+    if (validation.ok) {
       const ref = fb.doc(collections.products, data.id)
-      await fb.updateDoc(ref, data)
-      const docData = data
 
-      res.status(200).json({ success: true, data: docData })
+      const prodSnap = await fb.getDoc(ref)
+
+      // Check if product exists
+      if (prodSnap.exists()) {
+        const fbProductData = prodSnap.data() as TFBProduct
+
+        const modelRef = fb.doc(collections.models, data.model)
+        const modelSnap = await fb.getDoc(modelRef)
+        const modelData = modelSnap.data()
+
+        // Check if new model exists, in change case
+        if (!modelSnap.exists()) {
+          throw new Error("Este modelo não existe mais.")
+        }
+
+        // Check if new color is available in this new model, in change case
+
+        const isColorAvailable = modelData.colors.includes(data.color)
+
+        if (isColorAvailable) {
+          const hasChangedConfig =
+            data.model !== fbProductData.model ||
+            data.color !== fbProductData.color ||
+            data.code !== fbProductData.code
+
+          if (hasChangedConfig) {
+            const query = fb.query(
+              collections.products,
+              fb.where("code", "==", data.code)
+            )
+
+            const sameCodeSnap = await fb.getDocs(query)
+
+            if (
+              sameCodeSnap.docs.filter((doc) => doc.id !== data.id).length > 0
+            ) {
+              const message =
+                "Já existe outro produto com essa configuração (tipo, modelo e cor)."
+              throw new Error(message)
+            }
+          }
+
+          // Update
+
+          await fb.updateDoc(ref, data)
+          const docData = data
+
+          res.status(200).json({ success: true, data: docData })
+        } else throw new Error("Este modelo não permite essa cor.")
+      } else throw new Error("Este produto não existe.")
     } else {
-      throw new Error(jsonError("Verifique os campos e tente novamente."))
+      const fieldsStr = validation.fields.join(", ")
+      const message = `Verifique os campos (${fieldsStr}) e tente novamente.`
+      throw new Error(message)
     }
   } catch (error) {
     res.status(400).json(getCustomError(error))
@@ -139,7 +232,9 @@ export const toggleProductStatus = async (req: Request, res: Response) => {
   try {
     const data = req.body
 
-    if (productValidator(data)) {
+    const validation = productValidator(data)
+
+    if (validation.ok) {
       const ref = fb.doc(collections.products, data.id)
       await fb.updateDoc(ref, { active: !data.active })
       const docData = data

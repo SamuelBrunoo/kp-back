@@ -3,7 +3,10 @@ import { Request, Response } from "express"
 import * as fb from "firebase/firestore"
 import app from "../services/firebase"
 import { TNewProduct } from "../utils/types/data/product"
-import { productValidator } from "../utils/validators/product"
+import {
+  newProductValidator,
+  productValidator,
+} from "../utils/validators/product"
 
 const firestore = fb.getFirestore(app)
 
@@ -28,7 +31,7 @@ export const addProductType = async (req: Request, res: Response) => {
   try {
     const data: TNewProduct = req.body
 
-    if (productValidator(data)) {
+    if (newProductValidator(data)) {
       const doc = await fb.addDoc(collections.productTypes, data)
       const docData = { ...data, id: doc.id }
 

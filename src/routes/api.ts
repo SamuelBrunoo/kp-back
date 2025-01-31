@@ -35,6 +35,7 @@ routes.get("/models/:id", ModelsController.getModel)
 // # Products
 routes.post("/products", ProductsController.addProduct)
 routes.get("/products", ProductsController.getProducts)
+routes.get("/products/listPage", ProductsController.getProductslistPage)
 routes.delete("/products/:id", ProductsController.deleteProduct)
 routes.put("/products/:id", ProductsController.updateProduct)
 routes.get("/products/:id", ProductsController.getProduct)
