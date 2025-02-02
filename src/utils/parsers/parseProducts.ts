@@ -10,7 +10,7 @@ const parseProducts = ({ products, models }: Props) => {
   let list: TProduct[] = []
 
   products.forEach((product) => {
-    const m = models.find((mod) => mod.code === product.model) as TModel
+    const m = models.find((model) => model.id === product.model) as TModel
 
     const obj: TProduct = {
       ...product,
