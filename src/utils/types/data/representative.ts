@@ -1,3 +1,4 @@
+import { TAddress } from "./address"
 import { TClient } from "./client"
 
 export type TRepresentative = {
@@ -5,15 +6,7 @@ export type TRepresentative = {
   name: string
   cpf?: string
   cnpj?: string
-  address: {
-    full: string
-    street: string
-    number: string
-    neighborhood: string
-    city: string
-    state: string
-    cep: string
-  }
+  address: TAddress
   email: string
   phone: string
   clients: TClient[]
@@ -24,15 +17,7 @@ export type TNewRepresentative = {
   name: string
   cpf?: string
   cnpj?: string
-  address: {
-    full: string
-    street: string
-    number: string
-    neighborhood: string
-    city: string
-    state: string
-    cep: string
-  }
+  address: TAddress
   email: string
   phone: string
 }

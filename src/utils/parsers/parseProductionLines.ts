@@ -120,7 +120,7 @@ const parseProductionLines = (props: Props) => {
       order: {
         client: {
           id: client.id,
-          name: client.name,
+          name: client.clientName,
           socialRole: client.socialRole,
         },
         code: order.code,

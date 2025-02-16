@@ -43,6 +43,7 @@ routes.get("/products/:id", ProductsController.getProduct)
 // # Clients
 routes.post("/clients", ClientsController.addClient)
 routes.get("/clients", ClientsController.getClients)
+routes.get("/clients/listPage", ClientsController.getClientsListPage)
 routes.delete("/clients/:id", ClientsController.deleteClient)
 routes.put("/clients/:id", ClientsController.updateClient)
 routes.get("/clients/:id", ClientsController.getClient)

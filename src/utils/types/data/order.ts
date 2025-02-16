@@ -26,6 +26,10 @@ export type TFBOrder = {
   emmitter: string
 }
 
+export type TBasicOrder = TFBOrder & {
+  id: string
+}
+
 export type TNewOrder = {
   client: string
   orderDate: number

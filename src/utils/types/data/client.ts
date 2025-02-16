@@ -1,43 +1,42 @@
-export type TClient = {
-  id: string
-  type: string
-  name: string
+import { TAddress } from "./address"
+
+export type TClientType = "juridical" | "physical"
+
+export type TFBClient = {
+  type: TClientType
+  clientName: string
+  personName: string
   socialRole: string
-  cpf?: string
-  cnpj?: string
-  stateRegister: string
-  address: {
-    full: string
-    street: string
-    number: string
-    neighborhood: string
-    city: string
-    state: string
-    cep: string
+  phone1: string
+  phone2: string
+  documents: {
+    register: string
+    stateInscription: string
+    cityInscription: string
   }
+  address: TAddress
   email: string
-  phone: string
-  orders: string[]
-  representative: string
+  representative: string | null
 }
 
-export type TNewClient = {
+export type TNewClient = TFBClient
+
+export type TBaseClient = TFBClient & {
+  id: string
+}
+
+export type TClient = TBaseClient & {
+  orders: string[]
+}
+
+/* *** ListPage *** */
+
+export type TPageListClient = {
+  id: string
   name: string
-  type: string
-  socialRole: string
-  cpf?: string
-  cnpj?: string
-  stateRegister: string
-  address: {
-    full: string
-    street: string
-    number: string
-    neighborhood: string
-    city: string
-    state: string
-    cep: string
-  }
-  email: string
-  phone: string
-  representative: string
+  address: string
+  document: string
+  stateIncription: string
+  orders: number
+  deletable: boolean
 }

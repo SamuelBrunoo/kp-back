@@ -26,6 +26,10 @@ export const collections = {
   productTypes: fb.collection(firestore, "productTypes"),
   representatives: fb.collection(firestore, "representatives"),
   workers: fb.collection(firestore, "workers"),
+  
+  // Locations
+  cities: fb.collection(firestore, "cities"),
+  states: fb.collection(firestore, "states"),
 }
 
 export default app
