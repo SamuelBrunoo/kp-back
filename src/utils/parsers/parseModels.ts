@@ -35,6 +35,7 @@ const parseModels = ({
       let storageQnt = 0
 
       const ordersWithModel = orders.filter((o) =>
+        // @ts-ignore
         o.products.some((p) => p.model === i.code)
       )
       const modelsProducts = products.filter((p) => p.model === i.code)

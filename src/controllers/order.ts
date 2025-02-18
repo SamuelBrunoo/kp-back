@@ -5,7 +5,7 @@ import { collections } from "../services/firebase"
 
 import { TClient } from "../utils/types/data/client"
 import { TRepresentative } from "../utils/types/data/representative"
-import { TFBOrder, TNewOrder } from "../utils/types/data/order"
+import { TBasicOrder, TFBOrder, TNewOrder } from "../utils/types/data/order"
 import { TModel } from "../utils/types/data/model"
 import { TProduct } from "../utils/types/data/product"
 import { TProdType } from "../utils/types/data/prodType"
@@ -13,7 +13,7 @@ import { TColor } from "../utils/types/data/color"
 import { TEmmitter } from "../utils/types/data/emmiter"
 
 import { parseFbDocs } from "../utils/parsers/fbDoc"
-import { orderValidator } from "../utils/validators/order"
+import { newOrderValidator, orderValidator } from "../utils/validators/order"
 import parseOrders from "../utils/parsers/parseOrders"
 import parseOrder from "../utils/parsers/parseOrder"
 import { treatData } from "../utils/parsers/treatData"
@@ -135,23 +135,25 @@ export const getOrder = async (req: Request, res: Response) => {
 
 export const addOrder = async (req: Request, res: Response) => {
   try {
-    let colProducts: TProduct[] = []
-    let colProductionLines: TProductionLine[] = []
+    const data = req.body as TNewOrder
 
-    const pms = [
-      fb.getDocs(fb.query(collections.products)).then((res) => {
-        colProducts = parseFbDocs(res as any) as TProduct[]
-      }),
-      fb.getDocs(fb.query(collections.productionLines)).then((res) => {
-        colProductionLines = parseFbDocs(res as any) as TProductionLine[]
-      }),
-    ]
+    const validation = newOrderValidator(data)
 
-    await Promise.all(pms)
+    if (validation.ok) {
+      let colProducts: TProduct[] = []
+      let colProductionLines: TProductionLine[] = []
 
-    const data = req.body
+      const pms = [
+        fb.getDocs(fb.query(collections.products)).then((res) => {
+          colProducts = parseFbDocs(res as any) as TProduct[]
+        }),
+        fb.getDocs(fb.query(collections.productionLines)).then((res) => {
+          colProductionLines = parseFbDocs(res as any) as TProductionLine[]
+        }),
+      ]
 
-    if (orderValidator(data)) {
+      await Promise.all(pms)
+
       const lo = await fb.getDocs(
         fb.query(collections.orders, fb.orderBy("code", "desc"), fb.limit(1))
       )
@@ -160,7 +162,10 @@ export const addOrder = async (req: Request, res: Response) => {
         lo.docs.length > 0 ? (lo.docs[0].data() as TFBOrder) : null
 
       const newCode = lastOrder ? Number(lastOrder.code) + 1 : 1
-      const treated = treatData("newOrder", data, { newCode })
+      const productsToTreat = colProducts.filter((prod) =>
+        data.products.map((p) => p.id).includes(prod.id)
+      )
+      const treated = treatData("newOrder", data, { newCode, productsToTreat })
 
       const info: TNewOrder = data
       const clientRef = fb.doc(collections.clients, info.client)
@@ -169,7 +174,10 @@ export const addOrder = async (req: Request, res: Response) => {
 
       // Register Order
       const doc = await fb.addDoc(collections.orders, treated)
-      const docData = { ...treated, id: doc.id } as TFBOrder
+      const docData = { ...treated, id: doc.id } as TBasicOrder
+
+      // Add to client history
+      await fb.updateDoc(clientRef, { orders: [...client.orders, docData.id] })
 
       // TODO: production line creator helper
 
@@ -239,10 +247,8 @@ export const addOrder = async (req: Request, res: Response) => {
 
       res.status(200).json({ success: true, data: docData })
     } else {
-      res.status(400).json({
-        success: false,
-        error: "Verifique os campos e tente novamente",
-      })
+      const fieldsStr = validation.fields.join(", ")
+      throw new Error(`Verifique os campos (${fieldsStr}) e tente novamente.`)
     }
   } catch (error) {
     res

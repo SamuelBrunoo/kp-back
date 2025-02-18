@@ -5,13 +5,25 @@ export type TPaymentConfig = {
 export type TRepresentativePaymentConfig = {
   commissionType: TCommissionType
   value: number
-  paymentMethod: TPpaymentMethod
+  paymentMethod: TPaymentMethod
   period: TComissionPeriod
   dateLimit: number
   dateLimit2: number | null
 }
 
-export type TPpaymentMethod = "pix" | "ted" | "check" | "ticket"
+export type TOrderPaymentConfig = {
+  method: TPaymentMethod
+  hasInstallments: boolean
+  installments: number
+  dueDate: number
+  paymentCode: string | null
+  paymentNumber: string | null
+  status: string
+}
+
+export type TPaymentStatus = "payed" | "awaiting"
+
+export type TPaymentMethod = "pix" | "ted" | "check" | "slip"
 
 export type TCommissionType = "percentage" | "fixed"
 

@@ -27,7 +27,7 @@ export const getRepMonthOrdersResume = (
       orderDate.getFullYear() === today.year
     ) {
       res.sales += 1
-      res.total += order.value
+      res.total += order.totals.commission
     }
   })
 
@@ -54,7 +54,7 @@ export const getRepYearOrdersResume = (
 
     if (orderDate.getFullYear() === todayYear) {
       res.sales += 1
-      res.total += order.value
+      res.total += order.totals.commission
     }
   })
 

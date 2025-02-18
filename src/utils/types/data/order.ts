@@ -1,97 +1,69 @@
-import { TClient } from "./client"
-import { TProduct } from "./product"
+import { TBaseClient, TClient } from "./client"
+import { TOrderPaymentConfig, TPaymentMethod } from "./payment"
 
-export type TFBOrder = {
+export type TNewOrder = {
   client: string
-  code: string
-  representative?: string
   orderDate: number
-  value: number
-  status: TOPStatus
-  products: {
-    id: string
-    quantity: number
-    status: TOPStatus
-  }[]
-  productsIds: string[]
   deadline: number
-  payment: {
-    type: TPayment
-    paymentCode: string
-    paymentNumber: string
-    status: string
-    installments?: number
-  }
-  shippingType: TShipping
   emmitter: string
+  representative: string | null
+  products: TNewOrderProduct[]
+  totals: {
+    value: number
+    commission: number
+    liquid: number
+  }
+  payment: TOrderPaymentConfig
+  shipping: TShipping
+}
+
+export type TFBOrder = TNewOrder & {
+  code: string
+  status: TOPStatus
+  products: TOrderProduct[]
 }
 
 export type TBasicOrder = TFBOrder & {
   id: string
 }
 
-export type TNewOrder = {
-  client: string
-  orderDate: number
-  value: number
-  status: TOPStatus
-  products: TNewOrderProduct[]
-  productsIds: string[]
-  total: {
-    products: number
-    value: number
-  }
-  deadline: number
-  representative: string
-  payment: {
-    installments?: string
-    type: TPayment
-    paymentCode: string
-    paymentNumber: string
-    status: string
-  }
-  shippingType: TShipping
-  emmitter: string
-}
-
 export type TOrder = {
   id: string
-  code: string
-  client: TClient
   orderDate: number
-  value: number
-  status: TOPStatus
-  products: TOrderProduct[]
-  productsIds: string[]
-  total: {
-    products: number
-    value: number
-  }
   deadline: number
-  representative?: string
-  payment: {
-    installments?: number
-    type: TPayment
-    paymentCode: string
-    paymentNumber: string
-    status: string
-  }
-  shippingType: TShipping
   emmitter: string
-}
-
-type TNewOrderProduct = TProduct & {
-  quantity: number
-}
-
-type TOrderProduct = TProduct & {
-  quantity: number
+  representative: string | null
+  totals: {
+    value: number
+    commission: number
+    liquid: number
+  }
+  payment: TOrderPaymentConfig
+  shipping: TShipping
+  client: TBaseClient
+  products: TOrderProduct[]
+  code: string
   status: TOPStatus
 }
 
-export type TPayment = "pix" | "cash" | "slip"
+type TNewOrderProduct = {
+  id: string
+  quantity: number
+}
 
-export type TShipping = "transporter" | "representative" | "mail"
+type TOrderProduct = TNewOrderProduct & {
+  model: string
+  status: TOPStatus
+}
+
+export type TShipping = {
+  type: TShippingType
+  method: null | TShippingMethod
+}
+
+export type TShippingType = "transporter" | "representative" | "mail"
+
+export type TShippingMethod = "PAC" | "SEDEX"
 
 export type TOPStatus = "queued" | "lor" | "doing" | "done"
 

@@ -20,6 +20,7 @@ type Props = {
 const parseOrder = (props: Props) => {
   const { order, prodTypes, colors, models, products } = props
 
+  // @ts-ignore
   const pds: TOrder["products"] = order.products.map((pd) => {
     const product = products.find((p) => p.id === pd.id) as TProduct
 
@@ -43,18 +44,15 @@ const parseOrder = (props: Props) => {
     ...order,
     products: pds,
     representative: order.representative ?? "Não definido",
-    total: {
-      products: pds.reduce((prev, pd) => prev + pd.quantity, 0),
-      value: pds.reduce((prev, pd) => prev + pd.quantity * pd.price, 0),
-    },
     payment: {
       ...order.payment,
+      // @ts-ignore
       installments:
         order.payment.installments !== undefined
           ? String(order.payment.installments)
           : undefined,
       paymentNumber:
-        order.payment.type === "slip"
+        order.payment.method === "slip"
           ? formatSlip(order.payment.paymentNumber)
           : order.payment.paymentNumber,
     },

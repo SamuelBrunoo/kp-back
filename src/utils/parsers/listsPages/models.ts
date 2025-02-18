@@ -33,6 +33,7 @@ export const parseModelsPageList = ({
       // Deletable
 
       const ordersWithModel = orders.filter((o) =>
+        // @ts-ignore
         o.products.some((p) => p.model === i.code)
       )
       const modelsProducts = products.filter((p) => p.model === i.code)

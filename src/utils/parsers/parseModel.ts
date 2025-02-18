@@ -31,6 +31,7 @@ const parseModel = ({
   // Deletable
 
   const ordersWithModel = orders.filter((o) =>
+    // @ts-ignore
     o.products.some((p) => p.model === model.code)
   )
   const modelsProducts = products.filter((p) => p.model === model.code)
