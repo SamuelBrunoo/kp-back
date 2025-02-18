@@ -116,15 +116,5 @@ export const newClientValidator = (data: TNewClient): TErrorsCheck => {
 }
 
 export const clientValidator = (data: TClient): TErrorsCheck => {
-  let res: TErrorsCheck = {
-    ok: true,
-    fields: [],
-  }
-
-  if (!data.id || typeof data.id !== "string") {
-    res.ok = false
-    res.fields.push("id")
-  }
-
-  return res
+  return newClientValidator(data)
 }

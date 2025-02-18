@@ -150,7 +150,7 @@ export const addClient = async (req: Request, res: Response) => {
 
 export const updateClient = async (req: Request, res: Response) => {
   try {
-    const data = req.body
+    const data = req.body as TClient
 
     const validation = clientValidator(data)
 
@@ -160,22 +160,98 @@ export const updateClient = async (req: Request, res: Response) => {
       const client = await fb.getDoc(ref)
 
       if (client.exists()) {
-        const ref = fb.doc(collections.clients, data.id)
-        await fb.updateDoc(ref, data)
-        const docData = data
+        // 1. check if already exists a model with its code
+        let query = fb.query(
+          collections.clients,
+          fb.or(
+            fb.where("email", "==", data.email),
+            fb.where("documents.register", "==", data.documents.register)
+          )
+        )
 
-        res.status(200).json({ success: true, data: docData })
-      } else {
-        res.status(400).json({
-          success: false,
-          error: "Verifique os campos e tente novamente.",
-        })
-      }
-    } else throw new Error("Este usuário não existe.")
+        if (data.documents.cityInscription) {
+          if (data.documents.stateInscription) {
+            query = fb.query(
+              collections.clients,
+              fb.or(
+                fb.where("email", "==", data.email),
+                fb.where("documents.register", "==", data.documents.register),
+                fb.where(
+                  "documents.cityInscription",
+                  "==",
+                  data.documents.cityInscription
+                ),
+                fb.where(
+                  "documents.stateInscription",
+                  "==",
+                  data.documents.stateInscription
+                )
+              )
+            )
+          } else {
+            query = fb.query(
+              collections.clients,
+              fb.or(
+                fb.where("email", "==", data.email),
+                fb.where("documents.register", "==", data.documents.register),
+                fb.where(
+                  "documents.cityInscription",
+                  "==",
+                  data.documents.cityInscription
+                )
+              )
+            )
+          }
+        }
+
+        const docsSnap = await fb.getDocs(query)
+
+        const alreadyExists =
+          docsSnap.docs.filter((i) => i.id !== clientId).length > 0
+
+        if (!alreadyExists) {
+          const ref = fb.doc(collections.clients, clientId)
+          await fb.updateDoc(ref, data)
+          const docData = data
+
+          res.status(200).json({ success: true, data: docData })
+        } else {
+          const registeredClient = docsSnap.docs[0].data() as TFBClient
+
+          let message = ""
+
+          if (registeredClient.email === data.email) {
+            message = "Já existe um cliente com este email."
+          } else if (
+            registeredClient.documents.register === data.documents.register
+          ) {
+            message = "Já existe um cliente com este cpf/cnpj."
+          } else if (
+            data.documents.cityInscription &&
+            data.documents.cityInscription.replace(/\D/g, "").length > 0 &&
+            registeredClient.documents.cityInscription ===
+              data.documents.cityInscription
+          ) {
+            message = "Já existe um cliente com esta inscrição municipal."
+          } else if (
+            data.documents.stateInscription &&
+            data.documents.stateInscription.replace(/\D/g, "").length > 0 &&
+            registeredClient.documents.stateInscription ===
+              data.documents.stateInscription
+          ) {
+            message = "Já existe um cliente com esta inscrição estadual."
+          }
+
+          if (message !== "") throw new Error(message)
+          else throw new Error()
+        }
+      } else throw new Error("Este usuário não existe.")
+    } else {
+      const fieldsStr = validation.fields.join(", ")
+      throw new Error(`Verifique os campos (${fieldsStr}) e tente novamente.`)
+    }
   } catch (error) {
-    res
-      .status(400)
-      .json({ success: false, error: "Houve um erro. Tente novamente" })
+    res.status(400).json(getCustomError(error))
   }
 }
 
