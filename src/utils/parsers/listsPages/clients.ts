@@ -19,7 +19,7 @@ export const parseClientsPageList = ({
   let list: TPageListClient[] = []
 
   try {
-    clients.forEach(async (i) => {
+    clients.forEach((i) => {
       const clientOrders = orders.filter((o) => o.client === i.id)
 
       const ordersCount = clientOrders.length

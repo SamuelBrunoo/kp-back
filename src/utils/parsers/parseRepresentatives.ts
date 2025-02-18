@@ -10,7 +10,9 @@ const parseRepresentatives = ({ representatives, clients }: Props) => {
   let list: any[] = []
 
   representatives.forEach((i) => {
-    const c = clients.filter((client) => client.representative === i.id)
+    const c = clients.filter(
+      (client) => client.representative === i.id
+    )
 
     const obj: TRepresentative = {
       ...i,

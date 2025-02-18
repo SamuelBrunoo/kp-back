@@ -5,6 +5,6 @@ export type TAddress = {
   cep: string
   neighborhood: string
   street: string
-  number: string
+  number: number
   complement: string
 }

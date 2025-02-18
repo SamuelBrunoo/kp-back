@@ -51,6 +51,10 @@ routes.get("/clients/:id", ClientsController.getClient)
 // # Representatives
 routes.post("/representatives", RepsController.addRepresentative)
 routes.get("/representatives", RepsController.getRepresentatives)
+routes.get(
+  "/representatives/listPage",
+  RepsController.getRepresentativesListPage
+)
 routes.delete("/representatives/:id", RepsController.deleteRepresentative)
 routes.put("/representatives/:id", RepsController.updateRepresentative)
 routes.get("/representatives/:id", RepsController.getRepresentative)
@@ -58,6 +62,7 @@ routes.get("/representatives/:id", RepsController.getRepresentative)
 // # Orders
 routes.post("/orders", OrderController.addOrder)
 routes.get("/orders", OrderController.getOrders)
+// routes.get("/orders/listPage", OrderController.getOrdersListPage)
 routes.delete("/orders/:id", OrderController.deleteOrder)
 routes.put("/orders/:id", OrderController.updateOrder)
 routes.get("/orders/:id", OrderController.getOrder)
@@ -65,6 +70,7 @@ routes.get("/orders/:id", OrderController.getOrder)
 // # Production Lines
 routes.post("/productionLines", PLineController.addProductionLine)
 routes.get("/productionLines", PLineController.getProductionLines)
+// routes.get("/productionLines/listPage", PLineController.getProductionLinesListPage)
 routes.delete("/productionLines/:id", PLineController.deleteProductionLine)
 routes.put("/productionLines/:id", PLineController.updateProductionLine)
 routes.get("/productionLines/:id", PLineController.getProductionLine)
