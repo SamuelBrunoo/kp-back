@@ -62,7 +62,7 @@ routes.get("/representatives/:id", RepsController.getRepresentative)
 // # Orders
 routes.post("/orders", OrderController.addOrder)
 routes.get("/orders", OrderController.getOrders)
-// routes.get("/orders/listPage", OrderController.getOrdersListPage)
+routes.get("/orders/listPage", OrderController.getOrdersListPage)
 routes.delete("/orders/:id", OrderController.deleteOrder)
 routes.put("/orders/:id", OrderController.updateOrder)
 routes.get("/orders/:id", OrderController.getOrder)

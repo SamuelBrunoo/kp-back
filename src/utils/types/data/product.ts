@@ -1,5 +1,4 @@
 export type TFBProduct = {
-  id: string
   active: boolean
   code: string
   model: string
@@ -10,6 +9,10 @@ export type TFBProduct = {
     has: boolean
     quantity: number
   }
+}
+
+export type TBasicProduct = TFBProduct & {
+  id: string
 }
 
 export type TProduct = {

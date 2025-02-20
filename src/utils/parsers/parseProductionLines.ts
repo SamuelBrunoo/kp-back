@@ -66,8 +66,6 @@ const parseProductionLines = (props: Props) => {
       id: string
     }
 
-    console.log(order, pLine)
-
     const client = clients.find(
       (client) => order.client === client.id
     ) as TClient
@@ -117,17 +115,8 @@ const parseProductionLines = (props: Props) => {
 
     const obj: TProductionLine = {
       id: pLine.id,
-      order: {
-        client: {
-          id: client.id,
-          name: client.clientName,
-          socialRole: client.socialRole,
-        },
-        code: order.code,
-        id: order.id,
-        orderDate: order.orderDate,
-        deadline: order.deadline,
-      },
+      client: client.id,
+      order: order.id,
       products: pds,
       quantity: pds.length,
       status: status,

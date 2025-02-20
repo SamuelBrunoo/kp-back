@@ -36,7 +36,8 @@ export type TNewProductLine = {
 
 export type TProductionLine = {
   id: string
-  order: TProductionOrder
+  client: string
+  order: string
   status: TOPStatus
   quantity: number
   products: TLineProductGroup[]

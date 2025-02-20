@@ -1,5 +1,6 @@
 import { TBaseClient, TClient } from "./client"
 import { TOrderPaymentConfig, TPaymentMethod } from "./payment"
+import { TProduct } from "./product"
 
 export type TNewOrder = {
   client: string
@@ -23,8 +24,41 @@ export type TFBOrder = TNewOrder & {
   products: TOrderProduct[]
 }
 
-export type TBasicOrder = TFBOrder & {
+export type TBasicOrder = {
   id: string
+  code: string
+  status: TOPStatus
+  products: TOrderProduct[]
+} & TFBOrder
+
+export type TPageListOrder = {
+  id: string
+  clientName: string
+  orderDate: string
+  value: number
+  quantity: number
+  status: TOPStatus
+  details: {
+    productionLineId: string | null
+    products: TOrderDetailsProduct[]
+    additional: {
+      clientName: string
+      clientRegister: string
+      clientStateInscription: string | null
+      orderDate: string
+      deadline: string
+      valueTotal: number
+      valueCommission: number
+      valueLiquid: number
+      paymentMethod: string
+      hasInstallments: string
+      installments: number
+      paidInstallments: number
+      emmitter: string
+      representative: string | null
+      address: string
+    }
+  }
 }
 
 export type TOrder = {
@@ -52,7 +86,18 @@ type TNewOrderProduct = {
 }
 
 type TOrderProduct = TNewOrderProduct & {
+  status: TOPStatus
+}
+
+type TOrderDetailsProduct = {
+  id: string
+  code: string
   model: string
+  name: string
+  color: string
+  price: number
+  type: string
+  quantity: number
   status: TOPStatus
 }
 
@@ -68,8 +113,8 @@ export type TShippingMethod = "PAC" | "SEDEX"
 export type TOPStatus = "queued" | "lor" | "doing" | "done"
 
 export const TOPStatusWeight = {
-  queued: 1,
-  done: 2,
+  done: 1,
+  queued: 2,
   doing: 3,
   lor: 4,
 }

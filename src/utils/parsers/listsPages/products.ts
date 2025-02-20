@@ -4,6 +4,7 @@ import {
   TFBProduct,
   TProduct,
   TPageListProduct,
+  TBasicProduct,
 } from "../../types/data/product"
 import { TOrder } from "../../types/data/order"
 import { TProdType } from "../../types/data/prodType"
@@ -12,7 +13,7 @@ type Props = {
   models: TFBModel[]
   colors: TColor[]
   prodTypes: TProdType[]
-  products: TFBProduct[]
+  products: TBasicProduct[]
   orders: TOrder[]
 }
 

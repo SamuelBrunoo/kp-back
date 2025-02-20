@@ -3,14 +3,17 @@ import { Request, Response } from "express"
 import * as fb from "firebase/firestore"
 import { collections } from "../services/firebase"
 
-import { TClient } from "../utils/types/data/client"
-import { TRepresentative } from "../utils/types/data/representative"
+import { TBaseClient, TClient } from "../utils/types/data/client"
+import {
+  TBasicRepresentative,
+  TRepresentative,
+} from "../utils/types/data/representative"
 import { TBasicOrder, TFBOrder, TNewOrder } from "../utils/types/data/order"
 import { TModel } from "../utils/types/data/model"
-import { TProduct } from "../utils/types/data/product"
+import { TBasicProduct, TProduct } from "../utils/types/data/product"
 import { TProdType } from "../utils/types/data/prodType"
 import { TColor } from "../utils/types/data/color"
-import { TEmmitter } from "../utils/types/data/emmiter"
+import { TBasicEmmitter, TEmmitter } from "../utils/types/data/emmiter"
 
 import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { newOrderValidator, orderValidator } from "../utils/validators/order"
@@ -26,6 +29,85 @@ import {
 } from "../utils/types/data/productionLine"
 
 import { v4 as uuid } from "uuid"
+import { getCustomError } from "../utils/helpers/getCustomError"
+import { parseOrdersPageList } from "../utils/parsers/listsPages/orders"
+import { TCity } from "../utils/types/data/city"
+import { TState } from "../utils/types/data/state"
+
+export const getOrdersListPage = async (req: Request, res: Response) => {
+  try {
+    const colClients = parseFbDocs(
+      await fb.getDocs(fb.query(collections.clients))
+    ) as TBaseClient[]
+    const colOrders = parseFbDocs(
+      await fb.getDocs(fb.query(collections.orders))
+    ) as TBasicOrder[]
+
+    const colEmmitters = parseFbDocs(
+      await fb.getDocs(fb.query(collections.emmitters))
+    ) as TBasicEmmitter[]
+
+    const colRepresentatives = parseFbDocs(
+      await fb.getDocs(fb.query(collections.emmitters))
+    ) as TBasicRepresentative[]
+
+    const colProductTypes = parseFbDocs(
+      await fb.getDocs(fb.query(collections.productTypes))
+    ) as TProdType[]
+
+    const colProducts = parseFbDocs(
+      await fb.getDocs(fb.query(collections.products))
+    ) as TBasicProduct[]
+
+    const colColors = parseFbDocs(
+      await fb.getDocs(fb.query(collections.colors))
+    ) as TColor[]
+
+    const colModels = parseFbDocs(
+      await fb.getDocs(fb.query(collections.models))
+    ) as TModel[]
+
+    const colProductionLines = parseFbDocs(
+      await fb.getDocs(fb.query(collections.productionLines))
+    ) as TProductionLine[]
+
+    // -----
+
+    const clientsCities = colClients.map((client) => client.address.city)
+    const clientsStates = colClients.map((client) => client.address.state)
+
+    const cities = parseFbDocs(
+      await fb.getDocs(
+        fb.query(collections.cities, fb.where("code", "in", clientsCities))
+      )
+    ) as TCity[]
+
+    const states = parseFbDocs(
+      await fb.getDocs(
+        fb.query(collections.states, fb.where("code", "in", clientsStates))
+      )
+    ) as TState[]
+
+    const list = parseOrdersPageList({
+      clients: colClients,
+      orders: colOrders,
+      cities: cities,
+      states: states,
+      emmitters: colEmmitters,
+      representatives: colRepresentatives,
+
+      productTypes: colProductTypes,
+      products: colProducts,
+      colors: colColors,
+      models: colModels,
+      productionLines: colProductionLines,
+    })
+
+    res.status(200).json({ success: true, data: { list } })
+  } catch (error) {
+    res.status(400).json(getCustomError(error))
+  }
+}
 
 export const getOrders = async (req: Request, res: Response) => {
   try {
