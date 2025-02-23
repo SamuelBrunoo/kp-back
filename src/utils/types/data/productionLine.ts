@@ -19,8 +19,13 @@ export type TFBLineProductGroup = {
 
 export type TFBLineProduct = {
   productionId: string
-  inCharge: string
   status: TOPStatus
+  index: number
+  inCharge: null | {
+    id: string
+    name: string
+    attributionDate: number
+  }
 }
 
 // # New
@@ -32,8 +37,6 @@ export type TNewProductLine = {
   products: TFBLineProductGroup[]
 }
 
-// # Client
-
 export type TProductionLine = {
   id: string
   client: string
@@ -41,6 +44,49 @@ export type TProductionLine = {
   status: TOPStatus
   quantity: number
   products: TLineProductGroup[]
+}
+
+export type TPageListProductionLine = {
+  id: string
+  clientName: string
+  orderDate: string
+  onProduction: number
+  status: TOPStatus
+  details: {
+    products: TOrderPLDetailsProduct[]
+    attributions: TAttribution[]
+  }
+}
+
+// Order tab
+
+export type TOrderPLDetailsProduct = {
+  type: string
+  model: string
+  code: string
+  quantity: number
+  list: TOrderPLDetailsProductListItem[]
+}
+
+export type TOrderPLDetailsProductListItem = {
+  lineNumber: number
+  color: string
+  code: string
+}
+
+// -----
+
+export type TAttribution = {
+  number: number
+  responsable: null | {
+    id: string
+    name: string
+  }
+  model: string
+  color: string
+  code: string
+  status: TOPStatus
+  attributedAt: string | null
 }
 
 export type TProductionOrder = {
@@ -67,9 +113,10 @@ export type TLineProductGroup = {
 export type TLineProduct = {
   index: number
   productionId: string
-  inCharge: {
+  inCharge: null | {
     id: string
     name: string
+    attributionDate: number
   }
   status: TOPStatus
 }

@@ -299,7 +299,8 @@ export const addOrder = async (req: Request, res: Response) => {
               const pToDo: TFBLineProduct = {
                 status: "queued",
                 productionId: newId,
-                inCharge: "",
+                inCharge: null,
+                index: i
               }
 
               plProdGroup.list.push(pToDo)

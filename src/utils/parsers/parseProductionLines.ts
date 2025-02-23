@@ -82,14 +82,19 @@ const parseProductionLines = (props: Props) => {
       let pgStatus: TProductionLine["status"] = "queued"
 
       const list: TLineProduct[] = pGroup.list.map((pd, index) => {
-        const w = workers.find((wk) => wk.id === pd.inCharge)
+        const w = pd.inCharge
+          ? workers.find((wk) => wk.id === pd.inCharge.id)
+          : null
 
         const prod: TLineProduct = {
           index: index + 1,
-          inCharge: {
-            id: w?.id ?? "Não atribuído",
-            name: w?.name ?? "Não atribuído",
-          },
+          inCharge: w
+            ? {
+                id: w.id,
+                name: w.name,
+                attributionDate: new Date().getTime(),
+              }
+            : null,
           productionId: pd.productionId,
           status: pd.status,
         }
