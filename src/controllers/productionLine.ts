@@ -4,32 +4,28 @@ import * as fb from "firebase/firestore"
 import { collections } from "../services/firebase"
 
 import { TBaseClient, TClient } from "../utils/types/data/client"
-import {
-  TBasicRepresentative,
-  TRepresentative,
-} from "../utils/types/data/representative"
-import { TBasicOrder, TFBOrder, TNewOrder } from "../utils/types/data/order"
+import { TRepresentative } from "../utils/types/data/representative"
+import { TBasicOrder, TFBOrder } from "../utils/types/data/order"
 import { TModel } from "../utils/types/data/model"
 import { TBasicProduct, TProduct } from "../utils/types/data/product"
 import { TProdType } from "../utils/types/data/prodType"
 import { TColor } from "../utils/types/data/color"
-import { TBasicEmmitter, TEmmitter } from "../utils/types/data/emmiter"
+import { TEmmitter } from "../utils/types/data/emmiter"
 
 import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { orderValidator } from "../utils/validators/order"
 import parseOrder from "../utils/parsers/parseOrder"
-import { treatData } from "../utils/parsers/treatData"
 import {
-  TFBLineProduct,
   TFBProductionLine,
-  TNewProductLine,
   TProductionLine,
 } from "../utils/types/data/productionLine"
 
-import { v4 as uuid } from "uuid"
 import parseProductionLines from "../utils/parsers/parseProductionLines"
 import { TWorker } from "../utils/types/data/worker"
-import { parseProductionLinePageList } from "../utils/parsers/listsPages/productionLine"
+import {
+  parseProductionLinePageList,
+  parseProductionLinePageListByProducts,
+} from "../utils/parsers/listsPages/productionLine"
 import { getCustomError } from "../utils/helpers/getCustomError"
 
 export const getProductionLinesListPage = async (
@@ -37,20 +33,16 @@ export const getProductionLinesListPage = async (
   res: Response
 ) => {
   try {
+    const { showType } = req.params
+
     const colClients = parseFbDocs(
       await fb.getDocs(fb.query(collections.clients))
     ) as TBaseClient[]
     const colOrders = parseFbDocs(
-      await fb.getDocs(fb.query(collections.orders))
+      await fb.getDocs(
+        fb.query(collections.orders, fb.where("status", "!=", "done"))
+      )
     ) as TBasicOrder[]
-
-    const colEmmitters = parseFbDocs(
-      await fb.getDocs(fb.query(collections.emmitters))
-    ) as TBasicEmmitter[]
-
-    const colRepresentatives = parseFbDocs(
-      await fb.getDocs(fb.query(collections.emmitters))
-    ) as TBasicRepresentative[]
 
     const colProductTypes = parseFbDocs(
       await fb.getDocs(fb.query(collections.productTypes))
@@ -76,16 +68,28 @@ export const getProductionLinesListPage = async (
       await fb.getDocs(fb.query(collections.workers))
     ) as TWorker[]
 
-    const list = parseProductionLinePageList({
-      clients: colClients,
-      orders: colOrders,
-      productTypes: colProductTypes,
-      products: colProducts,
-      colors: colColors,
-      models: colModels,
-      productionLines: colProductionLines,
-      workers: colWorkers,
-    })
+    const list =
+      showType === "orders"
+        ? parseProductionLinePageList({
+            clients: colClients,
+            orders: colOrders,
+            productTypes: colProductTypes,
+            products: colProducts,
+            colors: colColors,
+            models: colModels,
+            productionLines: colProductionLines,
+            workers: colWorkers,
+          })
+        : parseProductionLinePageListByProducts({
+            clients: colClients,
+            orders: colOrders,
+            productTypes: colProductTypes,
+            products: colProducts,
+            colors: colColors,
+            models: colModels,
+            productionLines: colProductionLines,
+            workers: colWorkers,
+          })
 
     res.status(200).json({ success: true, data: { list } })
   } catch (error) {

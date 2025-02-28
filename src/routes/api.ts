@@ -70,7 +70,10 @@ routes.get("/orders/:id", OrderController.getOrder)
 // # Production Lines
 routes.post("/productionLines", PLineController.addProductionLine)
 routes.get("/productionLines", PLineController.getProductionLines)
-routes.get("/productionLines/listPage", PLineController.getProductionLinesListPage)
+routes.get(
+  "/productionLines/listPage/:showType",
+  PLineController.getProductionLinesListPage
+)
 routes.delete("/productionLines/:id", PLineController.deleteProductionLine)
 routes.put("/productionLines/:id", PLineController.updateProductionLine)
 routes.get("/productionLines/:id", PLineController.getProductionLine)

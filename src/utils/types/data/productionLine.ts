@@ -47,6 +47,11 @@ export type TProductionLine = {
 }
 
 export type TPageListProductionLine = {
+  order: TPageListPLOrders
+  products: TPageListPLProducts
+}
+
+export type TPageListPLOrders = {
   id: string
   clientName: string
   orderDate: string
@@ -56,6 +61,28 @@ export type TPageListProductionLine = {
     products: TOrderPLDetailsProduct[]
     attributions: TAttribution[]
   }
+}
+
+export type TPageListPLProducts = {
+  id: string
+  type: string
+  modelName: string
+  onProduction: number
+  orders: number
+  status: TOPStatus
+
+  details: {
+    ordersList: TPageListPLProductsDetailsOrders[]
+    attributions: TPageListPLProductsDetailsAttribution[]
+  }
+}
+
+export type TPageListPLProductsDetailsOrders = {
+  index: number
+  orderNumber: number
+  clientName: string
+  orderDate: string
+  deadline: string
 }
 
 // Order tab
@@ -85,6 +112,17 @@ export type TAttribution = {
   model: string
   color: string
   code: string
+  status: TOPStatus
+  attributedAt: string | null
+}
+
+export type TPageListPLProductsDetailsAttribution = {
+  index: number
+  color: string
+  responsable: null | {
+    id: string
+    name: string
+  }
   status: TOPStatus
   attributedAt: string | null
 }

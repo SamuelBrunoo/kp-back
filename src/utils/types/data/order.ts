@@ -26,7 +26,7 @@ export type TFBOrder = TNewOrder & {
 
 export type TBasicOrder = {
   id: string
-  code: string
+  code: number
   status: TOPStatus
   products: TOrderProduct[]
 } & TFBOrder
