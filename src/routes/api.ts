@@ -1,4 +1,6 @@
 import { Router } from "express"
+
+import * as AuthController from "../controllers/auth"
 import * as ProductTypesController from "../controllers/productType"
 import * as ColorsController from "../controllers/colors"
 import * as ModelsController from "../controllers/model"
@@ -11,6 +13,9 @@ import * as PLineController from "../controllers/productionLine"
 import * as PageInfoController from "../controllers/pageInfo"
 
 const routes = Router()
+
+// # Auth
+routes.post("/auth/login", AuthController.login)
 
 // # Form Bare
 routes.get("/formBare/model", PageInfoController.getModelFormData)

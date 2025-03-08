@@ -1,4 +1,5 @@
 export type TFBWorker = {
+  userId: string
   name: string
 }
 
