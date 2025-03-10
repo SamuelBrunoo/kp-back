@@ -54,6 +54,7 @@ export type TPageListModel = {
   name: string
   price: number
   type: string
+  typeKey: string
   storage: {
     has: boolean
     quantity: number

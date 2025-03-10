@@ -5,7 +5,7 @@ import { collections } from "../services/firebase"
 import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { TClient } from "../utils/types/data/client"
 import { TRepresentative } from "../utils/types/data/representative"
-import { TProduct } from "../utils/types/data/product"
+import { TBasicProduct, TProduct } from "../utils/types/data/product"
 import { TProdType } from "../utils/types/data/prodType"
 import { TColor } from "../utils/types/data/color"
 import { TEmmitter } from "../utils/types/data/emmiter"
@@ -13,6 +13,7 @@ import { TFBModel, TModel, TModelDetails } from "../utils/types/data/model"
 import { getCustomError } from "../utils/helpers/getCustomError"
 import { TOrder } from "../utils/types/data/order"
 import parseModel from "../utils/parsers/parseModel"
+import parseProduct from "../utils/parsers/data/products/parseProduct"
 
 export const getOrderFormData = async (req: Request, res: Response) => {
   try {
@@ -111,6 +112,57 @@ export const getModelFormData = async (req: Request, res: Response) => {
       })
 
       resultInfo.model = modelInfo
+    }
+
+    const result = resultInfo
+
+    res.status(200).json({ success: true, data: result })
+  } catch (error) {
+    res.status(400).json(getCustomError(error))
+  }
+}
+
+export const getProductFormData = async (req: Request, res: Response) => {
+  try {
+    const { productId } = req.query
+
+    const colModels = parseFbDocs(
+      await fb.getDocs(fb.query(collections.models))
+    ) as TModel[]
+    const colProducts = parseFbDocs(
+      await fb.getDocs(fb.query(collections.products))
+    ) as TBasicProduct[]
+    const colColors = parseFbDocs(
+      await fb.getDocs(fb.query(collections.colors))
+    ) as TColor[]
+    const colProdTypes = parseFbDocs(
+      await fb.getDocs(fb.query(collections.productTypes))
+    ) as TProdType[]
+
+    let resultInfo: {
+      product?: TProduct
+      prodTypes: TProdType[]
+      models: TModel[]
+      colors: TColor[]
+    } = {
+      colors: colColors,
+      prodTypes: colProdTypes,
+      models: colModels,
+    }
+
+    if (productId) {
+      const colOrders = parseFbDocs(
+        await fb.getDocs(fb.query(collections.orders))
+      ) as TOrder[]
+
+      const product = colProducts.find((p) => p.id === productId)
+
+      const productInfo = parseProduct({
+        product: product,
+        models: colModels,
+      })
+
+      resultInfo.product = productInfo
     }
 
     const result = resultInfo

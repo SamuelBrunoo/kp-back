@@ -40,6 +40,7 @@ export const parseProductsPageList = ({
       const obj: TPageListProduct = {
         id: product.id,
         type: productProductType.name,
+        typeKey: productProductType.code,
         model: productModel.name,
         name: product.name,
         code: product.code,

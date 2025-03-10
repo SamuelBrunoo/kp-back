@@ -48,6 +48,7 @@ export type TNewProduct = {
 export type TPageListProduct = {
   id: string
   type: string
+  typeKey: string
   model: string
   name: string
   code: string

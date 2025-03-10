@@ -27,10 +27,6 @@ export const modelValidator = (data: TNewModel): TErrorsCheck => {
     res.ok = false
     res.fields.push("cores")
   }
-  if (!data.storage) {
-    res.ok = false
-    res.fields.push("estoque")
-  }
   if (
     !data.price ||
     Number.isNaN(data.price) ||

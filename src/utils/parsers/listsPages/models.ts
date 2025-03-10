@@ -64,6 +64,7 @@ export const parseModelsPageList = ({
         id: i.id,
         colors: cls.length,
         type: t.name,
+        typeKey: t.code,
         storage,
         name: i.name,
         price: !Number.isNaN(i.price) ? +i.price : 0,

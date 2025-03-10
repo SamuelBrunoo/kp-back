@@ -74,7 +74,18 @@ export const login = async (req: Request, res: Response) => {
             }
           }
 
-          res.status(200).json(userData)
+          // token
+          const token = ""
+          const refreshToken = ""
+
+          res.status(200).json({
+            success: true,
+            data: {
+              token,
+              refreshToken,
+              user: userData,
+            },
+          })
         })
         .catch((error) => {
           const errorCode = error.code

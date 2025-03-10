@@ -1,8 +1,12 @@
 import { TFBModel, TModel } from "../../../types/data/model"
-import { TFBProduct, TProduct } from "../../../types/data/product"
+import {
+  TBasicProduct,
+  TFBProduct,
+  TProduct,
+} from "../../../types/data/product"
 
 type Props = {
-  product: TFBProduct
+  product: TBasicProduct
   models: TModel[]
 }
 

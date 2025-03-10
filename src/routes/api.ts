@@ -19,6 +19,7 @@ routes.post("/auth/login", AuthController.login)
 
 // # Form Bare
 routes.get("/formBare/model", PageInfoController.getModelFormData)
+routes.get("/formBare/product", PageInfoController.getProductFormData)
 routes.get("/formBare/order", PageInfoController.getOrderFormData)
 
 // # Product Types
