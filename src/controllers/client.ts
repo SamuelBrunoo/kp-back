@@ -15,9 +15,13 @@ import { parseClientsPageList } from "../utils/parsers/listsPages/clients"
 import { TBasicOrder } from "../utils/types/data/order"
 import { TCity } from "../utils/types/data/city"
 import { TState } from "../utils/types/data/state"
+import { TBasicRepresentative } from "../utils/types/data/representative"
 
 export const getClientsListPage = async (req: Request, res: Response) => {
   try {
+    const colRepresentatives = parseFbDocs(
+      await fb.getDocs(fb.query(collections.representatives))
+    ) as TBasicRepresentative[]
     const colClients = parseFbDocs(
       await fb.getDocs(fb.query(collections.clients))
     ) as TBaseClient[]
@@ -36,11 +40,12 @@ export const getClientsListPage = async (req: Request, res: Response) => {
 
     const states = parseFbDocs(
       await fb.getDocs(
-        fb.query(collections.states, fb.where("code", "in", clientsStates))
+        fb.query(collections.states, fb.where("__name__", "in", clientsStates))
       )
     ) as TState[]
 
     const list = parseClientsPageList({
+      representatives: colRepresentatives,
       clients: colClients,
       orders: colOrders,
       cities: cities,

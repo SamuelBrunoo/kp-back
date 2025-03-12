@@ -7,4 +7,5 @@ export type TAddress = {
   street: string
   number: number
   complement: string
+  full?: string
 }

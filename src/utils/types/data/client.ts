@@ -34,9 +34,13 @@ export type TClient = TBaseClient & {
 export type TPageListClient = {
   id: string
   name: string
-  address: string
+  socialRole: string
+  type: TClientType
+  address: TAddress
+  cep: string
   document: string
   stateIncription: string
   orders: number
   deletable: boolean
+  details: TClient
 }

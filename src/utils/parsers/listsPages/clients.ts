@@ -1,9 +1,11 @@
 import { TCity } from "../../types/data/city"
 import { TBaseClient, TClient, TPageListClient } from "../../types/data/client"
 import { TBasicOrder } from "../../types/data/order"
+import { TBasicRepresentative } from "../../types/data/representative"
 import { TState } from "../../types/data/state"
 
 type Props = {
+  representatives: TBasicRepresentative[]
   clients: TBaseClient[]
   orders: TBasicOrder[]
   cities: TCity[]
@@ -11,6 +13,7 @@ type Props = {
 }
 
 export const parseClientsPageList = ({
+  representatives,
   clients,
   orders,
   cities,
@@ -24,15 +27,13 @@ export const parseClientsPageList = ({
 
       const ordersCount = clientOrders.length
 
-      // Address info
-
-      const city = cities.find((c) => c.code === i.address.city)
-      const state = states.find((s) => s.id === i.address.state)
-
-      const addressTxt =
-        city && state
-          ? `${i.address.street}, nº${i.address.number} - ${city.name}, ${state.abbr}`
-          : ""
+      // Address
+      const state = states.find(s => s.id === i.address.state)
+      
+      // Representative
+      const representative = i.representative
+        ? representatives.find((r) => r.id === i.representative).name
+        : "Não atribuído"
 
       // Deletable
       const isClientDeletable = ordersCount === 0
@@ -40,11 +41,32 @@ export const parseClientsPageList = ({
       const obj: TPageListClient = {
         id: i.id,
         name: i.clientName,
-        address: addressTxt,
+        socialRole: i.socialRole,
+        type: i.type,
+        address: i.address,
+        cep: i.address.cep,
         document: i.documents.register,
         stateIncription: i.documents.stateInscription,
         orders: ordersCount,
         deletable: isClientDeletable,
+
+        details: {
+          address: {
+            ...i.address,
+            state: state.name
+          },
+          clientName: i.clientName,
+          documents: i.documents,
+          email: i.email,
+          id: i.id,
+          orders: clientOrders.map((o) => o.id),
+          personName: i.personName,
+          phone1: i.phone1,
+          phone2: i.phone2,
+          representative: representative,
+          socialRole: i.socialRole,
+          type: i.type,
+        },
       }
 
       list.push(obj)
