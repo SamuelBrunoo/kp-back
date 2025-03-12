@@ -29,7 +29,10 @@ export const parseClientsPageList = ({
       const city = cities.find((c) => c.code === i.address.city)
       const state = states.find((s) => s.id === i.address.state)
 
-      const addressTxt = `${i.address.street}, nº${i.address.number} - ${city.name}, ${state.abbr}`
+      const addressTxt =
+        city && state
+          ? `${i.address.street}, nº${i.address.number} - ${city.name}, ${state.abbr}`
+          : ""
 
       // Deletable
       const isClientDeletable = ordersCount === 0
@@ -46,7 +49,9 @@ export const parseClientsPageList = ({
 
       list.push(obj)
     })
-  } catch (error) {}
+  } catch (error) {
+    console.log("Erro", error)
+  }
 
   return list
 }
