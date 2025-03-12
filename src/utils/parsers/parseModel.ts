@@ -28,30 +28,28 @@ const parseModel = ({
     cls.push(c.code)
   })
 
+  // Storage
+  let hasStorage = false
+  let storageQnt = 0
+
   // Deletable
 
   const ordersWithModel = orders.filter((o) =>
     // @ts-ignore
-    o.products.some((p) => p.model === model.code)
+    o.products.some((p) => p.model === model.id)
   )
-  const modelsProducts = products.filter((p) => p.model === model.code)
-
-  modelsProducts.forEach((p) => {
-    if (p.storage.has) {
-      if (!hasStorage) hasStorage = true
-      storageQnt += p.storage.quantity
-    }
-  })
-
-  // Storage
-  let hasStorage = false
-  let storageQnt = 0
+  const modelsProducts = products.filter((p) => p.model === model.id)
 
   const variations: TModelDetails["variations"] = modelsProducts.map((p) => {
     const variation: TModelDetails["variations"][number] = {
       ...p,
       color: (colors.find((col) => col.code === p.color) as TColor).name,
       price: model.price,
+    }
+
+    if (p.storage.has) {
+      if (!hasStorage) hasStorage = true
+      storageQnt += p.storage.quantity
     }
 
     return variation

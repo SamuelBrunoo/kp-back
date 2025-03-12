@@ -3,8 +3,11 @@ import { Request, Response } from "express"
 import * as fb from "firebase/firestore"
 import { collections } from "../services/firebase"
 import { parseFbDocs } from "../utils/parsers/fbDoc"
-import { TClient } from "../utils/types/data/client"
-import { TRepresentative } from "../utils/types/data/representative"
+import { TBaseClient, TClient } from "../utils/types/data/client"
+import {
+  TFBRepresentative,
+  TRepresentative,
+} from "../utils/types/data/representative"
 import { TBasicProduct, TProduct } from "../utils/types/data/product"
 import { TProdType } from "../utils/types/data/prodType"
 import { TColor } from "../utils/types/data/color"
@@ -14,6 +17,9 @@ import { getCustomError } from "../utils/helpers/getCustomError"
 import { TOrder } from "../utils/types/data/order"
 import parseModel from "../utils/parsers/parseModel"
 import parseProduct from "../utils/parsers/data/products/parseProduct"
+import { TState } from "../utils/types/data/state"
+import parseClients from "../utils/parsers/tableData/parseClients"
+import parseClient from "../utils/parsers/parseClient"
 
 export const getOrderFormData = async (req: Request, res: Response) => {
   try {
@@ -163,6 +169,49 @@ export const getProductFormData = async (req: Request, res: Response) => {
       })
 
       resultInfo.product = productInfo
+    }
+
+    const result = resultInfo
+
+    res.status(200).json({ success: true, data: result })
+  } catch (error) {
+    res.status(400).json(getCustomError(error))
+  }
+}
+
+export const getClientFormData = async (req: Request, res: Response) => {
+  try {
+    const { clientId } = req.query
+
+    const colRepresentatives = parseFbDocs(
+      await fb.getDocs(fb.query(collections.representatives))
+    ) as TRepresentative[]
+    const colClients = parseFbDocs(
+      await fb.getDocs(fb.query(collections.clients))
+    ) as TBaseClient[]
+    const colStates = parseFbDocs(
+      await fb.getDocs(fb.query(collections.states))
+    ) as TState[]
+
+    let resultInfo: {
+      representatives: TRepresentative[]
+      states: TState[]
+      client?: TBaseClient
+    } = {
+      representatives: colRepresentatives,
+      states: colStates,
+    }
+
+    if (clientId) {
+      const client = colClients.find((p) => p.id === clientId)
+
+      const clientInfo = parseClient({
+        representatives: colRepresentatives,
+        client: client,
+        states: colStates,
+      })
+
+      resultInfo.client = clientInfo
     }
 
     const result = resultInfo

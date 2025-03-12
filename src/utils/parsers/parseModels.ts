@@ -36,9 +36,9 @@ const parseModels = ({
 
       const ordersWithModel = orders.filter((o) =>
         // @ts-ignore
-        o.products.some((p) => p.model === i.code)
+        o.products.some((p) => p.model === i.id)
       )
-      const modelsProducts = products.filter((p) => p.model === i.code)
+      const modelsProducts = products.filter((p) => p.model === i.id)
 
       modelsProducts.forEach((p) => {
         if (p.storage.has) {

@@ -1,5 +1,4 @@
 export type TFBState = {
-  code: number
   name: string
   abbr: string
 }

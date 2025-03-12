@@ -60,7 +60,7 @@ export const parseOrdersPageList = ({
       // Address info
 
       const city = cities.find((c) => c.code === client.address.city)
-      const state = states.find((s) => s.code === client.address.state)
+      const state = states.find((s) => s.id === client.address.state)
 
       const addressTxt = `${client.address.street}, nº${client.address.number} - ${city.name}, ${state.abbr}`
 

@@ -27,7 +27,7 @@ export const parseClientsPageList = ({
       // Address info
 
       const city = cities.find((c) => c.code === i.address.city)
-      const state = states.find((s) => s.code === i.address.state)
+      const state = states.find((s) => s.id === i.address.state)
 
       const addressTxt = `${i.address.street}, nº${i.address.number} - ${city.name}, ${state.abbr}`
 
