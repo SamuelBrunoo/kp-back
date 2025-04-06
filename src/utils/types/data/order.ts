@@ -1,6 +1,5 @@
-import { TBaseClient, TClient } from "./client"
-import { TOrderPaymentConfig, TPaymentMethod } from "./payment"
-import { TProduct } from "./product"
+import { TBaseClient } from "./client"
+import { TOrderPaymentConfig } from "./payment"
 
 export type TNewOrder = {
   client: string
@@ -15,6 +14,8 @@ export type TNewOrder = {
     liquid: number
   }
   payment: TOrderPaymentConfig
+  shippingType: TShipping["type"]
+  shippingMode: TShipping["method"]
   shipping: TShipping
 }
 
@@ -33,6 +34,7 @@ export type TBasicOrder = {
 
 export type TPageListOrder = {
   id: string
+  code: string
   clientName: string
   orderDate: string
   value: number

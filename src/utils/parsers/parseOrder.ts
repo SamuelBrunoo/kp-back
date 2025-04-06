@@ -52,7 +52,7 @@ const parseOrder = (props: Props) => {
           ? String(order.payment.installments)
           : undefined,
       paymentNumber:
-        order.payment.method === "slip"
+        order.payment.type === "slip"
           ? formatSlip(order.payment.paymentNumber)
           : order.payment.paymentNumber,
     },

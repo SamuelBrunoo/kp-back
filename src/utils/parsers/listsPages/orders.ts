@@ -59,7 +59,7 @@ export const parseOrdersPageList = ({
 
       // Address info
 
-      const city = cities.find((c) => c.code === client.address.city)
+      const city = cities.find((c) => c.id === client.address.city)
       const state = states.find((s) => s.id === client.address.state)
 
       const addressTxt = `${client.address.street}, nº${client.address.number} - ${city.name}, ${state.abbr}`
@@ -111,8 +111,11 @@ export const parseOrdersPageList = ({
       // Production
       const productionLine = productionLines.find((pl) => pl.order === i.id)
 
+      console.log("Pagamento", i.payment)
+
       const obj: TPageListOrder = {
         id: i.id,
+        code: i.code,
         clientName: client.clientName,
         orderDate: dateFns.format(i.orderDate, "dd/MM/yyyy"),
         quantity: i.products
@@ -133,7 +136,7 @@ export const parseOrdersPageList = ({
             emmitter: orderEmmitter.name,
             hasInstallments: i.payment.hasInstallments ? "Sim" : "Não",
             installments: i.payment.installments,
-            paymentMethod: paymentRelation[i.payment.method],
+            paymentMethod: paymentRelation[i.payment.type],
             paidInstallments: paidInstallments,
             representative: representative ? representative.name : null,
             valueCommission: i.totals.commission,

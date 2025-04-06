@@ -78,13 +78,13 @@ export const getOrdersListPage = async (req: Request, res: Response) => {
 
     const cities = parseFbDocs(
       await fb.getDocs(
-        fb.query(collections.cities, fb.where("code", "in", clientsCities))
+        fb.query(collections.cities, fb.where("__name__", "in", clientsCities))
       )
     ) as TCity[]
 
     const states = parseFbDocs(
       await fb.getDocs(
-        fb.query(collections.states, fb.where("code", "in", clientsStates))
+        fb.query(collections.states, fb.where("__name__", "in", clientsStates))
       )
     ) as TState[]
 
@@ -259,7 +259,7 @@ export const addOrder = async (req: Request, res: Response) => {
       const docData = { ...treated, id: doc.id } as TBasicOrder
 
       // Add to client history
-      await fb.updateDoc(clientRef, { orders: [...client.orders, docData.id] })
+      // await fb.updateDoc(clientRef, { orders: [...(client.orders ?? []), docData.id] })
 
       // TODO: production line creator helper
 
@@ -300,7 +300,7 @@ export const addOrder = async (req: Request, res: Response) => {
                 status: "queued",
                 productionId: newId,
                 inCharge: null,
-                index: i
+                index: i,
               }
 
               plProdGroup.list.push(pToDo)
@@ -334,6 +334,7 @@ export const addOrder = async (req: Request, res: Response) => {
       throw new Error(`Verifique os campos (${fieldsStr}) e tente novamente.`)
     }
   } catch (error) {
+    console.log(error)
     res
       .status(400)
       .json({ success: false, error: "Houve um erro. Tente novamente" })

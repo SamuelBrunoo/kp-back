@@ -1,7 +1,7 @@
 export type TAddress = {
   country: number
   state: string
-  city: number
+  city: string
   cep: string
   neighborhood: string
   street: string

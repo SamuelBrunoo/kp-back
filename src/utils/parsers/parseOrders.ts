@@ -76,7 +76,7 @@ const parseOrders = (props: Props) => {
       payment: {
         ...order.payment,
         paymentNumber:
-          order.payment.method === "slip"
+          order.payment.type === "slip"
             ? formatSlip(order.payment.paymentNumber)
             : order.payment.paymentNumber,
       },

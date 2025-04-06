@@ -30,7 +30,7 @@ export const newOrderValidator = (data: TNewOrder): TErrorsCheck => {
     res.ok = false
     res.fields.push("emissor")
   }
-  if (!data.shipping.type || typeof data.shipping.type !== "string") {
+  if (!data.shippingType || typeof data.shippingType !== "string") {
     res.ok = false
     res.fields.push("envio")
   }

@@ -12,7 +12,7 @@ export type TRepresentativePaymentConfig = {
 }
 
 export type TOrderPaymentConfig = {
-  method: TPaymentMethod
+  type: TPaymentMethod
   hasInstallments: boolean
   installments: number
   dueDate: number
