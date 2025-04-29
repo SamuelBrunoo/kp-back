@@ -91,7 +91,7 @@ export const getProductionLinesListPage = async (
             workers: colWorkers,
           })
 
-    res.status(200).json({ success: true, data: { list } })
+    res.status(200).json({ success: true, data: { list, workers: colWorkers } })
   } catch (error) {
     res.status(400).json(getCustomError(error))
   }

@@ -37,38 +37,12 @@ const parseProductionLines = (props: Props) => {
 
   let list: TProductionLine[] = []
 
-  console.log("----------")
-  console.log("Parsing production line")
-  console.log("----------")
-  console.log("\n\n")
-  console.log("----------")
-  console.log("\n")
-  console.log("productionLines\n", productionLines)
-  console.log("---")
-  console.log("prodTypes\n", prodTypes)
-  console.log("---")
-  console.log("colors\n", colors)
-  console.log("---")
-  console.log("models\n", models)
-  console.log("---")
-  console.log("products\n", products)
-  console.log("---")
-  console.log(orders)
-  console.log("clients\n", clients)
-  console.log("---")
-  console.log("workers\n", workers)
-  console.log("\n")
-  console.log("\n\n")
-  console.log("----------")
-
   productionLines.forEach((pLine) => {
     const order = orders.find((ord) => pLine.order === ord.id) as TFBOrder & {
       id: string
     }
 
-    const client = clients.find(
-      (client) => order.client === client.id
-    ) as TClient
+    const client = clients.find((c) => order.client === c.id) as TClient
 
     let status: TProductionLine["status"] = "queued"
 
@@ -76,7 +50,7 @@ const parseProductionLines = (props: Props) => {
       const product = products.find((p) => p.id === pGroup.id) as TProduct
 
       const c = colors.find((col) => col.code === product.color) as TColor
-      const m = models.find((mod) => mod.code === product.model) as TModel
+      const m = models.find((mod) => mod.id === product.model) as TModel
       const t = prodTypes.find((pt) => pt.code === m.type) as TProdType
 
       let pgStatus: TProductionLine["status"] = "queued"

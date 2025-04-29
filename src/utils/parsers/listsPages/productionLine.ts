@@ -58,14 +58,19 @@ export const parseProductionLinePageList = ({
       let currentOrderStatusWeight = 1
       i.products.forEach((p) => {
         const statusWeight = TOPStatusWeight[p.status]
+
         currentOrderStatusWeight = Math.max(
           statusWeight,
           currentOrderStatusWeight
         )
       })
 
-      const orderStatus: TOPStatus =
-        orderProductStatusRelation[currentOrderStatusWeight]
+      const orderStatusName = Object.entries(TOPStatusWeight).find(
+        ([key, value]) => value === currentOrderStatusWeight
+      )[0] as TOPStatus
+
+      // const orderStatus: TOPStatus = orderProductStatusRelation[orderStatusName]
+      const orderStatus = orderStatusName
 
       // Attributions
       let attributions: TPageListProductionLine["order"]["details"]["attributions"] =
@@ -125,6 +130,7 @@ export const parseProductionLinePageList = ({
 
       const obj: TPageListProductionLine["order"] = {
         id: i.id,
+        orderCode: order.code,
         clientName: client.clientName,
         orderDate: dateFns.format(order.orderDate, "dd/MM/yyyy"),
         onProduction: i.products

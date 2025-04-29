@@ -53,6 +53,7 @@ export type TPageListProductionLine = {
 
 export type TPageListPLOrders = {
   id: string
+  orderCode: string
   clientName: string
   orderDate: string
   onProduction: number
