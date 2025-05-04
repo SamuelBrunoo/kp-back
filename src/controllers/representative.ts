@@ -7,7 +7,7 @@ import {
   representativeValidator,
 } from "../utils/validators/representative"
 import { parseFbDocs } from "../utils/parsers/fbDoc"
-import parseRepresentatives from "../utils/parsers/parseRepresentatives"
+import { parseRepresentatives } from "../utils/parsers/parseRepresentatives"
 import {
   TFBRepresentative,
   TNewRepresentative,
@@ -76,6 +76,7 @@ export const getRepresentatives = async (req: Request, res: Response) => {
     const list = parseRepresentatives({
       representatives: colRepresentatives,
       clients: colClients,
+      states: [],
     })
 
     res.json({ success: true, data: { list } })
@@ -109,7 +110,9 @@ export const addRepresentative = async (req: Request, res: Response) => {
   try {
     const data = req.body as TNewRepresentative
 
-    if (newRepresentativeValidator(data)) {
+    const validation = newRepresentativeValidator(data)
+
+    if (validation.ok) {
       // 1. check if already exists a model with its code
       let query = fb.query(
         collections.representatives,
@@ -163,13 +166,11 @@ export const addRepresentative = async (req: Request, res: Response) => {
         else throw new Error()
       }
     } else {
-      res.status(400).json({
-        success: false,
-        error: "Verifique os campos e tente novamente",
-      })
+      const fieldsStr = validation.fields.join(", ")
+      throw new Error(`Verifique os campos (${fieldsStr}) e tente novamente.`)
     }
   } catch (error) {
-    res.status(400).json(getCustomError(error))
+    res.status(400).json({ success: false, error: error.message })
   }
 }
 

@@ -1,9 +1,4 @@
-import { TBaseClient, TClient } from "../types/data/client"
-import { TColor } from "../types/data/color"
-import { TFBModel, TModel, TModelDetails } from "../types/data/model"
-import { TOrder } from "../types/data/order"
-import { TProdType } from "../types/data/prodType"
-import { TProduct } from "../types/data/product"
+import { TBaseClient } from "../types/data/client"
 import { TFBRepresentative } from "../types/data/representative"
 import { TState } from "../types/data/state"
 

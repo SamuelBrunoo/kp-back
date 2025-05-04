@@ -5,6 +5,7 @@ import { collections } from "../services/firebase"
 import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { TBaseClient, TClient } from "../utils/types/data/client"
 import {
+  TBasicRepresentative,
   TFBRepresentative,
   TRepresentative,
 } from "../utils/types/data/representative"
@@ -14,12 +15,13 @@ import { TColor } from "../utils/types/data/color"
 import { TEmmitter } from "../utils/types/data/emmiter"
 import { TFBModel, TModel, TModelDetails } from "../utils/types/data/model"
 import { getCustomError } from "../utils/helpers/getCustomError"
-import { TOrder } from "../utils/types/data/order"
+import { TBasicOrder, TOrder } from "../utils/types/data/order"
 import parseModel from "../utils/parsers/parseModel"
 import parseProduct from "../utils/parsers/data/products/parseProduct"
 import { TState } from "../utils/types/data/state"
 import parseClients from "../utils/parsers/tableData/parseClients"
 import parseClient from "../utils/parsers/parseClient"
+import { parseRepresentative } from "../utils/parsers/parseRepresentatives"
 
 export const getOrderFormData = async (req: Request, res: Response) => {
   try {
@@ -212,6 +214,55 @@ export const getClientFormData = async (req: Request, res: Response) => {
       })
 
       resultInfo.client = clientInfo
+    }
+
+    const result = resultInfo
+
+    res.status(200).json({ success: true, data: result })
+  } catch (error) {
+    res.status(400).json(getCustomError(error))
+  }
+}
+
+export const getRepresentativeFormData = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { representativeId } = req.query
+
+    const colRepresentatives = parseFbDocs(
+      await fb.getDocs(fb.query(collections.representatives))
+    ) as TRepresentative[]
+    const colClients = parseFbDocs(
+      await fb.getDocs(fb.query(collections.clients))
+    ) as TBaseClient[]
+    const colStates = parseFbDocs(
+      await fb.getDocs(fb.query(collections.states))
+    ) as TState[]
+    const colOrders = parseFbDocs(
+      await fb.getDocs(fb.query(collections.orders))
+    ) as TBasicOrder[]
+
+    let resultInfo: {
+      representative?: TBasicRepresentative
+      states: TState[]
+    } = {
+      states: colStates,
+    }
+
+    if (representativeId) {
+      const representative = colRepresentatives.find(
+        (p) => p.id === representativeId
+      )
+
+      const representativeInfo = parseRepresentative({
+        representative: representative,
+        clients: colClients,
+        orders: colOrders,
+      })
+
+      resultInfo.representative = representativeInfo
     }
 
     const result = resultInfo

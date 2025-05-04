@@ -22,6 +22,7 @@ routes.get("/formBare/model", PageInfoController.getModelFormData)
 routes.get("/formBare/product", PageInfoController.getProductFormData)
 routes.get("/formBare/order", PageInfoController.getOrderFormData)
 routes.get("/formBare/client", PageInfoController.getClientFormData)
+routes.get("/formBare/representative", PageInfoController.getRepresentativeFormData)
 
 // # Product Types
 routes.get("/productTypes", ProductTypesController.getProductTypes)

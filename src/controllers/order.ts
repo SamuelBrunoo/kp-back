@@ -334,7 +334,6 @@ export const addOrder = async (req: Request, res: Response) => {
       throw new Error(`Verifique os campos (${fieldsStr}) e tente novamente.`)
     }
   } catch (error) {
-    console.log(error)
     res
       .status(400)
       .json({ success: false, error: "Houve um erro. Tente novamente" })

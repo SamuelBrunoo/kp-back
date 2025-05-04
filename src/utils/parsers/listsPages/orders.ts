@@ -111,8 +111,6 @@ export const parseOrdersPageList = ({
       // Production
       const productionLine = productionLines.find((pl) => pl.order === i.id)
 
-      console.log("Pagamento", i.payment)
-
       const obj: TPageListOrder = {
         id: i.id,
         code: i.code,

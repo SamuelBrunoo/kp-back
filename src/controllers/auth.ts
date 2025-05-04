@@ -43,7 +43,6 @@ export const login = async (req: Request, res: Response) => {
           if (isWorker) {
             // get worker data
             const fbWorkerData = workersList.docs[0]
-            // console.log(fbWorkerData)
             userData = {
               ...parseFbDoc(fbWorkerData),
               email,
