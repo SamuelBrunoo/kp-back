@@ -5,7 +5,6 @@ import {
 import { TBaseClient, TClient } from "../types/data/client"
 import { TState } from "../types/data/state"
 import { TBasicOrder } from "../types/data/order"
-import parseClients from "./tableData/parseClients"
 
 type Props = {
   representative: TBasicRepresentative
@@ -18,9 +17,11 @@ export const parseRepresentative = ({ representative, clients }: Props) => {
     (client) => client.representative === representative.id
   )
 
+  const clientsList = representativeClients as TClient[]
+
   let obj: TRepresentative = {
     ...representative,
-    clients: parseClients(representativeClients),
+    clients: clientsList,
     orders: [],
   }
 
