@@ -38,16 +38,16 @@ export const parseModelsPageList = ({
       )
       const modelsProducts = products.filter((p) => p.model === i.id)
 
+      // Storage
+      let hasStorage = false
+      let storageQnt = 0
+
       modelsProducts.forEach((p) => {
         if (p.storage.has) {
           if (!hasStorage) hasStorage = true
           storageQnt += p.storage.quantity
         }
       })
-
-      // Storage
-      let hasStorage = false
-      let storageQnt = 0
 
       modelsProducts.forEach((p) => {
         if (p.storage.has) {
@@ -73,7 +73,9 @@ export const parseModelsPageList = ({
 
       list.push(obj)
     })
-  } catch (error) {}
+  } catch (error) {
+    console.log(error)
+  }
 
   return list
 }
