@@ -11,18 +11,25 @@ import * as OrderController from "../controllers/order"
 import * as PLineController from "../controllers/productionLine"
 
 import * as PageInfoController from "../controllers/pageInfo"
+import * as DashboardController from "../controllers/dashboard"
 
 const routes = Router()
 
 // # Auth
 routes.post("/auth/login", AuthController.login)
 
+// # Dashboard
+routes.get("/dashboard", DashboardController.getAdminDashboardInfo)
+
 // # Form Bare
 routes.get("/formBare/model", PageInfoController.getModelFormData)
 routes.get("/formBare/product", PageInfoController.getProductFormData)
 routes.get("/formBare/order", PageInfoController.getOrderFormData)
 routes.get("/formBare/client", PageInfoController.getClientFormData)
-routes.get("/formBare/representative", PageInfoController.getRepresentativeFormData)
+routes.get(
+  "/formBare/representative",
+  PageInfoController.getRepresentativeFormData
+)
 
 // # Product Types
 routes.get("/productTypes", ProductTypesController.getProductTypes)

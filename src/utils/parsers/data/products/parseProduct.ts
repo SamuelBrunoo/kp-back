@@ -1,7 +1,6 @@
 import { TFBModel, TModel } from "../../../types/data/model"
 import {
   TBasicProduct,
-  TFBProduct,
   TProduct,
 } from "../../../types/data/product"
 

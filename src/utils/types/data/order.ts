@@ -4,6 +4,7 @@ import { TOrderPaymentConfig } from "./payment"
 export type TNewOrder = {
   client: string
   orderDate: number
+  shippedAt?: number | null
   deadline: number
   emmitter: string
   representative: string | null
@@ -20,6 +21,7 @@ export type TNewOrder = {
 }
 
 export type TFBOrder = TNewOrder & {
+  shippedAt: number | null
   code: string
   status: TOPStatus
   products: TOrderProduct[]
@@ -65,6 +67,7 @@ export type TPageListOrder = {
 
 export type TOrder = {
   id: string
+  shippedAt: number | null
   orderDate: number
   deadline: number
   emmitter: string
