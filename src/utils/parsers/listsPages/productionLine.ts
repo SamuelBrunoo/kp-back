@@ -91,6 +91,8 @@ export const parseProductionLinePageList = ({
             code: product.code,
             color: color.name,
             lineNumber: listItem.index,
+            productId: p.id,
+            productionId: listItem.productionId,
           }))
 
         // Order products details
@@ -120,6 +122,8 @@ export const parseProductionLinePageList = ({
               code: product.code,
               model: modelName,
               status: pListItem.status,
+              productId: p.id,
+              productionId: pListItem.productionId,
             }
 
           attributions.push(attributionItem)

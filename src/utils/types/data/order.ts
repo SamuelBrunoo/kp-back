@@ -88,6 +88,7 @@ export type TOrder = {
 type TNewOrderProduct = {
   id: string
   quantity: number
+  status: TOPStatus
 }
 
 type TOrderProduct = TNewOrderProduct & {

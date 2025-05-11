@@ -24,7 +24,7 @@ export type TFBLineProduct = {
   inCharge: null | {
     id: string
     name: string
-    attributionDate: number
+    attributionDate: number | string
   }
 }
 
@@ -98,6 +98,8 @@ export type TOrderPLDetailsProduct = {
 
 export type TOrderPLDetailsProductListItem = {
   lineNumber: number
+  productionId: string
+  productId: string
   color: string
   code: string
 }
@@ -114,6 +116,8 @@ export type TAttribution = {
   color: string
   code: string
   status: TOPStatus
+  productionId: string
+  productId: string
   attributedAt: string | null
 }
 

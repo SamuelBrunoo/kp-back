@@ -12,10 +12,10 @@ import { TProdType } from "../utils/types/data/prodType"
 import { TColor } from "../utils/types/data/color"
 import { TEmmitter } from "../utils/types/data/emmiter"
 
-import { parseFbDocs } from "../utils/parsers/fbDoc"
-import { orderValidator } from "../utils/validators/order"
+import { parseFbDoc, parseFbDocs } from "../utils/parsers/fbDoc"
 import parseOrder from "../utils/parsers/parseOrder"
 import {
+  TAttribution,
   TFBProductionLine,
   TProductionLine,
 } from "../utils/types/data/productionLine"
@@ -27,6 +27,8 @@ import {
   parseProductionLinePageListByProducts,
 } from "../utils/parsers/listsPages/productionLine"
 import { getCustomError } from "../utils/helpers/getCustomError"
+import { extractProductionUpdates } from "../utils/helpers/productionLine"
+import { extractOrderProductionUpdates } from "../utils/helpers/order"
 
 export const getProductionLinesListPage = async (
   req: Request,
@@ -227,24 +229,49 @@ export const addProductionLine = async (req: Request, res: Response) => {
 
 export const updateProductionLine = async (req: Request, res: Response) => {
   try {
-    const data = req.body
+    const incomingData = req.body as
+      | undefined
+      | {
+          id: string
+          products: TAttribution[]
+        }
 
-    if (orderValidator(data)) {
-      const ref = fb.doc(collections.orders, data.id)
-      await fb.updateDoc(ref, data)
-      const docData = data
+    const productionLineId = req.params.id
+    const ref = fb.doc(collections.productionLines, productionLineId)
+    const fbProductionLineDoc = await fb.getDoc(ref)
 
-      res.status(200).json({ success: true, data: docData })
-    } else {
-      res.status(400).json({
-        success: false,
-        error: "Verifique os campos e tente novamente",
-      })
-    }
+    if (fbProductionLineDoc.exists()) {
+      const fbProductionLine = parseFbDoc(
+        fbProductionLineDoc
+      ) as TFBProductionLine
+
+      const orderId = fbProductionLine.order
+      const orderRef = fb.doc(collections.orders, orderId)
+      const fbOrder = await fb.getDoc(orderRef)
+
+      if (fbOrder.exists()) {
+        let order: TFBOrder = fbOrder.data() as TFBOrder
+
+        const newProductionLineObj: TFBProductionLine =
+          extractProductionUpdates(incomingData.products, fbProductionLine)
+
+        const newOrderObj: TFBOrder = extractOrderProductionUpdates(
+          newProductionLineObj.products,
+          order
+        )
+
+        // Update Order
+        await fb.updateDoc(orderRef, newOrderObj)
+
+        // Update Production Line
+        await fb.updateDoc(ref, newProductionLineObj)
+        const docData = newProductionLineObj
+
+        res.status(200).json({ success: true, data: docData })
+      } else throw new Error("Este pedido não existe ou já foi concluído")
+    } else throw new Error("Esta produção não existe ou já foi concluída")
   } catch (error) {
-    res
-      .status(400)
-      .json({ success: false, error: "Houve um erro. Tente novamente" })
+    res.status(400).json(getCustomError(error))
   }
 }
 
