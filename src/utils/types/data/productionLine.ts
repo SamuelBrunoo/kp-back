@@ -129,7 +129,7 @@ export type TPageListPLProductsDetailsAttribution = {
     name: string
   }
   status: TOPStatus
-  attributedAt: string | null
+  attributedAt: string | number | null
 }
 
 export type TProductionOrder = {

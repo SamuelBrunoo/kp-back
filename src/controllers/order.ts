@@ -8,7 +8,12 @@ import {
   TBasicRepresentative,
   TRepresentative,
 } from "../utils/types/data/representative"
-import { TBasicOrder, TFBOrder, TNewOrder } from "../utils/types/data/order"
+import {
+  TBasicOrder,
+  TFBOrder,
+  TNewOrder,
+  TOPStatus,
+} from "../utils/types/data/order"
 import { TModel } from "../utils/types/data/model"
 import { TBasicProduct, TProduct } from "../utils/types/data/product"
 import { TProdType } from "../utils/types/data/prodType"
@@ -36,11 +41,22 @@ import { TState } from "../utils/types/data/state"
 
 export const getOrdersListPage = async (req: Request, res: Response) => {
   try {
+    const { shippingStatus } = req.query
+
+    let statusToFilter: TOPStatus[] = []
+
+    if (shippingStatus) {
+      statusToFilter =
+        shippingStatus === "todo" ? ["queued", "doing", "lor"] : ["done"]
+    } else statusToFilter = ["queued", "doing", "lor", "done"]
+
     const colClients = parseFbDocs(
       await fb.getDocs(fb.query(collections.clients))
     ) as TBaseClient[]
     const colOrders = parseFbDocs(
-      await fb.getDocs(fb.query(collections.orders))
+      await fb.getDocs(
+        fb.query(collections.orders, fb.where("status", "in", statusToFilter))
+      )
     ) as TBasicOrder[]
 
     const colEmmitters = parseFbDocs(

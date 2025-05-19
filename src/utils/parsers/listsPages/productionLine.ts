@@ -132,28 +132,32 @@ export const parseProductionLinePageList = ({
         orderProductsDetails.push(orderProductsDetailsItem)
       })
 
-      const obj: TPageListProductionLine["order"] = {
-        id: i.id,
-        orderCode: order.code,
-        clientName: client.clientName,
-        orderDate: dateFns.format(order.orderDate, "dd/MM/yyyy"),
-        onProduction: i.products
-          .map((prod) => prod.list.length)
-          .reduce((prev, next) => prev + next, 0),
-        status: orderStatus,
-        details: {
-          products: orderProductsDetails,
-          attributions: attributions,
-        },
-      }
+      if (order) {
+        const obj: TPageListProductionLine["order"] = {
+          id: i.id,
+          orderCode: order.code,
+          clientName: client.clientName,
+          orderDate: dateFns.format(order.orderDate, "dd/MM/yyyy"),
+          onProduction: i.products
+            .map((prod) => prod.list.length)
+            .reduce((prev, next) => prev + next, 0),
+          status: orderStatus,
+          details: {
+            products: orderProductsDetails,
+            attributions: attributions,
+          },
+        }
 
-      list.push(obj)
+        list.push(obj)
+      }
     })
   } catch (error) {
     console.error(error)
   }
 
-  return list
+  const sortedList = list.sort((a, b) => (a.orderCode > b.orderCode ? -1 : 1))
+
+  return sortedList
 }
 
 export const parseProductionLinePageListByProducts = ({
@@ -288,14 +292,6 @@ export const parseProductionLinePageListByProducts = ({
       let attributions: TPageListPLProducts["details"]["attributions"] = []
 
       prodOI[mid].forEach((p) => {
-        /*
-          productId
-          productionId
-          index
-          incharge { id, name }
-          attributedAt
-
-        */
         // Readable data
         const product = products.find((prod) => prod.id === p.id)
         const color = colors.find((col) => col.code === product.color)
@@ -310,7 +306,7 @@ export const parseProductionLinePageListByProducts = ({
         // Attribution
         const attributionData: TPageListPLProducts["details"]["attributions"][number] =
           {
-            attributedAt: dateFns.format(p.attributedAt, "dd/MM/yyyy"),
+            attributedAt: p.attributedAt,
             color: color.name,
             index: p.index,
             responsable: workers.find((w) => w.id === ""),

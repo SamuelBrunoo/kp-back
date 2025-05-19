@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 
 import * as fb from "firebase/firestore"
 import { collections } from "../services/firebase"
-import { parseFbDocs } from "../utils/parsers/fbDoc"
+import { parseFbDoc, parseFbDocs } from "../utils/parsers/fbDoc"
 import { TBaseClient, TClient } from "../utils/types/data/client"
 import {
   TBasicRepresentative,
@@ -25,6 +25,8 @@ import { parseRepresentative } from "../utils/parsers/parseRepresentatives"
 
 export const getOrderFormData = async (req: Request, res: Response) => {
   try {
+    const { orderId } = req.query
+
     let colClients: TClient[] = []
     let colEmmitters: TEmmitter[] = []
     let colRepresentatives: TRepresentative[] = []
@@ -60,7 +62,7 @@ export const getOrderFormData = async (req: Request, res: Response) => {
 
     await Promise.all(pms)
 
-    const data = {
+    let data: any = {
       clients: colClients,
       emmitters: colEmmitters,
       representatives: colRepresentatives,
@@ -68,6 +70,16 @@ export const getOrderFormData = async (req: Request, res: Response) => {
       prodTypes: colProdTypes,
       models: colModels,
       colors: colColors,
+    }
+
+    if (orderId) {
+      const ref = fb.doc(collections.orders, orderId as string)
+      const fbOrder = await fb.getDoc(ref)
+
+      if (fbOrder.exists()) {
+        const orderInfo = parseFbDoc(fbOrder)
+        data.order = orderInfo
+      }
     }
 
     res.json({ success: true, data: data })

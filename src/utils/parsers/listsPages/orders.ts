@@ -62,7 +62,9 @@ export const parseOrdersPageList = ({
       const city = cities.find((c) => c.id === client.address.city)
       const state = states.find((s) => s.id === client.address.state)
 
-      const addressTxt = `${client.address.street}, nº${client.address.number} - ${city.name}, ${state.abbr}`
+      const addressTxt = `${client.address.street}, nº${
+        client.address.number
+      } - ${city && `${city.name}, `}${state.abbr}`
 
       // Payments
       const paidInstallments = 0
@@ -150,5 +152,7 @@ export const parseOrdersPageList = ({
     console.log(error)
   }
 
-  return list
+  const sortedList = list.sort((a, b) => (a.code > b.code ? -1 : 1))
+
+  return sortedList
 }

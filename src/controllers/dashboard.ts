@@ -150,20 +150,20 @@ export const getAdminDashboardInfo = async (req: Request, res: Response) => {
 
     /* Orders */
 
-    const shippedToday = orders.filter((o) =>
-      o.shippedAt ? matchDay(o.shippedAt, d.getTime()) : false
-    )
+    const shippedToday = orders
+      .filter((o) => (o.shippedAt ? matchDay(o.shippedAt, d.getTime()) : false))
+      .sort((a, b) => (a.code >= b.code ? -1 : 1))
 
-    const waitingToShip = orders.filter(
-      (o) => o.status === "done" && !o.shippedAt
-    )
+    const waitingToShip = orders
+      .filter((o) => o.status === "done" && !o.shippedAt)
+      .sort((a, b) => (a.code >= b.code ? -1 : 1))
 
     const onProduction = orders
       .filter((o) => o.status !== "done" && o.status !== "queued")
-      .sort((a, b) => (a.code >= b.code ? 1 : -1))
+      .sort((a, b) => (a.code >= b.code ? -1 : 1))
     const lastOrders = orders
       .filter((o) => o.status === "queued")
-      .sort((a, b) => (a.code >= b.code ? 1 : -1))
+      .sort((a, b) => (a.code >= b.code ? -1 : 1))
 
     /* Result object */
 
