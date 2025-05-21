@@ -81,8 +81,8 @@ export const parseOrdersPageList = ({
         )
       })
 
-      const orderStatus: TOPStatus =
-        orderProductStatusRelation[currentOrderStatusWeight]
+      // const orderStatus: TOPStatus =
+      //   orderProductStatusRelation[currentOrderStatusWeight]
 
       // Emmitter
       const orderEmmitter = emmitters.find((e) => e.id === i.emmitter)
@@ -121,7 +121,7 @@ export const parseOrdersPageList = ({
         quantity: i.products
           .map((p) => p.quantity)
           .reduce((prev, next) => prev + next),
-        status: orderStatus,
+        status: i.status,
         value: i.totals.value,
         details: {
           productionLineId: productionLine ? productionLine.id : null,
@@ -133,10 +133,13 @@ export const parseOrdersPageList = ({
             address: addressTxt,
             orderDate: dateFns.format(i.orderDate, "dd/MM/yyyy"),
             deadline: dateFns.format(i.deadline, "dd/MM/yyyy"),
+            shippedAt: i.shippedAt
+              ? dateFns.format(i.shippedAt, "dd/MM/yyyy")
+              : null,
             emmitter: orderEmmitter.name,
             hasInstallments: i.payment.hasInstallments ? "Sim" : "Não",
             installments: i.payment.installments,
-            paymentMethod: paymentRelation[i.payment.type],
+            paymentMethod: i.payment.type,
             paidInstallments: paidInstallments,
             representative: representative ? representative.name : null,
             valueCommission: i.totals.commission,

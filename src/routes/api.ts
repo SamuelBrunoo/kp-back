@@ -80,6 +80,7 @@ routes.get("/orders", OrderController.getOrders)
 routes.get("/orders/listPage", OrderController.getOrdersListPage)
 routes.delete("/orders/:id", OrderController.deleteOrder)
 routes.put("/orders/:id", OrderController.updateOrder)
+routes.put("/orders/shipOrder/:id", OrderController.shipOrder)
 routes.get("/orders/:id", OrderController.getOrder)
 
 // # Production Lines

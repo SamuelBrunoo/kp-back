@@ -51,6 +51,7 @@ export type TPageListOrder = {
       clientStateInscription: string | null
       orderDate: string
       deadline: string
+      shippedAt: string | null
       valueTotal: number
       valueCommission: number
       valueLiquid: number

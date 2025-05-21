@@ -20,7 +20,7 @@ import { TProdType } from "../utils/types/data/prodType"
 import { TColor } from "../utils/types/data/color"
 import { TBasicEmmitter, TEmmitter } from "../utils/types/data/emmiter"
 
-import { parseFbDocs } from "../utils/parsers/fbDoc"
+import { parseFbDoc, parseFbDocs } from "../utils/parsers/fbDoc"
 import { newOrderValidator, orderValidator } from "../utils/validators/order"
 import parseOrders from "../utils/parsers/parseOrders"
 import parseOrder from "../utils/parsers/parseOrder"
@@ -41,22 +41,24 @@ import { TState } from "../utils/types/data/state"
 
 export const getOrdersListPage = async (req: Request, res: Response) => {
   try {
-    const { shippingStatus } = req.query
+    const shippingStatus = req.query.shippingStatus as
+      | "todo"
+      | "waitingShip"
+      | "shipped"
 
-    let statusToFilter: TOPStatus[] = []
-
-    if (shippingStatus) {
-      statusToFilter =
-        shippingStatus === "todo" ? ["queued", "doing", "lor"] : ["done"]
-    } else statusToFilter = ["queued", "doing", "lor", "done"]
+    const orderConditions =
+      shippingStatus === "todo"
+        ? [fb.where("status", "!=", "done")]
+        : shippingStatus === "shipped"
+        ? [fb.where("status", "==", "done"), fb.where("shippedAt", "!=", null)]
+        : [fb.where("status", "==", "done"), fb.where("shippedAt", "==", null)]
 
     const colClients = parseFbDocs(
       await fb.getDocs(fb.query(collections.clients))
     ) as TBaseClient[]
+
     const colOrders = parseFbDocs(
-      await fb.getDocs(
-        fb.query(collections.orders, fb.where("status", "in", statusToFilter))
-      )
+      await fb.getDocs(fb.query(collections.orders, ...orderConditions))
     ) as TBasicOrder[]
 
     const colEmmitters = parseFbDocs(
@@ -370,6 +372,42 @@ export const updateOrder = async (req: Request, res: Response) => {
       res.status(400).json({
         success: false,
         error: "Verifique os campos e tente novamente",
+      })
+    }
+  } catch (error) {
+    res
+      .status(400)
+      .json({ success: false, error: "Houve um erro. Tente novamente" })
+  }
+}
+
+export const shipOrder = async (req: Request, res: Response) => {
+  try {
+    const data = req.body
+
+    const { orderId, shippedAt } = data
+
+    if (orderId && shippedAt && !Number.isNaN(+shippedAt)) {
+      const ref = fb.doc(collections.orders, orderId)
+      await fb.updateDoc(ref, { shippedAt })
+
+      // Remove productionLine
+      const productionLineDocs = await fb.getDocs(
+        fb.query(collections.productionLines, fb.where("order", "==", orderId))
+      )
+
+      if (productionLineDocs.size === 1) {
+        const productionLineRef = productionLineDocs.docs[0].ref
+        await fb.deleteDoc(productionLineRef)
+      }
+
+      const docData = data
+
+      res.status(200).json({ success: true, data: docData })
+    } else {
+      res.status(400).json({
+        success: false,
+        error: "Verifique a data e tente novamente",
       })
     }
   } catch (error) {
