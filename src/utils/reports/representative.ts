@@ -1,7 +1,9 @@
 import { TBasicOrder } from "../types/data/order"
+import { TFBRepresentative } from "../types/data/representative"
 
 export const getRepMonthOrdersResume = (
-  orders: TBasicOrder[]
+  orders: TBasicOrder[],
+  representative: TFBRepresentative
 ): {
   sales: number
   total: number
@@ -22,12 +24,18 @@ export const getRepMonthOrdersResume = (
   orders.forEach((order) => {
     const orderDate = new Date(order.orderDate)
 
+    const isCommissionFixed =
+      representative.paymentConfig.commissionType === "fixed"
+
     if (
       orderDate.getMonth() === today.month &&
       orderDate.getFullYear() === today.year
     ) {
       res.sales += 1
-      res.total += order.totals.commission
+      res.total +=
+        order.totals.commission ?? isCommissionFixed
+          ? representative.paymentConfig.value
+          : order.totals.value * (representative.paymentConfig.value / 100)
     }
   })
 
@@ -35,7 +43,8 @@ export const getRepMonthOrdersResume = (
 }
 
 export const getRepYearOrdersResume = (
-  orders: TBasicOrder[]
+  orders: TBasicOrder[],
+  representative: TFBRepresentative
 ): {
   sales: number
   total: number
@@ -49,12 +58,18 @@ export const getRepYearOrdersResume = (
 
   const todayYear = d.getFullYear()
 
+  const isCommissionFixed =
+    representative.paymentConfig.commissionType === "fixed"
+
   orders.forEach((order) => {
     const orderDate = new Date(order.orderDate)
 
     if (orderDate.getFullYear() === todayYear) {
       res.sales += 1
-      res.total += order.totals.commission
+      res.total +=
+        order.totals.commission ?? isCommissionFixed
+          ? representative.paymentConfig.value
+          : order.totals.value * (representative.paymentConfig.value / 100)
     }
   })
 

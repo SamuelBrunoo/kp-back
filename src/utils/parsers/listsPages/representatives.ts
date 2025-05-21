@@ -1,7 +1,7 @@
 import {
   getRepMonthOrdersResume,
   getRepYearOrdersResume,
-} from "../../reports/month"
+} from "../../reports/representative"
 import { TBasicOrder } from "../../types/data/order"
 import {
   TPageListRepresentative,
@@ -35,10 +35,12 @@ export const parseRepresentativesPageList = ({
 
       clientsList = lastingClients
 
-      const repOrders = orders.filter((order) => order.client === rep.id)
+      const repOrders = orders.filter(
+        (order) => order.representative === rep.id
+      )
 
-      const monthlyData = getRepMonthOrdersResume(repOrders)
-      const yearlyData = getRepYearOrdersResume(repOrders)
+      const monthlyData = getRepMonthOrdersResume(repOrders, rep)
+      const yearlyData = getRepYearOrdersResume(repOrders, rep)
 
       const isDeletable = false
 
@@ -48,8 +50,8 @@ export const parseRepresentativesPageList = ({
         clients: repClients.length,
         monthTotal: monthlyData.total,
         monthSells: monthlyData.sales,
-        yearSells: yearlyData.total,
-        yearTotal: yearlyData.sales,
+        yearSells: yearlyData.sales,
+        yearTotal: yearlyData.total,
         deletable: isDeletable,
       }
 

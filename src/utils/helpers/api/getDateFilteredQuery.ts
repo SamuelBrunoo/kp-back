@@ -28,6 +28,11 @@ export const getRepresentativesQuery = (dateFilter: TDateFilter): fb.Query => {
       fb.where("representative", "!=", null),
       fb.where("orderDate", "<=", dateFilter.end)
     )
+  } else if (!dateFilter.start && !dateFilter.end) {
+    ordersQuery = fb.query(
+      collections.orders,
+      fb.where("representative", "!=", null)
+    )
   }
 
   return ordersQuery

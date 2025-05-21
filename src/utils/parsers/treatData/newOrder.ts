@@ -26,6 +26,7 @@ export const treatNewOrder = (
 
   let obj: TFBOrder = {
     ...data,
+    representative: !!data.representative ? data.representative : null,
     shippedAt: null,
     code: extra.newCode,
     status: "queued",
