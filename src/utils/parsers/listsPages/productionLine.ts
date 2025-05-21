@@ -22,6 +22,7 @@ import {
 
 import dateFns from "date-fns"
 import { TWorker } from "../../types/data/worker"
+import { getListOverralStatus } from "../../helpers/getListOverralStatus"
 
 type Props = {
   clients: TBaseClient[]
@@ -72,40 +73,72 @@ export const parseProductionLinePageList = ({
       // const orderStatus: TOPStatus = orderProductStatusRelation[orderStatusName]
       const orderStatus = orderStatusName
 
-      // Attributions
-      let attributions: TPageListProductionLine["order"]["details"]["attributions"] =
-        []
-
       // Products
       let orderProductsDetails: TPageListProductionLine["order"]["details"]["products"] =
         []
 
+      const modelsIds = [
+        ...new Set(
+          i.products.map((p) => {
+            const product = products.find((prod) => prod.id === p.id)
+            const model = models.find((mod) => mod.id === product.model)
+
+            return model.id
+          })
+        ),
+      ]
+
+      let currentMListLength = 0
+      modelsIds.forEach((mId) => {
+        let modelList = []
+
+        const model = models.find((mod) => mod.id === mId)
+        const type = productTypes.find((type) => type.code === model.type)
+
+        i.products.forEach((p) => {
+          const product = products.find((prod) => prod.id === p.id)
+
+          if (product.model === mId) {
+            const color = colors.find((col) => col.code === product.color)
+
+            p.list.forEach((listItem) =>
+              modelList.push({
+                code: product.code,
+                color: color.name,
+                lineNumber: currentMListLength + listItem.index,
+                productId: p.id,
+                productionId: listItem.productionId,
+                status: p.status,
+              })
+            )
+
+            currentMListLength += p.list.length
+          }
+        })
+
+        // Order products details
+        const modelResumeList: TPageListProductionLine["order"]["details"]["products"][number] =
+          {
+            model: model.name,
+            status: getListOverralStatus(modelList),
+            quantity: modelList.length,
+            type: type.name,
+            list: modelList,
+          }
+
+        orderProductsDetails.push(modelResumeList)
+      })
+
+      // Attributions
+      let attributions: TPageListProductionLine["order"]["details"]["attributions"] =
+        []
+
+      let currentListLength = 0
       i.products.forEach((p) => {
         const product = products.find((prod) => prod.id === p.id)
         const color = colors.find((col) => col.code === product.color)
         const model = models.find((mod) => mod.id === product.model)
-        const type = productTypes.find((type) => type.code === product.type)
 
-        const list: TPageListProductionLine["order"]["details"]["products"][number]["list"] =
-          p.list.map((listItem) => ({
-            code: product.code,
-            color: color.name,
-            lineNumber: listItem.index,
-            productId: p.id,
-            productionId: listItem.productionId,
-          }))
-
-        // Order products details
-        const orderProductsDetailsItem: TPageListProductionLine["order"]["details"]["products"][number] =
-          {
-            code: product.code,
-            model: model.name,
-            quantity: p.list.length,
-            type: type.name,
-            list: list,
-          }
-
-        // Attributions
         p.list.forEach((pListItem) => {
           const modelName = model.name
           const colorName = color.name
@@ -113,7 +146,7 @@ export const parseProductionLinePageList = ({
 
           const attributionItem: TPageListProductionLine["order"]["details"]["attributions"][number] =
             {
-              number: pListItem.index,
+              number: currentListLength + pListItem.index,
               responsable: worker,
               color: colorName,
               attributedAt: worker
@@ -129,7 +162,7 @@ export const parseProductionLinePageList = ({
           attributions.push(attributionItem)
         })
 
-        orderProductsDetails.push(orderProductsDetailsItem)
+        currentListLength += p.list.length
       })
 
       if (order) {

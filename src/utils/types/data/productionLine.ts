@@ -91,8 +91,8 @@ export type TPageListPLProductsDetailsOrders = {
 export type TOrderPLDetailsProduct = {
   type: string
   model: string
-  code: string
   quantity: number
+  status: TOPStatus
   list: TOrderPLDetailsProductListItem[]
 }
 
