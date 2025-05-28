@@ -48,7 +48,7 @@ const parseOrders = (props: Props) => {
 
         if (product) {
           const c = colors.find((col) => col.code === product.color) as TColor
-          const m = models.find((mod) => mod.code === product.model) as TModel
+          const m = models.find((mod) => mod.id === product.model) as TModel
           const t = prodTypes.find((pt) => pt.code === m.type) as TProdType
 
           const obj: TOrder["products"][number] = {

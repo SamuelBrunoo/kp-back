@@ -101,10 +101,5 @@ export const productValidator = (data: TProduct): TErrorsCheck => {
     res.fields.push("estoque")
   }
 
-  if (typeof data.active == "undefined") {
-    res.ok = false
-    res.fields.push("status")
-  }
-
   return res
 }

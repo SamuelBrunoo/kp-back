@@ -13,6 +13,7 @@ export type TNewOrder = {
     value: number
     commission: number
     liquid: number
+    products: number
   }
   payment: TOrderPaymentConfig
   shippingType: TShipping["type"]
@@ -22,21 +23,21 @@ export type TNewOrder = {
 
 export type TFBOrder = TNewOrder & {
   shippedAt: number | null
-  code: string
+  code: string | number
   status: TOPStatus
   products: TOrderProduct[]
 }
 
 export type TBasicOrder = {
   id: string
-  code: number
+  code: string | number
   status: TOPStatus
   products: TOrderProduct[]
 } & TFBOrder
 
 export type TPageListOrder = {
   id: string
-  code: string
+  code: string | number
   clientName: string
   orderDate: string
   value: number
@@ -77,12 +78,13 @@ export type TOrder = {
     value: number
     commission: number
     liquid: number
+    products: number
   }
   payment: TOrderPaymentConfig
   shipping: TShipping
   client: TBaseClient
   products: TOrderProduct[]
-  code: string
+  code: string | number
   status: TOPStatus
 }
 
@@ -98,7 +100,7 @@ type TOrderProduct = TNewOrderProduct & {
 
 type TOrderDetailsProduct = {
   id: string
-  code: string
+  code: string | number
   model: string
   name: string
   color: string

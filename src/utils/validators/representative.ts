@@ -44,7 +44,7 @@ export const newRepresentativeValidator = (
     res.ok = false
     res.fields.push("cpf")
   }
-  if (!data.registers.cnpj || typeof data.registers.cnpj !== "string") {
+  if (!!data.registers.cnpj && typeof data.registers.cnpj !== "string") {
     res.ok = false
     res.fields.push("cnpj")
   }

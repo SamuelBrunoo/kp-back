@@ -168,7 +168,7 @@ export const parseProductionLinePageList = ({
       if (order) {
         const obj: TPageListProductionLine["order"] = {
           id: i.id,
-          orderCode: order.code,
+          orderCode: String(order.code),
           clientName: client.clientName,
           orderDate: dateFns.format(order.orderDate, "dd/MM/yyyy"),
           onProduction: i.products

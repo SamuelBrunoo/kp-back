@@ -13,6 +13,8 @@ import * as PLineController from "../controllers/productionLine"
 import * as PageInfoController from "../controllers/pageInfo"
 import * as DashboardController from "../controllers/dashboard"
 
+import * as PdfController from "../controllers/pdf"
+
 const routes = Router()
 
 // # Auth
@@ -96,5 +98,8 @@ routes.get("/productionLines/:id", PLineController.getProductionLine)
 
 // # Page info
 routes.get("/pageInfo/orderForm", PageInfoController.getOrderFormData)
+
+// # PDF
+routes.get("/pdfs/order", PdfController.getOrderPdf)
 
 export default routes

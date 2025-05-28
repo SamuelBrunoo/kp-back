@@ -56,10 +56,14 @@ export const getProducts = async (req: Request, res: Response) => {
     const colModels = parseFbDocs(
       await fb.getDocs(fb.query(collections.models))
     ) as TModel[]
+    const colColors = parseFbDocs(
+      await fb.getDocs(fb.query(collections.colors))
+    ) as TModel[]
 
     const list = parseProducts({
       products: colProducts,
       models: colModels,
+      colors: colColors,
     })
 
     res.status(200).json({ success: true, data: { list } })

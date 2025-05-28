@@ -1,20 +1,25 @@
-import { TModel } from "../types/data/model"
+import { TColor } from "../types/data/color"
+import { TFBModel, TModel } from "../types/data/model"
 import { TBasicProduct, TProduct } from "../types/data/product"
 
 type Props = {
   products: TBasicProduct[]
-  models: TModel[]
+  models: TFBModel[]
+  colors: TColor[]
 }
 
-const parseProducts = ({ products, models }: Props) => {
+const parseProducts = ({ products, models, colors }: Props) => {
   let list: TProduct[] = []
 
   products.forEach((product) => {
-    const m = models.find((model) => model.id === product.model) as TModel
+    const m = models.find((model) => model.id === product.model) as TFBModel
+    const c = colors.find((color) => color.code === product.color) as TColor
 
     const obj: TProduct = {
       ...product,
       price: m.price,
+      name: m.name,
+      color: c.name,
     }
 
     list.push(obj)
