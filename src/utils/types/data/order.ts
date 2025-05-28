@@ -9,6 +9,7 @@ export type TNewOrder = {
   emmitter: string
   representative: string | null
   products: TNewOrderProduct[]
+  observations: string
   totals: {
     value: number
     commission: number
@@ -26,6 +27,7 @@ export type TFBOrder = TNewOrder & {
   code: string | number
   status: TOPStatus
   products: TOrderProduct[]
+  observations: string
 }
 
 export type TBasicOrder = {
@@ -51,6 +53,7 @@ export type TPageListOrder = {
       clientRegister: string
       clientStateInscription: string | null
       orderDate: string
+      observations: string
       deadline: string
       shippedAt: string | null
       valueTotal: number
@@ -84,6 +87,7 @@ export type TOrder = {
   shipping: TShipping
   client: TBaseClient
   products: TOrderProduct[]
+  observations: string
   code: string | number
   status: TOPStatus
 }

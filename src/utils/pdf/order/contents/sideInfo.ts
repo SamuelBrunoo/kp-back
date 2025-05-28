@@ -58,7 +58,10 @@ export const getPdfSideInfo = async (
         ]
       : []),
     { title: "Produtos:", value: String(order.totals.products) },
-    { title: "Observações", value: "-" },
+    {
+      title: "Observações",
+      value: !!order.observations ? order.observations : "-",
+    },
     ...(forAdmin
       ? [{ title: "Valor total", value: formatMoney(order.totals.value) }]
       : []),
