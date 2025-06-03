@@ -132,6 +132,7 @@ export const parseOrdersPageList = ({
             clientStateInscription: client.documents.stateInscription,
             address: addressTxt,
             orderDate: dateFns.format(i.orderDate, "dd/MM/yyyy"),
+            observations: i.observations,
             deadline: dateFns.format(i.deadline, "dd/MM/yyyy"),
             shippedAt: i.shippedAt
               ? dateFns.format(i.shippedAt, "dd/MM/yyyy")
