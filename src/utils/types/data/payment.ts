@@ -20,9 +20,20 @@ export type TOrderPaymentConfig = {
   paymentCode: string | null
   paymentNumber: string | null
   status: string
+  slips?: Slip[]
 }
 
-export type TPaymentStatus = "payed" | "awaiting"
+export type Slip = {
+  installment: number
+  value: number
+  dueDate: string
+  status: TPaymentStatus
+  barCode: string
+  cleanCode: string
+  pdfUrl: string
+}
+
+export type TPaymentStatus = "payed" | "awaiting" | "delayed"
 
 export type TPaymentMethod = "pix" | "ted" | "check" | "slip"
 
