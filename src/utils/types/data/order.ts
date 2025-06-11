@@ -15,6 +15,7 @@ export type TNewOrder = {
     commission: number
     liquid: number
     products: number
+    ship: number
   }
   payment: TOrderPaymentConfig
   shippingType: TShipping["type"]
@@ -82,6 +83,7 @@ export type TOrder = {
     commission: number
     liquid: number
     products: number
+    ship: number
   }
   payment: TOrderPaymentConfig
   shipping: TShipping
@@ -117,6 +119,7 @@ type TOrderDetailsProduct = {
 export type TShipping = {
   type: TShippingType
   method: null | TShippingMethod
+  price: number
 }
 
 export type TShippingType = "transporter" | "representative" | "mail"

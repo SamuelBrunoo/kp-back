@@ -54,7 +54,6 @@ export const getClientsListPage = async (req: Request, res: Response) => {
 
     res.status(200).json({ success: true, data: { list } })
   } catch (error) {
-    console.log(error)
     res.status(400).json(getCustomError(error))
   }
 }

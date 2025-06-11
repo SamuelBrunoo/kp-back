@@ -8,12 +8,9 @@ import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { sumOrdersValues } from "../utils/helpers/sumOrdersValues"
 import { matchDay, matchYear } from "../utils/helpers/date/index.ts/matchDay"
 import { TBaseClient } from "../utils/types/data/client"
-import parseOrders from "../utils/parsers/parseOrders"
 import { TBasicProduct } from "../utils/types/data/product"
-import parseProducts from "../utils/parsers/parseProducts"
 import {
   parseProductsToBestSeller,
-  parseProductToBestSeller,
   ParserBastSellerProps,
 } from "../utils/parsers/data/products/betsSeller"
 import { TFBModel } from "../utils/types/data/model"

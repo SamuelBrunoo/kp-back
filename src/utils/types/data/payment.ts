@@ -20,7 +20,12 @@ export type TOrderPaymentConfig = {
   paymentCode: string | null
   paymentNumber: string | null
   status: string
-  slips?: Slip[]
+  slips?: (UnfilledSlip | Slip)[]
+}
+
+export type UnfilledSlip = {
+  installment: number
+  dueDate: string
 }
 
 export type Slip = {
@@ -30,13 +35,22 @@ export type Slip = {
   status: TPaymentStatus
   barCode: string
   cleanCode: string
-  pdfUrl: string
 }
 
 export type TPaymentStatus = "payed" | "awaiting" | "delayed"
 
-export type TPaymentMethod = "pix" | "ted" | "check" | "slip"
+export type TPaymentMethod = "pix" | "slip"
 
 export type TCommissionType = "percentage" | "fixed"
 
 export type TComissionPeriod = "monthly" | "dualweek"
+
+export type TBankSlipRegister = {
+  txid: string
+  qrCode: string
+  linhaDigitavel: string
+  codigoBarras: string
+  cooperativa: string
+  posto: string
+  nossoNumero: string
+}

@@ -12,6 +12,10 @@ server.use(cors({ origin: "*" }))
 server.use(express.urlencoded({ extended: true }))
 server.use(express.json())
 
+server.get("/ping", async (req: Request, res: Response) => {
+  res.status(200).json({ pong: true })
+})
+
 server.use("/api", apiRoutes)
 
 server.use((req: Request, res: Response) => {

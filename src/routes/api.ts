@@ -13,12 +13,18 @@ import * as PLineController from "../controllers/productionLine"
 import * as PageInfoController from "../controllers/pageInfo"
 import * as DashboardController from "../controllers/dashboard"
 
+import * as PaymentsController from "../controllers/payments"
+
 import * as PdfController from "../controllers/pdf"
+import { authenticate } from "../middlewares/auth"
 
 const routes = Router()
 
 // # Auth
 routes.post("/auth/login", AuthController.login)
+routes.post("/auth/refreshToken", AuthController.refreshToken)
+
+routes.use(authenticate)
 
 // # Dashboard
 routes.get("/dashboard", DashboardController.getAdminDashboardInfo)
@@ -98,6 +104,12 @@ routes.get("/productionLines/:id", PLineController.getProductionLine)
 
 // # Page info
 routes.get("/pageInfo/orderForm", PageInfoController.getOrderFormData)
+
+// # Payments
+routes.post(
+  "/payments/order/generate",
+  PaymentsController.generateOrderPayments
+)
 
 // # PDF
 routes.get("/pdfs/order", PdfController.getOrderPdf)

@@ -6,6 +6,8 @@ import app from "../services/firebase"
 import { getCustomError } from "../utils/helpers/getCustomError"
 import { authMessagesFbRelation } from "../utils/relations/firebase/authMessages"
 import { parseFbDoc } from "../utils/parsers/fbDoc"
+import { generateTokens, verifyRefreshToken } from "../utils/jwt"
+import { TBasicEmmitter, TSafeEmmitter } from "../utils/types/data/emmiter"
 
 const firestore = fb.getFirestore(app)
 const authInstance = getAuth(app)
@@ -49,21 +51,26 @@ export const login = async (req: Request, res: Response) => {
             }
           } else {
             // get emmitter data
-            const emmittersList = await fb.getDocs(
+            const emmittersDocs = await fb.getDocs(
               fb.query(
                 collections.emmitters,
                 fb.where("userId", "==", userCredential.user.uid)
               )
             )
 
-            const isEmmiter = !emmittersList.empty
+            if (emmittersDocs.size > 0) {
+              const emmitter = parseFbDoc(emmittersDocs.docs[0])
 
-            if (isEmmiter) {
-              const emmitterData = emmittersList.docs[0]
-              userData = {
-                ...parseFbDoc(emmitterData),
-                email,
+              const emmitterInfo: TSafeEmmitter = {
+                address: emmitter.address,
+                cnpj: emmitter.cnpj,
+                email: emmitter.email,
+                name: emmitter.name,
+                phone: emmitter.phone,
+                cpf: emmitter.cpf,
               }
+
+              userData = emmitterInfo
             } else {
               const errorMessage = getCustomError({
                 message: "Usuário sem autorização",
@@ -74,13 +81,15 @@ export const login = async (req: Request, res: Response) => {
           }
 
           // token
-          const token = ""
-          const refreshToken = ""
+          const tokens = generateTokens(userData)
+
+          const accessToken = tokens.accessToken
+          const refreshToken = tokens.refreshToken
 
           res.status(200).json({
             success: true,
             data: {
-              token,
+              accessToken,
               refreshToken,
               user: userData,
             },
@@ -98,5 +107,17 @@ export const login = async (req: Request, res: Response) => {
     } else throw new Error("Preencha os campos corretamente")
   } catch (error) {
     res.status(400).json(getCustomError(error))
+  }
+}
+
+export const refreshToken = async (req: Request, res: Response) => {
+  const { refreshToken } = req.body
+
+  try {
+    const payload = verifyRefreshToken(refreshToken)
+    const tokens = generateTokens({ id: (payload as any).id })
+    res.status(200).json(tokens)
+  } catch {
+    res.status(403).json({ message: "Refresh token inválido" })
   }
 }
