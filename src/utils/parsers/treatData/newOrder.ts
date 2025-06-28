@@ -1,3 +1,4 @@
+import { getListOverralStatus } from "../../helpers/getListOverralStatus"
 import { TFBOrder, TNewOrder } from "../../types/data/order"
 import { TProduct } from "../../types/data/product"
 
@@ -16,7 +17,7 @@ export const treatNewOrder = (
       id: p.id,
       quantity: p.quantity,
       status:
-        prod.storage.has && prod.storage.quantity - p.quantity >= 0
+        !prod.storage.has || prod.storage.quantity - p.quantity >= 0
           ? "done"
           : "queued",
     }
@@ -29,7 +30,7 @@ export const treatNewOrder = (
     representative: !!data.representative ? data.representative : null,
     shippedAt: null,
     code: extra.newCode,
-    status: "queued",
+    status: getListOverralStatus(prods),
     products: prods,
   }
 

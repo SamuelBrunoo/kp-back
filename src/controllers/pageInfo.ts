@@ -6,7 +6,6 @@ import { parseFbDoc, parseFbDocs } from "../utils/parsers/fbDoc"
 import { TBaseClient, TClient } from "../utils/types/data/client"
 import {
   TBasicRepresentative,
-  TFBRepresentative,
   TRepresentative,
 } from "../utils/types/data/representative"
 import { TBasicProduct, TProduct } from "../utils/types/data/product"
@@ -19,9 +18,9 @@ import { TBasicOrder, TOrder } from "../utils/types/data/order"
 import parseModel from "../utils/parsers/parseModel"
 import parseProduct from "../utils/parsers/data/products/parseProduct"
 import { TState } from "../utils/types/data/state"
-import parseClients from "../utils/parsers/tableData/parseClients"
 import parseClient from "../utils/parsers/parseClient"
 import { parseRepresentative } from "../utils/parsers/parseRepresentatives"
+import parseProducts from "../utils/parsers/parseProducts"
 
 export const getOrderFormData = async (req: Request, res: Response) => {
   try {
@@ -77,8 +76,15 @@ export const getOrderFormData = async (req: Request, res: Response) => {
       const fbOrder = await fb.getDoc(ref)
 
       if (fbOrder.exists()) {
-        const orderInfo = parseFbDoc(fbOrder)
+        const orderInfo = parseFbDoc(fbOrder) as TBasicOrder
+
         data.order = orderInfo
+
+        data.products = parseProducts({
+          products: data.products,
+          colors: colColors,
+          models: colModels,
+        })
       }
     }
 

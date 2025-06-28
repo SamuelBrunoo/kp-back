@@ -7,7 +7,14 @@ import { getCustomError } from "../utils/helpers/getCustomError"
 import { authMessagesFbRelation } from "../utils/relations/firebase/authMessages"
 import { parseFbDoc } from "../utils/parsers/fbDoc"
 import { generateTokens, verifyRefreshToken } from "../utils/jwt"
-import { TBasicEmmitter, TSafeEmmitter } from "../utils/types/data/emmiter"
+import {
+  TBasicEmmitter,
+  TEmmitter,
+  TSafeEmmitter,
+} from "../utils/types/data/emmiter"
+import { TUser } from "../utils/types/data/user"
+import { TWorker } from "../utils/types/data/worker"
+import { parseSafeEmmitter } from "../utils/parsers/user"
 
 const firestore = fb.getFirestore(app)
 const authInstance = getAuth(app)
@@ -22,6 +29,7 @@ const collections = {
   production: fb.collection(firestore, "production"),
   workers: fb.collection(firestore, "workers"),
   emmitters: fb.collection(firestore, "emmitters"),
+  users: fb.collection(firestore, "users"),
 }
 
 export const login = async (req: Request, res: Response) => {
@@ -31,46 +39,29 @@ export const login = async (req: Request, res: Response) => {
     if (email && pass) {
       await signInWithEmailAndPassword(authInstance, email, pass)
         .then(async (userCredential) => {
-          const workersList = await fb.getDocs(
-            fb.query(
-              collections.workers,
-              fb.where("userId", "==", userCredential.user.uid)
-            )
-          )
+          const userRef = fb.doc(collections.users, userCredential.user.uid)
+          const userDoc = await fb.getDoc(userRef)
 
-          const isWorker = !workersList.empty
+          if (userDoc.exists()) {
+            const user = parseFbDoc(userDoc) as TUser
 
-          let userData = null
+            let userExtraInfo: null | TUser["roleInfo"] = null
 
-          if (isWorker) {
-            // get worker data
-            const fbWorkerData = workersList.docs[0]
-            userData = {
-              ...parseFbDoc(fbWorkerData),
-              email,
-            }
-          } else {
-            // get emmitter data
-            const emmittersDocs = await fb.getDocs(
-              fb.query(
-                collections.emmitters,
-                fb.where("userId", "==", userCredential.user.uid)
-              )
-            )
+            if (user.extraRole === "worker") {
+              const erRef = fb.doc(collections.workers, user.extraRoleId)
+              const erDoc = await fb.getDoc(erRef)
 
-            if (emmittersDocs.size > 0) {
-              const emmitter = parseFbDoc(emmittersDocs.docs[0])
+              if (erDoc.exists()) userExtraInfo = parseFbDoc(erDoc) as TWorker
+              else throw new Error("O papel do usuário é inválido.")
+            } else if (user.extraRole === "emmitter") {
+              const erRef = fb.doc(collections.emmitters, user.extraRoleId)
+              const erDoc = await fb.getDoc(erRef)
 
-              const emmitterInfo: TSafeEmmitter = {
-                address: emmitter.address,
-                cnpj: emmitter.cnpj,
-                email: emmitter.email,
-                name: emmitter.name,
-                phone: emmitter.phone,
-                cpf: emmitter.cpf,
-              }
-
-              userData = emmitterInfo
+              if (erDoc.exists()) {
+                const basicEmmitter = parseFbDoc(erDoc) as TEmmitter
+                const safeEmmitter = parseSafeEmmitter(basicEmmitter)
+                userExtraInfo = safeEmmitter
+              } else throw new Error("O papel do usuário é inválido.")
             } else {
               const errorMessage = getCustomError({
                 message: "Usuário sem autorização",
@@ -78,22 +69,27 @@ export const login = async (req: Request, res: Response) => {
 
               return res.status(400).json(errorMessage)
             }
+
+            const userData: TUser = {
+              ...user,
+              roleInfo: userExtraInfo,
+            }
+
+            // token
+            const tokens = generateTokens(userData)
+
+            const accessToken = tokens.accessToken
+            const refreshToken = tokens.refreshToken
+
+            res.status(200).json({
+              success: true,
+              data: {
+                accessToken,
+                refreshToken,
+                user: userData,
+              },
+            })
           }
-
-          // token
-          const tokens = generateTokens(userData)
-
-          const accessToken = tokens.accessToken
-          const refreshToken = tokens.refreshToken
-
-          res.status(200).json({
-            success: true,
-            data: {
-              accessToken,
-              refreshToken,
-              user: userData,
-            },
-          })
         })
         .catch((error) => {
           const errorCode = error.code

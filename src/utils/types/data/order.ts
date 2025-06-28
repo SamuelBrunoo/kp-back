@@ -100,7 +100,7 @@ type TNewOrderProduct = {
   status: TOPStatus
 }
 
-type TOrderProduct = TNewOrderProduct & {
+export type TOrderProduct = TNewOrderProduct & {
   status: TOPStatus
 }
 
