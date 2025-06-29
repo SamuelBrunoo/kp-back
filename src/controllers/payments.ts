@@ -13,7 +13,7 @@ import {
   TBankSlipRegister,
   UnfilledSlip,
 } from "../utils/types/data/payment"
-import { getSlipsValues } from "../utils/helpers/slip"
+import { getSlipDue, getSlipsValues } from "../utils/helpers/slip"
 import { TBaseClient } from "../utils/types/data/client"
 import { TState } from "../utils/types/data/state"
 import { TS_Slip_Register } from "../utils/types/data/services/sicredi/data/slip"
@@ -33,14 +33,14 @@ const collections = {
   states: fb.collection(firestore, "states"),
 }
 
-export const generateOrderPayments = async (req: Request, res: Response) => {
+export const generateOrderPayment = async (req: Request, res: Response) => {
   try {
     const { user } = req as any
 
     const orderId = req.body.orderId as string | undefined
-    const shipPrice = req.body.shipPrice as number | undefined
+    const shippingCost = req.body.shippingCost as number | undefined
 
-    if (orderId && shipPrice) {
+    if (orderId && shippingCost) {
       const orderRef = fb.doc(collections.orders, orderId)
       const orderDoc = await fb.getDoc(orderRef)
 
@@ -77,8 +77,8 @@ export const generateOrderPayments = async (req: Request, res: Response) => {
             clientStateDoc.exists() &&
             !client.address.full.includes(client.address.state)
           ) {
-            const emmitterState = parseFbDoc(emmitterDoc) as TState
-            const clientState = parseFbDoc(clientDoc) as TState
+            const emmitterState = parseFbDoc(emmitterStateDoc) as TState
+            const clientState = parseFbDoc(clientStateDoc) as TState
 
             if (orderPaymentConfig.type === "pix") {
               // generate pix
@@ -91,28 +91,31 @@ export const generateOrderPayments = async (req: Request, res: Response) => {
                 grant_type: "password",
                 password: bankCredentials.password,
                 username: bankCredentials.username,
-                scope: "COBRANCA",
+                scope: "cobranca",
               })
 
               if (req.ok) {
                 const credentials = req.data
 
                 // register slips
-                const shippedOrderPrice = order.totals.value + shipPrice
+                const shippedOrderPrice = order.totals.value + shippingCost
 
                 if (orderPaymentConfig.hasInstallments) {
-                  const slipsCount = orderPaymentConfig.slips.length
+                  const slipsCount = +orderPaymentConfig.installments
 
                   const slipValues = getSlipsValues(
                     shippedOrderPrice,
                     slipsCount
                   )
 
-                  let generatedSlips: TBankSlipRegister[] = []
+                  let generatedSlips: (TBankSlipRegister & UnfilledSlip)[] = []
                   let reqErrors: string[] = []
 
                   for (let i = 0; i < slipsCount; i++) {
-                    const slipData = orderPaymentConfig.slips[i] as UnfilledSlip
+                    const slipData = {
+                      installment: i,
+                      dueDate: getSlipDue(i, order.payment.due.toString()),
+                    } as UnfilledSlip
 
                     const slipTotal = slipValues[i]
 
@@ -126,7 +129,11 @@ export const generateOrderPayments = async (req: Request, res: Response) => {
                       cep: +client.address.cep,
                       cidade: client.address.city,
                       email: client.email,
-                      endereco: client.address.full,
+                      endereco: `${client.address.street}, ${
+                        client.address.number
+                          ? `nº${client.address.number}`
+                          : "s/n"
+                      }`,
                       telefone: client.phone1,
                       uf: clientState.abbr,
                     }
@@ -159,18 +166,18 @@ export const generateOrderPayments = async (req: Request, res: Response) => {
 
                       tipoJuros: "PERCENTUAL",
                       juros: 33,
-                      multa: 200,
+                      multa: 2,
                     }
 
                     // In case of automatic split the commission, put in config above.
 
                     await Api.slips
-                      .register(slipConfig, credentials)
+                      .register(slipConfig, credentials, bankCredentials)
                       .then((slipReq) => {
                         if (slipReq.ok === true) {
                           const info: TBankSlipRegister = slipReq.data
-                          generatedSlips.push(info)
-                        } else reqErrors.push(slipReq.error.message)
+                          generatedSlips.push({ ...info, ...slipData })
+                        } else reqErrors.push(JSON.stringify(slipReq))
                       })
                       .catch((err) => {
                         reqErrors.push(err)
@@ -178,7 +185,7 @@ export const generateOrderPayments = async (req: Request, res: Response) => {
                   }
 
                   if (generatedSlips.length === slipsCount) {
-                    // update order to include shipPrice on it's totals
+                    // update order to include shippingCost on it's totals
 
                     const baseData = orderDoc.data() as TFBOrder
 
@@ -186,10 +193,13 @@ export const generateOrderPayments = async (req: Request, res: Response) => {
                       (s, sk) => ({
                         barCode: s.codigoBarras,
                         cleanCode: s.linhaDigitavel,
-                        dueDate: baseData.payment.slips[sk].dueDate,
-                        installment: baseData.payment.slips[sk].installment,
+                        dueDate: s.dueDate,
+                        installment: s.installment,
                         status: "awaiting",
                         value: slipValues[sk],
+                        nossoNumero: s.nossoNumero,
+                        txid: s.txid,
+                        qrCode: s.qrCode,
                       })
                     )
 
@@ -197,7 +207,7 @@ export const generateOrderPayments = async (req: Request, res: Response) => {
                       ...baseData,
                       totals: {
                         ...baseData.totals,
-                        ship: shipPrice,
+                        ship: shippingCost,
                       },
                       payment: {
                         ...baseData.payment,

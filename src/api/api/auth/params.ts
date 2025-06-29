@@ -12,6 +12,6 @@ export type TApi_Params_Auth = {
   }
 }
 
-type TScope = "COBRANCA"
+type TScope = "cobranca"
 
 type TGrantType = "password" | "refresh_token"

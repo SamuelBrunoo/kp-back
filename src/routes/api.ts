@@ -106,10 +106,7 @@ routes.get("/productionLines/:id", PLineController.getProductionLine)
 routes.get("/pageInfo/orderForm", PageInfoController.getOrderFormData)
 
 // # Payments
-routes.post(
-  "/payments/order/generate",
-  PaymentsController.generateOrderPayments
-)
+routes.post("/payments/order/generate", PaymentsController.generateOrderPayment)
 
 // # PDF
 routes.get("/pdfs/order", PdfController.getOrderPdf)

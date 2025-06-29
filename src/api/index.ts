@@ -1,12 +1,15 @@
 import axios from "axios"
 import { TApi } from "./types"
 import { jwtDecode } from "jwt-decode"
+import dotenv from "dotenv"
 
 // Api
 
 import { TDefaultBodyRes, TErrorResponse } from "./types"
 import { apiAuth } from "./api/auth"
 import { apiSlips } from "./api/slips"
+
+dotenv.config()
 
 export const initialResponse: TErrorResponse = {
   ok: false,
@@ -31,6 +34,8 @@ export const generateResponse = <T>(info: any): TDefaultBodyRes<T> => {
   }
 }
 
+// TODO: Implement apiKey using auth user
+const apiKey = process.env.BANK_API_API_KEY
 const backUrl = process.env.BANK_API_URL
 
 axios.defaults.baseURL = backUrl
@@ -51,23 +56,7 @@ const checkTokenExpiration = (token: string) => {
 
 axios.interceptors.request.use(function (config) {
   try {
-    const localToken = localStorage.getItem("token")
-
-    if (localToken) {
-      if (localToken === "undefined") {
-        localStorage.removeItem("token")
-
-        window.location.reload()
-      } else {
-        const isTokenExpired = checkTokenExpiration(localToken)
-
-        if (isTokenExpired) {
-          localStorage.removeItem("token")
-
-          window.location.reload()
-        } else config.headers.Authorization = `Bearer ${localToken}`
-      }
-    }
+    if (apiKey) config.headers["x-api-key"] = apiKey
 
     return config
   } catch (error) {

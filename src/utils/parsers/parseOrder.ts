@@ -46,10 +46,9 @@ const parseOrder = (props: Props) => {
     representative: order.representative ?? "Não definido",
     payment: {
       ...order.payment,
-      // @ts-ignore
       installments:
         order.payment.installments !== undefined
-          ? String(order.payment.installments)
+          ? order.payment.installments
           : undefined,
       paymentNumber:
         order.payment.type === "slip"

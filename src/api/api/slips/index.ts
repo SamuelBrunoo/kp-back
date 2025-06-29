@@ -5,43 +5,35 @@ import { TApi_Params_Slips as TParams } from "./params"
 import { TApi_Responses_Slips as TResponses } from "./responses"
 import { getApiError } from "../../../utils/helpers/api/getApiErrors"
 import { TS_Credential } from "../../../utils/types/data/services/sicredi/data/credential"
+import { TBankCredentials } from "../../../utils/types/data/emmiter"
 
 const baseURL = "/cobranca/boleto/v1"
 
-export const register: TApi["slips"]["register"] = async (slipConfig) => {
+export const register: TApi["slips"]["register"] = async (
+  slipConfig,
+  credentials,
+  bankCredentials
+) => {
   return new Promise(async (resolve, reject) => {
     try {
       const body = slipConfig
 
       await service
-        .post(`${baseURL}/boletos`, body)
+        .post(`${baseURL}/boletos`, body, {
+          headers: {
+            Authorization: `Bearer ${credentials.access_token}`,
+            cooperativa: bankCredentials.cooperativa,
+            posto: bankCredentials.posto,
+          },
+        })
         .then((res) => {
           if (res.status === 201) {
-            const info = res.data.data
+            const info = res.data
 
-            resolve({
-              ok: true,
-              data: info,
-            })
-          } else {
-            console.log(
-              "[API SICREDI] Cadastro de boleto: ",
-              slipConfig,
-              "\n",
-              res
-            )
-            resolve(getApiError(res))
-          }
+            resolve({ ok: true, data: info })
+          } else resolve(getApiError(res))
         })
-        .catch((err: AxiosError) => {
-          console.error(
-            "[API SICREDI] Cadastro de boleto: ",
-            slipConfig,
-            "\n",
-            err
-          )
-          resolve(getApiError(err))
-        })
+        .catch((err: AxiosError) => resolve(getApiError(err)))
     } catch (error) {
       reject({
         error:
@@ -54,7 +46,8 @@ export const register: TApi["slips"]["register"] = async (slipConfig) => {
 export type TApi_Slips = {
   register: (
     p: TParams["slips"]["register"],
-    credentials: TS_Credential
+    credentials: TS_Credential,
+    bankCredentials: TBankCredentials
   ) => TResponses["slips"]["register"]
 }
 

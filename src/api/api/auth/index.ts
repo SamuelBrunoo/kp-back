@@ -19,11 +19,17 @@ export const login: TApi["auth"]["token"] = async (params) => {
         grant_type,
       }
 
+      /* TODO: Environment variable for context value */
       await service
-        .post(`${baseURL}/openapi/token`, body)
+        .post(`${baseURL}/openapi/token`, body, {
+          headers: {
+            context: "COBRANCA",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        })
         .then((res) => {
-          if (res.data.success) {
-            const info = res.data.data
+          if (res.status === 200 && res.data.access_token !== undefined) {
+            const info = res.data
 
             resolve({
               ok: true,
@@ -36,7 +42,8 @@ export const login: TApi["auth"]["token"] = async (params) => {
         })
     } catch (error) {
       reject({
-        error: "Não foi possível listar as cores. Tente novamente mais tarde.",
+        error:
+          "Não foi possível fazer a autenticação. Tente novamente mais tarde.",
       })
     }
   })

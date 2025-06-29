@@ -16,7 +16,7 @@ export type TOrderPaymentConfig = {
   type: TPaymentMethod
   hasInstallments: boolean
   installments: number
-  dueDate: number
+  due: number
   paymentCode: string | null
   paymentNumber: string | null
   status: string
@@ -35,6 +35,9 @@ export type Slip = {
   status: TPaymentStatus
   barCode: string
   cleanCode: string
+  nossoNumero: string
+  txid: string
+  qrCode: string
 }
 
 export type TPaymentStatus = "payed" | "awaiting" | "delayed"
