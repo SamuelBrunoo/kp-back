@@ -16,6 +16,7 @@ const firestore = fb.getFirestore(app)
 
 // # Collections
 export const collections = {
+  users: fb.collection(firestore, "users"),
   clients: fb.collection(firestore, "clients"),
   colors: fb.collection(firestore, "colors"),
   emmitters: fb.collection(firestore, "emmitters"),
@@ -26,7 +27,7 @@ export const collections = {
   productTypes: fb.collection(firestore, "productTypes"),
   representatives: fb.collection(firestore, "representatives"),
   workers: fb.collection(firestore, "workers"),
-  
+
   // Locations
   cities: fb.collection(firestore, "cities"),
   states: fb.collection(firestore, "states"),

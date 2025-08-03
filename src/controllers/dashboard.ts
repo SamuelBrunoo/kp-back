@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 
 import * as fb from "firebase/firestore"
-import app from "../services/firebase"
+import app from "../network/firebase"
 import { getCustomError } from "../utils/helpers/getCustomError"
 import { TBasicOrder, TOrder } from "../utils/types/data/order"
 import { parseFbDocs } from "../utils/parsers/fbDoc"

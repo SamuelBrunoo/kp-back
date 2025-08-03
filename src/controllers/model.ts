@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 
 import * as fb from "firebase/firestore"
-import app from "../services/firebase"
+import app from "../network/firebase"
 import { TProduct } from "../utils/types/data/product"
 import { modelValidator } from "../utils/validators/model"
 import { parseFbDocs } from "../utils/parsers/fbDoc"

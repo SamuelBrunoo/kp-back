@@ -1,5 +1,5 @@
 import * as fb from "firebase/firestore"
-import { collections } from "../../../services/firebase"
+import { collections } from "../../../network/firebase"
 
 type TDateFilter = {
   start: string | null

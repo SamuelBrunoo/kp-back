@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 
 import * as fb from "firebase/firestore"
-import app from "../services/firebase"
+import app from "../network/firebase"
 import { TNewColor } from "../utils/types/data/color"
 import { colorValidator } from "../utils/validators/color"
 

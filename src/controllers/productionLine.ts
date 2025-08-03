@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 
 import * as fb from "firebase/firestore"
-import { collections } from "../services/firebase"
+import { collections } from "../network/firebase"
 
 import { TBaseClient, TClient } from "../utils/types/data/client"
 import { TRepresentative } from "../utils/types/data/representative"

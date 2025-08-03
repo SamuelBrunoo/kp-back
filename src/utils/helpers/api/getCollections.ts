@@ -1,5 +1,5 @@
 import * as fb from "firebase/firestore"
-import { collections } from "../../../services/firebase"
+import { collections } from "../../../network/firebase"
 import { parseFbDocs } from "../../parsers/fbDoc"
 import { TFBOrder, TBasicOrder } from "../../types/data/order"
 import { TClient } from "../../types/data/client"
