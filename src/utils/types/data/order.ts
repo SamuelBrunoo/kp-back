@@ -1,5 +1,5 @@
 import { TBaseClient } from "./client"
-import { TOrderPaymentConfig } from "./payment"
+import { Slip, TOrderPaymentConfig } from "./payment"
 
 export type TNewOrder = {
   client: string
@@ -68,6 +68,7 @@ export type TPageListOrder = {
       representative: string | null
       address: string
     }
+    paymentSlips?: Slip[]
   }
 }
 

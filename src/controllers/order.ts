@@ -38,6 +38,7 @@ import { getCustomError } from "../utils/helpers/getCustomError"
 import { parseOrdersPageList } from "../utils/parsers/listsPages/orders"
 import { TCity } from "../utils/types/data/city"
 import { TState } from "../utils/types/data/state"
+import { getParsedCollections } from "../utils/helpers/api/getCollections"
 
 export const getOrdersListPage = async (req: Request, res: Response) => {
   try {
@@ -129,43 +130,25 @@ export const getOrdersListPage = async (req: Request, res: Response) => {
 
 export const getOrders = async (req: Request, res: Response) => {
   try {
-    let colOrders: TFBOrder[] = []
-    let colClients: TClient[] = []
-    let colEmmitters: TEmmitter[] = []
-    let colRepresentatives: TRepresentative[] = []
-    let colProdTypes: TProdType[] = []
-    let colColors: TColor[] = []
-    let colModels: TModel[] = []
-    let colProducts: TProduct[] = []
-
-    const pms = [
-      fb.getDocs(fb.query(collections.orders)).then((res) => {
-        colOrders = parseFbDocs(res as any) as TFBOrder[]
-      }),
-      fb.getDocs(fb.query(collections.clients)).then((res) => {
-        colClients = parseFbDocs(res as any) as TClient[]
-      }),
-      fb.getDocs(fb.query(collections.emmitters)).then((res) => {
-        colEmmitters = parseFbDocs(res as any) as TEmmitter[]
-      }),
-      fb.getDocs(fb.query(collections.representatives)).then((res) => {
-        colRepresentatives = parseFbDocs(res as any) as TRepresentative[]
-      }),
-      fb.getDocs(fb.query(collections.productTypes)).then((res) => {
-        colProdTypes = parseFbDocs(res as any) as TProdType[]
-      }),
-      fb.getDocs(fb.query(collections.colors)).then((res) => {
-        colColors = parseFbDocs(res as any) as TColor[]
-      }),
-      fb.getDocs(fb.query(collections.models)).then((res) => {
-        colModels = parseFbDocs(res as any) as TModel[]
-      }),
-      fb.getDocs(fb.query(collections.products)).then((res) => {
-        colProducts = parseFbDocs(res as any) as TProduct[]
-      }),
-    ]
-
-    await Promise.all(pms)
+    const {
+      colOrders,
+      colClients,
+      colEmmitters,
+      colRepresentatives,
+      colProdTypes,
+      colColors,
+      colModels,
+      colProducts,
+    } = await getParsedCollections([
+      "orders",
+      "clients",
+      "emmitters",
+      "representatives",
+      "productTypes",
+      "colors",
+      "models",
+      "products",
+    ])
 
     const list = parseOrders({
       orders: colOrders as any,
@@ -240,19 +223,10 @@ export const addOrder = async (req: Request, res: Response) => {
     const validation = newOrderValidator(data)
 
     if (validation.ok) {
-      let colProducts: TProduct[] = []
-      let colProductionLines: TProductionLine[] = []
-
-      const pms = [
-        fb.getDocs(fb.query(collections.products)).then((res) => {
-          colProducts = parseFbDocs(res as any) as TProduct[]
-        }),
-        fb.getDocs(fb.query(collections.productionLines)).then((res) => {
-          colProductionLines = parseFbDocs(res as any) as TProductionLine[]
-        }),
-      ]
-
-      await Promise.all(pms)
+      const { colProductionLines, colProducts } = await getParsedCollections([
+        "productionLines",
+        "products",
+      ])
 
       const lo = await fb.getDocs(
         fb.query(collections.orders, fb.orderBy("code", "desc"), fb.limit(1))
@@ -265,6 +239,10 @@ export const addOrder = async (req: Request, res: Response) => {
       const productsToTreat = colProducts.filter((prod) =>
         data.products.map((p) => p.id).includes(prod.id)
       )
+
+      console.log("colProducts", colProducts)
+      console.log("Products to treat", productsToTreat)
+
       const treated = treatData("newOrder", data, { newCode, productsToTreat })
 
       const info: TNewOrder = data
@@ -342,9 +320,8 @@ export const addOrder = async (req: Request, res: Response) => {
       })
 
       // register new product line document
-      if (newProductLine) {
+      if (newProductLine)
         await fb.addDoc(collections.productionLines, newProductLine)
-      }
 
       res.status(200).json({ success: true, data: docData })
     } else {
@@ -352,6 +329,7 @@ export const addOrder = async (req: Request, res: Response) => {
       throw new Error(`Verifique os campos (${fieldsStr}) e tente novamente.`)
     }
   } catch (error) {
+    console.log(error)
     res
       .status(400)
       .json({ success: false, error: "Houve um erro. Tente novamente" })

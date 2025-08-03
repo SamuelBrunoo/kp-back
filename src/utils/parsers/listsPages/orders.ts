@@ -11,6 +11,7 @@ import {
   TOPStatusWeight,
   TPageListOrder,
 } from "../../types/data/order"
+import { Slip } from "../../types/data/payment"
 import { TProdType } from "../../types/data/prodType"
 import { TBasicProduct } from "../../types/data/product"
 import { TProductionLine } from "../../types/data/productionLine"
@@ -147,6 +148,7 @@ export const parseOrdersPageList = ({
             valueLiquid: i.totals.liquid,
             valueTotal: i.totals.value,
           },
+          paymentSlips: i.payment.slips as Slip[],
         },
       }
 

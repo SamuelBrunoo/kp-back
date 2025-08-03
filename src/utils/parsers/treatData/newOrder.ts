@@ -12,6 +12,8 @@ export const treatNewOrder = (
   const prods: TFBOrder["products"] = data.products.map((p) => {
     const prod = extra.productsToTreat.find((product) => product.id === p.id)
 
+    console.log("[INFO]: Parser - prod\n", prod)
+
     // @ts-ignore
     const obj: TFBOrder["products"][number] = {
       id: p.id,
@@ -21,6 +23,8 @@ export const treatNewOrder = (
           ? "done"
           : "queued",
     }
+
+    console.log("[INFO]: Parser - obj\n", obj)
 
     return obj
   })
