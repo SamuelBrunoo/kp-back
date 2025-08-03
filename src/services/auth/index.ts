@@ -118,6 +118,8 @@ const login = async (
   })
 }
 
-export const AuthService = {
+const AuthService = {
   login,
 }
+
+export default AuthService

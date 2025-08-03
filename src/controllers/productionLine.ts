@@ -29,6 +29,7 @@ import {
 import { getCustomError } from "../utils/helpers/getCustomError"
 import { extractProductionUpdates } from "../utils/helpers/productionLine"
 import { extractOrderProductionUpdates } from "../utils/helpers/order"
+import { getParsedCollections } from "../network/firebase/collectionsHelpers"
 
 export const getProductionLinesListPage = async (
   req: Request,
@@ -101,53 +102,25 @@ export const getProductionLinesListPage = async (
 
 export const getProductionLines = async (req: Request, res: Response) => {
   try {
-    let colOrders: TFBOrder[] = []
-    let colClients: TClient[] = []
-    let colEmmitters: TEmmitter[] = []
-    let colRepresentatives: TRepresentative[] = []
-    let colProdTypes: TProdType[] = []
-    let colColors: TColor[] = []
-    let colModels: TModel[] = []
-    let colProducts: TProduct[] = []
-    let colProductionLines: TFBProductionLine[] = []
-    let colWorkers: TWorker[] = []
-
-    const pms = [
-      fb.getDocs(fb.query(collections.orders)).then((res) => {
-        colOrders = parseFbDocs(res as any) as TFBOrder[]
-      }),
-      fb.getDocs(fb.query(collections.clients)).then((res) => {
-        colClients = parseFbDocs(res as any) as TClient[]
-      }),
-      fb.getDocs(fb.query(collections.emmitters)).then((res) => {
-        colEmmitters = parseFbDocs(res as any) as TEmmitter[]
-      }),
-      fb.getDocs(fb.query(collections.representatives)).then((res) => {
-        colRepresentatives = parseFbDocs(res as any) as TRepresentative[]
-      }),
-      fb.getDocs(fb.query(collections.productTypes)).then((res) => {
-        colProdTypes = parseFbDocs(res as any) as TProdType[]
-      }),
-      fb.getDocs(fb.query(collections.colors)).then((res) => {
-        colColors = parseFbDocs(res as any) as TColor[]
-      }),
-      fb.getDocs(fb.query(collections.models)).then((res) => {
-        colModels = parseFbDocs(res as any) as TModel[]
-      }),
-      fb.getDocs(fb.query(collections.products)).then((res) => {
-        colProducts = parseFbDocs(res as any) as TProduct[]
-      }),
-      fb.getDocs(fb.query(collections.productionLines)).then((res) => {
-        colProductionLines = parseFbDocs(res as any) as (TFBProductionLine & {
-          id: string
-        })[]
-      }),
-      fb.getDocs(fb.query(collections.workers)).then((res) => {
-        colWorkers = parseFbDocs(res as any) as TWorker[]
-      }),
-    ]
-
-    await Promise.all(pms)
+    const {
+      colOrders,
+      colClients,
+      colProdTypes,
+      colColors,
+      colModels,
+      colProducts,
+      colProductionLines,
+      colWorkers,
+    } = await getParsedCollections([
+      "orders",
+      "clients",
+      "productTypes",
+      "colors",
+      "models",
+      "products",
+      "productionLines",
+      "workers",
+    ])
 
     const list = parseProductionLines({
       productionLines: colProductionLines,
@@ -162,7 +135,6 @@ export const getProductionLines = async (req: Request, res: Response) => {
 
     res.json({ success: true, data: { list } })
   } catch (error) {
-    console.error(error)
     res.status(204).json({ success: false, error: true })
   }
 }

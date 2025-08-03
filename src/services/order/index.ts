@@ -1,0 +1,60 @@
+import * as fb from "firebase/firestore"
+import { collections } from "../../network/firebase"
+import { TBasicOrder, TFBOrder, TNewOrder } from "../../utils/types/data/order"
+import { TClient } from "../../utils/types/data/client"
+import { getCustomError } from "../../utils/helpers/getCustomError"
+
+const getLastOrderCode = async (): Promise<string> => {
+  return new Promise(async (resolve) => {
+    const lo = await fb.getDocs(
+      fb.query(collections.orders, fb.orderBy("code", "desc"), fb.limit(1))
+    )
+
+    const lastOrder =
+      lo.docs.length > 0 ? (lo.docs[0].data() as TFBOrder) : null
+
+    const code = lastOrder ? Number(lastOrder.code) : 1
+
+    resolve(code.toString())
+  })
+}
+
+const getNewOrderCode = async (): Promise<string> => {
+  return new Promise(async (resolve) => {
+    const lastOrderCode = await getLastOrderCode()
+    const newCode = lastOrderCode ? Number(lastOrderCode) + 1 : 1
+    resolve(newCode.toString())
+  })
+}
+
+const registerOrder = async (
+  data: TNewOrder
+): Promise<
+  { success: true; data: TBasicOrder } | { success: false; error: string }
+> => {
+  return new Promise(async (resolve) => {
+    try {
+      const info: TNewOrder = data
+      const clientRef = fb.doc(collections.clients, info.client)
+      const clientDoc = await fb.getDoc(clientRef)
+      const client = { ...clientDoc.data(), id: clientDoc.id } as TClient
+
+      // Register Order
+      const doc = await fb.addDoc(collections.orders, info)
+      const docData = { ...info, id: doc.id } as TBasicOrder
+
+      resolve({ success: true, data: docData })
+    } catch (error) {
+      const errorMessage = getCustomError(error)
+      resolve({ success: false, error: errorMessage.error })
+    }
+  })
+}
+
+const OrderService = {
+  getNewOrderCode,
+  getLastOrderCode,
+  registerOrder,
+}
+
+export default OrderService

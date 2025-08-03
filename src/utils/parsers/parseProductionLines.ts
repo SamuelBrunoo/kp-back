@@ -6,14 +6,10 @@ import { TColor } from "../types/data/color"
 import { TModel } from "../types/data/model"
 import { TProdType } from "../types/data/prodType"
 
-import {
-  TFBProductionLine,
-  TLineProduct,
-  TProductionLine,
-} from "../types/data/productionLine"
+import { TLineProduct, TProductionLine } from "../types/data/productionLine"
 
 type Props = {
-  productionLines: TFBProductionLine[]
+  productionLines: TProductionLine[]
   products: TProduct[]
   prodTypes: TProdType[]
   colors: TColor[]

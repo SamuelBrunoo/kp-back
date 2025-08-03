@@ -3,7 +3,6 @@ import { TOPStatus } from "./order"
 // # Firebase
 
 export type TFBProductionLine = {
-  id: string
   order: string
   client: string
   status: string

@@ -3,42 +3,21 @@ import { Request, Response } from "express"
 import * as fb from "firebase/firestore"
 import { collections } from "../network/firebase"
 
-import { TBaseClient, TClient } from "../utils/types/data/client"
-import {
-  TBasicRepresentative,
-  TRepresentative,
-} from "../utils/types/data/representative"
-import {
-  TBasicOrder,
-  TFBOrder,
-  TNewOrder,
-  TOPStatus,
-} from "../utils/types/data/order"
-import { TModel } from "../utils/types/data/model"
-import { TBasicProduct, TProduct } from "../utils/types/data/product"
-import { TProdType } from "../utils/types/data/prodType"
-import { TColor } from "../utils/types/data/color"
-import { TBasicEmmitter, TEmmitter } from "../utils/types/data/emmiter"
+import { TNewOrder } from "../utils/types/data/order"
 
-import { parseFbDoc, parseFbDocs } from "../utils/parsers/fbDoc"
+import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { newOrderValidator, orderValidator } from "../utils/validators/order"
 import parseOrders from "../utils/parsers/parseOrders"
 import parseOrder from "../utils/parsers/parseOrder"
 import { treatData } from "../utils/parsers/treatData"
-import {
-  TFBLineProduct,
-  TFBLineProductGroup,
-  TFBProductionLine,
-  TNewProductLine,
-  TProductionLine,
-} from "../utils/types/data/productionLine"
+import { TFBProductionLine } from "../utils/types/data/productionLine"
 
-import { v4 as uuid } from "uuid"
 import { getCustomError } from "../utils/helpers/getCustomError"
 import { parseOrdersPageList } from "../utils/parsers/listsPages/orders"
 import { TCity } from "../utils/types/data/city"
 import { TState } from "../utils/types/data/state"
-import { getParsedCollections } from "../utils/helpers/api/getCollections"
+import { getParsedCollections } from "../network/firebase/collectionsHelpers"
+import SERVICES from "../services"
 
 export const getOrdersListPage = async (req: Request, res: Response) => {
   try {
@@ -54,58 +33,60 @@ export const getOrdersListPage = async (req: Request, res: Response) => {
         ? [fb.where("status", "==", "done"), fb.where("shippedAt", "!=", null)]
         : [fb.where("status", "==", "done"), fb.where("shippedAt", "==", null)]
 
-    const colClients = parseFbDocs(
-      await fb.getDocs(fb.query(collections.clients))
-    ) as TBaseClient[]
-
-    const colOrders = parseFbDocs(
-      await fb.getDocs(fb.query(collections.orders, ...orderConditions))
-    ) as TBasicOrder[]
-
-    const colEmmitters = parseFbDocs(
-      await fb.getDocs(fb.query(collections.emmitters))
-    ) as TBasicEmmitter[]
-
-    const colRepresentatives = parseFbDocs(
-      await fb.getDocs(fb.query(collections.emmitters))
-    ) as TBasicRepresentative[]
-
-    const colProductTypes = parseFbDocs(
-      await fb.getDocs(fb.query(collections.productTypes))
-    ) as TProdType[]
-
-    const colProducts = parseFbDocs(
-      await fb.getDocs(fb.query(collections.products))
-    ) as TBasicProduct[]
-
-    const colColors = parseFbDocs(
-      await fb.getDocs(fb.query(collections.colors))
-    ) as TColor[]
-
-    const colModels = parseFbDocs(
-      await fb.getDocs(fb.query(collections.models))
-    ) as TModel[]
-
-    const colProductionLines = parseFbDocs(
-      await fb.getDocs(fb.query(collections.productionLines))
-    ) as TProductionLine[]
+    const {
+      colOrders,
+      colClients,
+      colEmmitters,
+      colRepresentatives,
+      colProdTypes,
+      colColors,
+      colModels,
+      colProducts,
+      colProductionLines,
+    } = await getParsedCollections(
+      [
+        "orders",
+        "clients",
+        "emmitters",
+        "representatives",
+        "productTypes",
+        "colors",
+        "models",
+        "products",
+      ],
+      {
+        orders: orderConditions,
+      }
+    )
 
     // -----
 
     const clientsCities = colClients.map((client) => client.address.city)
     const clientsStates = colClients.map((client) => client.address.state)
 
-    const cities = parseFbDocs(
-      await fb.getDocs(
-        fb.query(collections.cities, fb.where("__name__", "in", clientsCities))
-      )
-    ) as TCity[]
+    const cities =
+      clientsCities.length > 0
+        ? (parseFbDocs(
+            await fb.getDocs(
+              fb.query(
+                collections.cities,
+                fb.where("__name__", "in", clientsCities)
+              )
+            )
+          ) as TCity[])
+        : []
 
-    const states = parseFbDocs(
-      await fb.getDocs(
-        fb.query(collections.states, fb.where("__name__", "in", clientsStates))
-      )
-    ) as TState[]
+    const states =
+      clientsStates.length > 0
+        ? (parseFbDocs(
+            await fb.getDocs(
+              fb.query(
+                collections.states,
+                fb.where("__name__", "in", clientsStates)
+              )
+            )
+          ) as TState[])
+        : []
 
     const list = parseOrdersPageList({
       clients: colClients,
@@ -115,7 +96,7 @@ export const getOrdersListPage = async (req: Request, res: Response) => {
       emmitters: colEmmitters,
       representatives: colRepresentatives,
 
-      productTypes: colProductTypes,
+      productTypes: colProdTypes,
       products: colProducts,
       colors: colColors,
       models: colModels,
@@ -163,6 +144,7 @@ export const getOrders = async (req: Request, res: Response) => {
 
     res.json({ success: true, data: { list } })
   } catch (error) {
+    console.error("Error fetching orders:", error)
     res.status(204).json({ success: false, error: true })
   }
 }
@@ -174,27 +156,13 @@ export const getOrder = async (req: Request, res: Response) => {
     const fbOrder = await fb.getDoc(ref)
 
     if (fbOrder.exists()) {
-      let colProdTypes: TProdType[] = []
-      let colColors: TColor[] = []
-      let colModels: TModel[] = []
-      let colProducts: TProduct[] = []
-
-      const pms = [
-        fb.getDocs(fb.query(collections.productTypes)).then((res) => {
-          colProdTypes = parseFbDocs(res as any) as TProdType[]
-        }),
-        fb.getDocs(fb.query(collections.colors)).then((res) => {
-          colColors = parseFbDocs(res as any) as TColor[]
-        }),
-        fb.getDocs(fb.query(collections.models)).then((res) => {
-          colModels = parseFbDocs(res as any) as TModel[]
-        }),
-        fb.getDocs(fb.query(collections.products)).then((res) => {
-          colProducts = parseFbDocs(res as any) as TProduct[]
-        }),
-      ]
-
-      await Promise.all(pms)
+      const { colProducts, colColors, colProdTypes, colModels } =
+        await getParsedCollections([
+          "products",
+          "colors",
+          "productTypes",
+          "models",
+        ])
 
       const order = parseOrder({
         order: { ...fbOrder.data(), id: fbOrder.id } as any,
@@ -204,10 +172,7 @@ export const getOrder = async (req: Request, res: Response) => {
         products: colProducts,
       })
 
-      res.json({
-        success: true,
-        data: { order: order },
-      })
+      res.json({ success: true, data: { order: order } })
     } else {
       throw new Error("Este pedido não existe")
     }
@@ -220,116 +185,64 @@ export const addOrder = async (req: Request, res: Response) => {
   try {
     const data = req.body as TNewOrder
 
+    /* 1. Validate data */
     const validation = newOrderValidator(data)
 
     if (validation.ok) {
-      const { colProductionLines, colProducts } = await getParsedCollections([
-        "productionLines",
-        "products",
-      ])
-
-      const lo = await fb.getDocs(
-        fb.query(collections.orders, fb.orderBy("code", "desc"), fb.limit(1))
+      const { colProducts: orderProducts } = await getParsedCollections(
+        ["products"],
+        {
+          products: [
+            fb.where(
+              "id",
+              "in",
+              data.products.map((p) => p.id)
+            ),
+          ],
+        }
       )
 
-      const lastOrder =
-        lo.docs.length > 0 ? (lo.docs[0].data() as TFBOrder) : null
+      /* 2. Get last order code */
+      const newOrderCode = await SERVICES.Order.getNewOrderCode()
 
-      const newCode = lastOrder ? Number(lastOrder.code) + 1 : 1
-      const productsToTreat = colProducts.filter((prod) =>
-        data.products.map((p) => p.id).includes(prod.id)
-      )
+      /* 3. Treat data */
+      const orderData = treatData("newOrder", data, {
+        newOrderCode,
+        orderProducts,
+      })
 
-      console.log("colProducts", colProducts)
-      console.log("Products to treat", productsToTreat)
+      /* 4. Register order */
+      const newOrder = await SERVICES.Order.registerOrder(orderData)
+      if (newOrder.success === false) throw new Error(newOrder.error)
 
-      const treated = treatData("newOrder", data, { newCode, productsToTreat })
+      let requiresNewProductLine: Partial<TFBProductionLine> | undefined =
+        undefined
 
-      const info: TNewOrder = data
-      const clientRef = fb.doc(collections.clients, info.client)
-      const clientDoc = await fb.getDoc(clientRef)
-      const client = { ...clientDoc.data(), id: clientDoc.id } as TClient
+      /* 5. Update products count in storage */
+      newOrder.data.products.forEach(async (product) => {
+        const prodObj = orderProducts.find((p) => p.id === product.id)
 
-      // Register Order
-      const doc = await fb.addDoc(collections.orders, treated)
-      const docData = { ...treated, id: doc.id } as TBasicOrder
-
-      // Add to client history
-      // await fb.updateDoc(clientRef, { orders: [...(client.orders ?? []), docData.id] })
-
-      // TODO: production line creator helper
-
-      let newProductLine: Partial<TFBProductionLine> | undefined = undefined
-
-      // Product production group
-      info.products.forEach((product) => {
-        const prodSubj = colProducts.find((p) => p.id === product.id)
-
-        if (prodSubj && prodSubj.storage.has) {
-          const hasInStorage = prodSubj.storage.quantity - product.quantity >= 0
-
-          if (!hasInStorage) {
-            const missing = product.quantity - prodSubj.storage.quantity
-
-            if (!newProductLine) {
-              newProductLine = {
-                order: doc.id,
-                client: client.id,
-                status: "queued",
-                quantity: 0,
-                products: [],
-              }
-            }
-
-            // Group by product (id)
-
-            let plProdGroup: TFBLineProductGroup = {
-              id: prodSubj.id,
-              status: "queued",
-              list: [],
-            }
-
-            for (let i = 1; i <= missing; i++) {
-              const newId = uuid()
-
-              const pToDo: TFBLineProduct = {
-                status: "queued",
-                productionId: newId,
-                inCharge: null,
-                index: i,
-              }
-
-              plProdGroup.list.push(pToDo)
-            }
-
-            newProductLine.quantity += plProdGroup.list.length
-            newProductLine.products.push(plProdGroup)
-          }
-
-          // update product quantity
-          const stillTodo = product.quantity - prodSubj.storage.quantity
-          const willBeEmpty = prodSubj.storage.quantity - stillTodo < 0
-
-          fb.updateDoc(fb.doc(collections.products, prodSubj.id), {
-            storage: {
-              has: prodSubj.storage.has,
-              quantity: willBeEmpty ? 0 : prodSubj.storage.quantity - stillTodo,
-            },
-          })
+        if (prodObj && prodObj.storage.has) {
+          await SERVICES.Products.reduceStorageCount(
+            product.id,
+            prodObj.storage.quantity - product.quantity
+          )
         }
       })
 
-      // register new product line document
-      if (newProductLine)
-        await fb.addDoc(collections.productionLines, newProductLine)
+      /* 6. Create production line if needed */
+      if (requiresNewProductLine)
+        await SERVICES.ProductionLine.registerProductionLine(
+          newOrder.data,
+          orderProducts
+        )
 
-      res.status(200).json({ success: true, data: docData })
+      res.status(200).json({ success: true, data: newOrder.data })
     } else {
       const fieldsStr = validation.fields.join(", ")
       throw new Error(`Verifique os campos (${fieldsStr}) e tente novamente.`)
     }
   } catch (error) {
-    console.log(error)
     res
       .status(400)
       .json({ success: false, error: "Houve um erro. Tente novamente" })
