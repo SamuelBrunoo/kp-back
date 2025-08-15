@@ -3,14 +3,12 @@ import { Request, Response } from "express"
 import * as fb from "firebase/firestore"
 import { collections } from "../network/firebase"
 
-import { TBaseClient, TClient } from "../utils/types/data/client"
-import { TRepresentative } from "../utils/types/data/representative"
+import { TBaseClient } from "../utils/types/data/client"
 import { TBasicOrder, TFBOrder } from "../utils/types/data/order"
 import { TModel } from "../utils/types/data/model"
 import { TBasicProduct, TProduct } from "../utils/types/data/product"
 import { TProdType } from "../utils/types/data/prodType"
 import { TColor } from "../utils/types/data/color"
-import { TEmmitter } from "../utils/types/data/emmiter"
 
 import { parseFbDoc, parseFbDocs } from "../utils/parsers/fbDoc"
 import parseOrder from "../utils/parsers/parseOrder"
@@ -105,7 +103,7 @@ export const getProductionLines = async (req: Request, res: Response) => {
     const {
       colOrders,
       colClients,
-      colProdTypes,
+      colProductTypes,
       colColors,
       colModels,
       colProducts,
@@ -126,7 +124,7 @@ export const getProductionLines = async (req: Request, res: Response) => {
       productionLines: colProductionLines,
       orders: colOrders as any,
       clients: colClients,
-      prodTypes: colProdTypes,
+      prodTypes: colProductTypes,
       colors: colColors,
       models: colModels,
       products: colProducts,

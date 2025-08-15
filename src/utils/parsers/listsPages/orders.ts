@@ -1,13 +1,10 @@
-import { paymentRelation } from "../../relations/payment"
-import { orderProductStatusRelation } from "../../relations/status"
 import { TCity } from "../../types/data/city"
-import { TBaseClient, TClient, TPageListClient } from "../../types/data/client"
+import { TBaseClient } from "../../types/data/client"
 import { TColor } from "../../types/data/color"
-import { TBasicEmmitter, TEmmitter } from "../../types/data/emmiter"
+import { TBasicEmmitter } from "../../types/data/emmiter"
 import { TModel } from "../../types/data/model"
 import {
   TBasicOrder,
-  TOPStatus,
   TOPStatusWeight,
   TPageListOrder,
 } from "../../types/data/order"
@@ -88,13 +85,22 @@ export const parseOrdersPageList = ({
       // Emmitter
       const orderEmmitter = emmitters.find((e) => e.id === i.emmitter)
 
+      console.log("Here")
+
       // Products
       const orderProductsDetails: TPageListOrder["details"]["products"] =
         i.products.map((p) => {
           const product = products.find((prod) => prod.id === p.id)
+          console.log("[DEVELOPMENT] Product: \n", product)
+
           const color = colors.find((col) => col.code === product.color)
+          console.log("[DEVELOPMENT] Color: \n", color)
+
           const model = models.find((mod) => mod.id === product.model)
+          console.log("[DEVELOPMENT] Model: \n", model)
+
           const type = productTypes.find((type) => type.code === product.type)
+          console.log("[DEVELOPMENT] Type: \n", type, productTypes)
 
           const obj: TPageListOrder["details"]["products"][number] = {
             id: p.id,
@@ -111,8 +117,12 @@ export const parseOrdersPageList = ({
           return obj
         })
 
+      console.log("Here")
+
       // Production
       const productionLine = productionLines.find((pl) => pl.order === i.id)
+
+      console.log("Here")
 
       const obj: TPageListOrder = {
         id: i.id,
@@ -151,6 +161,8 @@ export const parseOrdersPageList = ({
           paymentSlips: i.payment.slips as Slip[],
         },
       }
+
+      console.log("Here")
 
       list.push(obj)
     })

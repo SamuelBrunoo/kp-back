@@ -7,7 +7,6 @@ import { TNewOrder } from "../utils/types/data/order"
 
 import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { newOrderValidator, orderValidator } from "../utils/validators/order"
-import parseOrders from "../utils/parsers/parseOrders"
 import parseOrder from "../utils/parsers/parseOrder"
 import { treatData } from "../utils/parsers/treatData"
 import { TFBProductionLine } from "../utils/types/data/productionLine"
@@ -26,7 +25,7 @@ export const getOrdersListPage = async (req: Request, res: Response) => {
       | "waitingShip"
       | "shipped"
 
-    const orderConditions =
+    const orderConditions: fb.QueryFieldFilterConstraint[] =
       shippingStatus === "todo"
         ? [fb.where("status", "!=", "done")]
         : shippingStatus === "shipped"
@@ -38,7 +37,7 @@ export const getOrdersListPage = async (req: Request, res: Response) => {
       colClients,
       colEmmitters,
       colRepresentatives,
-      colProdTypes,
+      colProductTypes,
       colColors,
       colModels,
       colProducts,
@@ -96,7 +95,7 @@ export const getOrdersListPage = async (req: Request, res: Response) => {
       emmitters: colEmmitters,
       representatives: colRepresentatives,
 
-      productTypes: colProdTypes,
+      productTypes: colProductTypes,
       products: colProducts,
       colors: colColors,
       models: colModels,
@@ -105,44 +104,16 @@ export const getOrdersListPage = async (req: Request, res: Response) => {
 
     res.status(200).json({ success: true, data: { list } })
   } catch (error) {
+    console.log("Error", error)
     res.status(400).json(getCustomError(error))
   }
 }
 
 export const getOrders = async (req: Request, res: Response) => {
   try {
-    const {
-      colOrders,
-      colClients,
-      colEmmitters,
-      colRepresentatives,
-      colProdTypes,
-      colColors,
-      colModels,
-      colProducts,
-    } = await getParsedCollections([
-      "orders",
-      "clients",
-      "emmitters",
-      "representatives",
-      "productTypes",
-      "colors",
-      "models",
-      "products",
-    ])
+    const { colOrders } = await getParsedCollections(["orders"])
 
-    const list = parseOrders({
-      orders: colOrders as any,
-      clients: colClients,
-      emmitters: colEmmitters,
-      representatives: colRepresentatives,
-      prodTypes: colProdTypes,
-      colors: colColors,
-      models: colModels,
-      products: colProducts,
-    })
-
-    res.json({ success: true, data: { list } })
+    res.json({ success: true, data: { list: colOrders } })
   } catch (error) {
     console.error("Error fetching orders:", error)
     res.status(204).json({ success: false, error: true })
@@ -156,7 +127,7 @@ export const getOrder = async (req: Request, res: Response) => {
     const fbOrder = await fb.getDoc(ref)
 
     if (fbOrder.exists()) {
-      const { colProducts, colColors, colProdTypes, colModels } =
+      const { colProducts, colColors, colProductTypes, colModels } =
         await getParsedCollections([
           "products",
           "colors",
@@ -167,7 +138,7 @@ export const getOrder = async (req: Request, res: Response) => {
       const order = parseOrder({
         order: { ...fbOrder.data(), id: fbOrder.id } as any,
         colors: colColors,
-        prodTypes: colProdTypes,
+        prodTypes: colProductTypes,
         models: colModels,
         products: colProducts,
       })

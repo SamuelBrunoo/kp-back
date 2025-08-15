@@ -1,7 +1,7 @@
 import * as fb from "firebase/firestore"
 import { collections } from "../firebase"
 import { parseFbDocs } from "../../utils/parsers/fbDoc"
-import { TFBOrder, TBasicOrder } from "../../utils/types/data/order"
+import { TBasicOrder } from "../../utils/types/data/order"
 import { TClient } from "../../utils/types/data/client"
 import { TEmmitter } from "../../utils/types/data/emmiter"
 import { TRepresentative } from "../../utils/types/data/representative"
@@ -19,7 +19,7 @@ interface ITypedCollections {
   colOrders: TBasicOrder[]
   colEmmitters: TEmmitter[]
   colRepresentatives: TRepresentative[]
-  colProdTypes: TProdType[]
+  colProductTypes: TProdType[]
   colProductionLines: TProductionLine[]
   colColors: TColor[]
   colModels: TModel[]
@@ -27,17 +27,37 @@ interface ITypedCollections {
   colWorkers: TWorker[]
 }
 
+type IFiltersCollections = {
+  [key in TWantedCollections]?: fb.QueryFieldFilterConstraint[]
+}
+
 const emptyTypedCollections: ITypedCollections = {
   colClients: [],
   colOrders: [],
   colEmmitters: [],
   colRepresentatives: [],
-  colProdTypes: [],
+  colProductTypes: [],
   colProductionLines: [],
   colColors: [],
   colModels: [],
   colProducts: [],
   colWorkers: [],
+}
+
+const emptyFiltersCollections: IFiltersCollections = {
+  clients: [],
+  orders: [],
+  emmitters: [],
+  representatives: [],
+  productTypes: [],
+  productionLines: [],
+  colors: [],
+  models: [],
+  products: [],
+  workers: [],
+  users: [],
+  cities: [],
+  states: [],
 }
 
 const getCollectionRelation = <T>(collectionName: string, data: any[]) => ({
@@ -47,28 +67,31 @@ const getCollectionRelation = <T>(collectionName: string, data: any[]) => ({
 
 const getCollectionKeyName = (collectionName: string): string => {
   const firstChar = collectionName.charAt(0)
-  collectionName.replace(firstChar, firstChar.toUpperCase())
+  collectionName = collectionName.replace(firstChar, firstChar.toUpperCase())
   return `col${collectionName}`
 }
 
 export const getParsedCollections = async (
   wantedCollections: TWantedCollections[],
-  filters?: {
-    [key in TWantedCollections]?: fb.QueryFieldFilterConstraint[]
-  }
+  filters: IFiltersCollections = emptyFiltersCollections
 ): Promise<ITypedCollections> => {
   try {
     let resultCollections = { ...emptyTypedCollections }
     let promises = []
 
     wantedCollections.forEach((collectionName) => {
-      const prom = async () => {
-        const collection = collections[collectionName]
-        const query = fb.query(collection, ...(filters[collectionName] ?? []))
-        const request = fb.getDocs(query)
+      const prom = new Promise(async (resolve, reject) => {
+        try {
+          const collection = collections[collectionName]
+          const collectionFilters =
+            filters && filters[collectionName] !== undefined
+              ? filters[collectionName]
+              : []
 
-        request.then((res) => {
-          const parsedCollection = parseFbDocs(res)
+          const query = fb.query(collection, ...collectionFilters)
+          const response = await fb.getDocs(query)
+
+          const parsedCollection = parseFbDocs(response)
 
           const collectionRelation = getCollectionRelation<TBasicOrder>(
             collectionName,
@@ -77,8 +100,13 @@ export const getParsedCollections = async (
 
           resultCollections[collectionRelation.colKey] =
             parsedCollection as typeof collectionRelation.colType
-        })
-      }
+
+          resolve(true)
+        } catch (error) {
+          reject(error)
+        }
+      })
+
       promises.push(prom)
     })
 
@@ -88,7 +116,6 @@ export const getParsedCollections = async (
 
     return resultCollections
   } catch (error) {
-    console.error(`[ERROR]: Function 'getParsedCollections' - \n`, error)
     return { ...emptyTypedCollections }
   }
 }
