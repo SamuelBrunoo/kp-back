@@ -12,9 +12,6 @@ export const treatNewOrder = (
   const prods: TFBOrder["products"] = data.products.map((p) => {
     const prod = extra.productsToTreat.find((product) => product.id === p.id)
 
-    console.log("[INFO]: Parser - prod\n", prod)
-
-    // @ts-ignore
     const obj: TFBOrder["products"][number] = {
       id: p.id,
       quantity: p.quantity,
@@ -24,16 +21,15 @@ export const treatNewOrder = (
           : "queued",
     }
 
-    console.log("[INFO]: Parser - obj\n", obj)
-
     return obj
   })
 
+  // @ts-ignore
   let obj: TFBOrder = {
     ...data,
     representative: !!data.representative ? data.representative : null,
     shippedAt: null,
-    code: extra.newCode,
+    code: Number(extra.newCode),
     status: getListOverralStatus(prods),
     products: prods,
   }

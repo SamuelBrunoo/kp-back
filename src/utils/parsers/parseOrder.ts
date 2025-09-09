@@ -1,4 +1,4 @@
-import { TFBOrder, TNewOrder, TOrder } from "../types/data/order"
+import { TBasicOrder, TFBOrder, TNewOrder, TOrder } from "../types/data/order"
 import { TEmmitter } from "../types/data/emmiter"
 import { TRepresentative } from "../types/data/representative"
 import { TClient } from "../types/data/client"
@@ -10,7 +10,7 @@ import { TProdType } from "../types/data/prodType"
 import { formatSlip } from "../formatters/slip"
 
 type Props = {
-  order: { id: string } & TFBOrder
+  order: TBasicOrder
   prodTypes: TProdType[]
   colors: TColor[]
   models: TModel[]
@@ -45,15 +45,15 @@ const parseOrder = (props: Props) => {
     products: pds,
     representative: order.representative ?? "Não definido",
     payment: {
-      ...order.payment,
+      ...order.payment as any,
       installments:
         order.payment.installments !== undefined
           ? order.payment.installments
           : undefined,
-      paymentNumber:
-        order.payment.type === "slip"
-          ? formatSlip(order.payment.paymentNumber)
-          : order.payment.paymentNumber,
+      // paymentNumber:
+      //   order.payment.type === "slip"
+      //     ? formatSlip(order.payment.paymentNumber)
+      //     : order.payment.paymentNumber,
     },
   }
 

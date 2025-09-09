@@ -20,7 +20,14 @@ export type TOrderPaymentConfig = {
   paymentCode: string | null
   paymentNumber: string | null
   status: string
-  slips?: (UnfilledSlip | Slip)[]
+  slips?: (UnfilledSlip | Slip | TBankSlipRegister)[]
+}
+
+export type TNewOrderPaymentConfig = {
+  hasInstallments: boolean
+  installments: number
+  type: TPaymentMethod
+  due?: number
 }
 
 export type UnfilledSlip = {
@@ -42,7 +49,7 @@ export type Slip = {
 
 export type TPaymentStatus = "payed" | "awaiting" | "delayed"
 
-export type TPaymentMethod = "pix" | "slip"
+export type TPaymentMethod = "pix" | "cash" | "slip"
 
 export type TCommissionType = "percentage" | "fixed"
 

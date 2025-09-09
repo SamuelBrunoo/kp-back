@@ -3,7 +3,7 @@ import { Request, Response } from "express"
 import * as fb from "firebase/firestore"
 import { collections } from "../network/firebase"
 
-import { TNewOrder } from "../utils/types/data/order"
+import { TBasicOrder, TFBOrder, TNewOrder } from "../utils/types/data/order"
 
 import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { newOrderValidator, orderValidator } from "../utils/validators/order"
@@ -165,7 +165,7 @@ export const addOrder = async (req: Request, res: Response) => {
         {
           products: [
             fb.where(
-              "id",
+              "__name__",
               "in",
               data.products.map((p) => p.id)
             ),
@@ -178,12 +178,12 @@ export const addOrder = async (req: Request, res: Response) => {
 
       /* 3. Treat data */
       const orderData = treatData("newOrder", data, {
-        newOrderCode,
-        orderProducts,
+        newCode: newOrderCode,
+        productsToTreat: orderProducts,
       })
 
       /* 4. Register order */
-      const newOrder = await SERVICES.Order.registerOrder(orderData)
+      let newOrder = await SERVICES.Order.registerOrder(orderData)
       if (newOrder.success === false) throw new Error(newOrder.error)
 
       let requiresNewProductLine: Partial<TFBProductionLine> | undefined =

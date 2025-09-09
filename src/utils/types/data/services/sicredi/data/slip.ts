@@ -51,7 +51,8 @@ export type TS_Slip_Register = {
 
   destinatarios?: TReceiver[] // *.2 Up to 30 accounts
 }
-type TPayer = {
+
+export type TPayer = {
   tipoPessoa: TPersonType
   documento: string // CPF | CNPJ
   nome: string
@@ -63,7 +64,7 @@ type TPayer = {
   email?: string
 }
 
-type TFinalReceiver = {
+export type TFinalReceiver = {
   tipoPessoa: TPersonType
   documento: string // CPF | CNPJ
   nome: string

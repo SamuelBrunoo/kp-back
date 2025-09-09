@@ -1,7 +1,6 @@
 import * as fb from "firebase/firestore"
 import { collections } from "../../network/firebase"
 import { TBasicOrder, TFBOrder, TNewOrder } from "../../utils/types/data/order"
-import { TClient } from "../../utils/types/data/client"
 import { getCustomError } from "../../utils/helpers/getCustomError"
 
 const getLastOrderCode = async (): Promise<string> => {
@@ -35,11 +34,7 @@ const registerOrder = async (
   return new Promise(async (resolve) => {
     try {
       const info: TNewOrder = data
-      const clientRef = fb.doc(collections.clients, info.client)
-      const clientDoc = await fb.getDoc(clientRef)
-      const client = { ...clientDoc.data(), id: clientDoc.id } as TClient
 
-      // Register Order
       const doc = await fb.addDoc(collections.orders, info)
       const docData = { ...info, id: doc.id } as TBasicOrder
 
