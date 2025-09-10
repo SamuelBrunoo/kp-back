@@ -1,9 +1,9 @@
 import { TBaseClient } from "../types/data/client"
-import { TFBRepresentative } from "../types/data/representative"
-import { TState } from "../types/data/state"
+import {TDBRepresentative } from "../types/data/representative"
+import { TState } from "../types/data/address/state"
 
 type Props = {
-  representatives: TFBRepresentative[]
+  representatives:TDBRepresentative[]
   client: TBaseClient
   states: TState[]
 }

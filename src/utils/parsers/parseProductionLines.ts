@@ -1,4 +1,4 @@
-import { TFBOrder, TOPStatusWeight, TOrder } from "../types/data/order"
+import {TDBOrder, TOPStatusWeight, TOrder } from "../types/data/order"
 import { TWorker } from "../types/data/worker"
 import { TClient } from "../types/data/client"
 import { TProduct } from "../types/data/product"
@@ -14,7 +14,7 @@ type Props = {
   prodTypes: TProdType[]
   colors: TColor[]
   models: TModel[]
-  orders: ({ id: string } & TFBOrder)[]
+  orders: ({ id: string } &TDBOrder)[]
   clients: TClient[]
   workers: TWorker[]
 }
@@ -34,7 +34,7 @@ const parseProductionLines = (props: Props) => {
   let list: TProductionLine[] = []
 
   productionLines.forEach((pLine) => {
-    const order = orders.find((ord) => pLine.order === ord.id) as TFBOrder & {
+    const order = orders.find((ord) => pLine.order === ord.id) asTDBOrder & {
       id: string
     }
 

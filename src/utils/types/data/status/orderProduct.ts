@@ -1,0 +1,1 @@
+export type TOPStatus = "queued" | "lor" | "doing" | "done"

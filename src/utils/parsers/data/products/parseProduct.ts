@@ -1,4 +1,4 @@
-import { TFBModel, TModel } from "../../../types/data/model"
+import {TDBModel, TModel } from "../../../types/data/model"
 import {
   TBasicProduct,
   TProduct,
@@ -10,7 +10,7 @@ type Props = {
 }
 
 const parseProduct = ({ product, models }: Props): TProduct => {
-  const m = models.find((model) => model.id === product.model) as TFBModel
+  const m = models.find((model) => model.id === product.model) asTDBModel
 
   let productData: TProduct = {
     ...product,

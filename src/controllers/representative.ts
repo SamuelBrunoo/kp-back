@@ -9,7 +9,7 @@ import {
 import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { parseRepresentatives } from "../utils/parsers/parseRepresentatives"
 import {
-  TFBRepresentative,
+ TDBRepresentative,
   TNewRepresentative,
   TRepresentative,
 } from "../utils/types/data/representative"
@@ -144,7 +144,7 @@ export const addRepresentative = async (req: Request, res: Response) => {
         res.status(200).json({ success: true, data: docData })
       } else {
         const registeredRepresentative =
-          docsSnap.docs[0].data() as TFBRepresentative
+          docsSnap.docs[0].data() asTDBRepresentative
 
         let message = ""
 
@@ -217,7 +217,7 @@ export const updateRepresentative = async (req: Request, res: Response) => {
           res.status(200).json({ success: true, data: docData })
         } else {
           const registeredRepresentative =
-            docsSnap.docs[0].data() as TFBRepresentative
+            docsSnap.docs[0].data() asTDBRepresentative
 
           let message = ""
 

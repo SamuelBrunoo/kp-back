@@ -1,7 +1,7 @@
 import * as fb from "firebase/firestore"
 import { collections } from "../../../network/firebase"
 import { parseFbDocs } from "../../parsers/fbDoc"
-import { TFBOrder, TBasicOrder } from "../../types/data/order"
+import {TDBOrder, TBasicOrder } from "../../types/data/order"
 import { TClient } from "../../types/data/client"
 import { TEmmitter } from "../../types/data/emmiter"
 import { TRepresentative } from "../../types/data/representative"
@@ -9,17 +9,17 @@ import { TProdType } from "../../types/data/prodType"
 import { TColor } from "../../types/data/color"
 import { TModel } from "../../types/data/model"
 import { TProduct } from "../../types/data/product"
-import { TFBProductionLine } from "../../types/data/productionLine"
+import {TDBProductionLine } from "../../types/data/productionLine"
 
 type TWantedCollections = keyof typeof collections
 
 interface ITypedCollections {
   colClients: TClient[]
-  colOrders: TFBOrder[]
+  colOrders:TDBOrder[]
   colEmmitters: TEmmitter[]
   colRepresentatives: TRepresentative[]
   colProdTypes: TProdType[]
-  colProductionLines: TFBProductionLine[]
+  colProductionLines:TDBProductionLine[]
   colColors: TColor[]
   colModels: TModel[]
   colProducts: TProduct[]

@@ -1,4 +1,4 @@
-import { TBasicOrder, TFBOrder, TNewOrder, TOrder } from "../types/data/order"
+import { TBasicOrder,TDBOrder, TNewOrder, TOrder } from "../types/data/order"
 import { TEmmitter } from "../types/data/emmiter"
 import { TRepresentative } from "../types/data/representative"
 import { TClient } from "../types/data/client"

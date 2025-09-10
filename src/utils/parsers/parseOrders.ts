@@ -1,4 +1,4 @@
-import { TFBOrder, TOrder } from "../types/data/order"
+import {TDBOrder, TOrder } from "../types/data/order"
 import { TEmmitter } from "../types/data/emmiter"
 import { TRepresentative } from "../types/data/representative"
 import { TBaseClient, TClient } from "../types/data/client"
@@ -10,7 +10,7 @@ import { TProdType } from "../types/data/prodType"
 import { formatSlip } from "../formatters/slip"
 
 type Props = {
-  orders: ({ id: string } & TFBOrder)[]
+  orders: ({ id: string } &TDBOrder)[]
   representatives: TRepresentative[]
   emmitters: TEmmitter[]
   clients: TClient[]

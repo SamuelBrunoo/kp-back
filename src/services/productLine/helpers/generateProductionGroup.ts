@@ -1,14 +1,14 @@
 import { v4 as uuid } from "uuid"
 import {
-  TFBLineProduct,
-  TFBLineProductGroup,
+ TDBLineProduct,
+ TDBLineProductGroup,
 } from "../../../utils/types/data/productionLine"
 
 export const generateProductionGroup = (
   productId: string,
   quantity: number
-): TFBLineProductGroup => {
-  let plProdGroup: TFBLineProductGroup = {
+):TDBLineProductGroup => {
+  let plProdGroup:TDBLineProductGroup = {
     id: productId,
     status: "queued",
     list: [],
@@ -17,7 +17,7 @@ export const generateProductionGroup = (
   for (let i = 1; i <= quantity; i++) {
     const newId = uuid()
 
-    const pToDo: TFBLineProduct = {
+    const pToDo:TDBLineProduct = {
       status: "queued",
       productionId: newId,
       inCharge: null,

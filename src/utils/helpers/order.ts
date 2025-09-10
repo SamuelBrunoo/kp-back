@@ -1,23 +1,23 @@
-import { TFBOrder } from "../types/data/order"
-import { TFBLineProductGroup } from "../types/data/productionLine"
+import {TDBOrder } from "../types/data/order"
+import {TDBLineProductGroup } from "../types/data/productionLine"
 import { getListOverralStatus } from "./getListOverralStatus"
 
 export const extractOrderProductionUpdates = (
-  products: TFBLineProductGroup[],
-  order: TFBOrder
-): TFBOrder => {
-  let newPl: TFBOrder = {
+  products:TDBLineProductGroup[],
+  order:TDBOrder
+):TDBOrder => {
+  let newPl:TDBOrder = {
     ...order,
     products: [],
   }
 
-  let newList: TFBOrder["products"] = []
+  let newList:TDBOrder["products"] = []
 
   order.products.forEach((prod) => {
     const productionLineProduct = products.find((p) => p.id === prod.id)
 
     if (productionLineProduct) {
-      let newProdObj: TFBOrder["products"][number] = {
+      let newProdObj:TDBOrder["products"][number] = {
         id: prod.id,
         quantity: prod.quantity,
         status: getListOverralStatus(productionLineProduct.list),

@@ -3,7 +3,7 @@ import {
   TRepresentative,
 } from "../types/data/representative"
 import { TBaseClient, TClient } from "../types/data/client"
-import { TState } from "../types/data/state"
+import { TState } from "../types/data/address/state"
 import { TBasicOrder } from "../types/data/order"
 
 type Props = {

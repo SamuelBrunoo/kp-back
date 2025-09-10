@@ -5,7 +5,7 @@ import app from "../network/firebase"
 import { TProduct } from "../utils/types/data/product"
 import { modelValidator } from "../utils/validators/model"
 import { parseFbDocs } from "../utils/parsers/fbDoc"
-import { TFBModel } from "../utils/types/data/model"
+import {TDBModel } from "../utils/types/data/model"
 import { TColor } from "../utils/types/data/color"
 import { TProdType } from "../utils/types/data/prodType"
 import parseModels from "../utils/parsers/parseModels"
@@ -35,7 +35,7 @@ export const getModelsListPage = async (req: Request, res: Response) => {
     ) as TColor[]
     const colModels = parseFbDocs(
       await fb.getDocs(fb.query(collections.models))
-    ) as TFBModel[]
+    ) asTDBModel[]
     const colProdTypes = parseFbDocs(
       await fb.getDocs(fb.query(collections.productTypes))
     ) as TProdType[]
@@ -69,7 +69,7 @@ export const getModels = async (req: Request, res: Response) => {
     ) as TColor[]
     const colModels = parseFbDocs(
       await fb.getDocs(fb.query(collections.models))
-    ) as TFBModel[]
+    ) asTDBModel[]
     const colProdTypes = parseFbDocs(
       await fb.getDocs(fb.query(collections.productTypes))
     ) as TProdType[]
@@ -97,7 +97,7 @@ export const getModel = async (req: Request, res: Response) => {
   try {
     const colModels = parseFbDocs(
       await fb.getDocs(fb.query(collections.models))
-    ) as TFBModel[]
+    ) asTDBModel[]
 
     const { id } = req.params
     const model = colModels.find((m) => m.id === id)

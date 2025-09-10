@@ -4,7 +4,7 @@ import * as fb from "firebase/firestore"
 import { collections } from "../network/firebase"
 
 import { TBaseClient } from "../utils/types/data/client"
-import { TBasicOrder, TFBOrder } from "../utils/types/data/order"
+import { TBasicOrder,TDBOrder } from "../utils/types/data/order"
 import { TModel } from "../utils/types/data/model"
 import { TBasicProduct, TProduct } from "../utils/types/data/product"
 import { TProdType } from "../utils/types/data/prodType"
@@ -14,7 +14,7 @@ import { parseFbDoc, parseFbDocs } from "../utils/parsers/fbDoc"
 import parseOrder from "../utils/parsers/parseOrder"
 import {
   TAttribution,
-  TFBProductionLine,
+ TDBProductionLine,
   TProductionLine,
 } from "../utils/types/data/productionLine"
 
@@ -213,19 +213,19 @@ export const updateProductionLine = async (req: Request, res: Response) => {
     if (fbProductionLineDoc.exists()) {
       const fbProductionLine = parseFbDoc(
         fbProductionLineDoc
-      ) as TFBProductionLine
+      ) asTDBProductionLine
 
       const orderId = fbProductionLine.order
       const orderRef = fb.doc(collections.orders, orderId)
       const fbOrder = await fb.getDoc(orderRef)
 
       if (fbOrder.exists()) {
-        let order: TFBOrder = fbOrder.data() as TFBOrder
+        let order:TDBOrder = fbOrder.data() asTDBOrder
 
-        const newProductionLineObj: TFBProductionLine =
+        const newProductionLineObj:TDBProductionLine =
           extractProductionUpdates(incomingData.products, fbProductionLine)
 
-        const newOrderObj: TFBOrder = extractOrderProductionUpdates(
+        const newOrderObj:TDBOrder = extractOrderProductionUpdates(
           newProductionLineObj.products,
           order
         )

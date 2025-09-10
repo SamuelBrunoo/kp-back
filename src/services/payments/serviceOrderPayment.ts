@@ -7,13 +7,13 @@ import { getSlipDue, getSlipsValues } from "../../utils/helpers/slip"
 import { parseFbDoc } from "../../utils/parsers/fbDoc"
 import { TBaseClient } from "../../utils/types/data/client"
 import { TBasicEmmitter } from "../../utils/types/data/emmiter"
-import { TBasicOrder, TFBOrder } from "../../utils/types/data/order"
+import { TBasicOrder,TDBOrder } from "../../utils/types/data/order"
 import {
   Slip,
   TBankSlipRegister,
   UnfilledSlip,
 } from "../../utils/types/data/payment"
-import { TState } from "../../utils/types/data/state"
+import { TState } from "../../utils/types/data/address/state"
 
 import * as fb from "firebase/firestore"
 
@@ -138,7 +138,7 @@ export const serviceGenerateOrderPayment = async (
                   if (generatedSlips.length === slipsCount) {
                     // update order to include shippingCost on it's totals
 
-                    const baseData = orderDoc.data() as TFBOrder
+                    const baseData = orderDoc.data() asTDBOrder
 
                     const completeSlipsInfo: Slip[] = generatedSlips.map(
                       (s, sk) => ({
@@ -164,7 +164,7 @@ export const serviceGenerateOrderPayment = async (
                         ...baseData.payment,
                         slips: completeSlipsInfo,
                       },
-                    } as TFBOrder
+                    } asTDBOrder
 
                     await fb.updateDoc(orderRef, newOrderData)
                     resolve({ ok: true, data: generatedSlips })

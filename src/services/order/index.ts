@@ -1,6 +1,6 @@
 import * as fb from "firebase/firestore"
 import { collections } from "../../network/firebase"
-import { TBasicOrder, TFBOrder, TNewOrder } from "../../utils/types/data/order"
+import { TBasicOrder,TDBOrder, TNewOrder } from "../../utils/types/data/order"
 import { getCustomError } from "../../utils/helpers/getCustomError"
 
 const getLastOrderCode = async (): Promise<string> => {
@@ -10,7 +10,7 @@ const getLastOrderCode = async (): Promise<string> => {
     )
 
     const lastOrder =
-      lo.docs.length > 0 ? (lo.docs[0].data() as TFBOrder) : null
+      lo.docs.length > 0 ? (lo.docs[0].data() asTDBOrder) : null
 
     const code = lastOrder ? Number(lastOrder.code) : 1
 

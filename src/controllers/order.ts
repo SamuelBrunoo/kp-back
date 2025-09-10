@@ -3,18 +3,18 @@ import { Request, Response } from "express"
 import * as fb from "firebase/firestore"
 import { collections } from "../network/firebase"
 
-import { TBasicOrder, TFBOrder, TNewOrder } from "../utils/types/data/order"
+import { TBasicOrder,TDBOrder, TNewOrder } from "../utils/types/data/order"
 
 import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { newOrderValidator, orderValidator } from "../utils/validators/order"
 import parseOrder from "../utils/parsers/parseOrder"
 import { treatData } from "../utils/parsers/treatData"
-import { TFBProductionLine } from "../utils/types/data/productionLine"
+import {TDBProductionLine } from "../utils/types/data/productionLine"
 
 import { getCustomError } from "../utils/helpers/getCustomError"
 import { parseOrdersPageList } from "../utils/parsers/listsPages/orders"
 import { TCity } from "../utils/types/data/city"
-import { TState } from "../utils/types/data/state"
+import { TState } from "../utils/types/data/address/state"
 import { getParsedCollections } from "../network/firebase/collectionsHelpers"
 import SERVICES from "../services"
 

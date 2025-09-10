@@ -2,7 +2,7 @@ import { TCity } from "../../types/data/city"
 import { TBaseClient, TClient, TPageListClient } from "../../types/data/client"
 import { TBasicOrder } from "../../types/data/order"
 import { TBasicRepresentative } from "../../types/data/representative"
-import { TState } from "../../types/data/state"
+import { TState } from "../../types/data/address/state"
 
 type Props = {
   representatives: TBasicRepresentative[]

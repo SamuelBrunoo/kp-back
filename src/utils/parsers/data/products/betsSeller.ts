@@ -1,12 +1,12 @@
 import { TColor } from "../../../types/data/color"
 import { TFront } from "../../../types/data/frontEnd"
-import { TFBModel, TModel } from "../../../types/data/model"
+import {TDBModel, TModel } from "../../../types/data/model"
 import { TProdType } from "../../../types/data/prodType"
 import { TBasicProduct } from "../../../types/data/product"
 
 export type ParserBastSellerProps = {
   product: TBasicProduct & { key: number; count: number }
-  models: TFBModel[]
+  models:TDBModel[]
   productTypes: TProdType[]
   colors: TColor[]
 }
@@ -17,7 +17,7 @@ export const parseProductToBestSeller = ({
   productTypes,
   colors,
 }: ParserBastSellerProps): TFront["cards"]["list"] => {
-  const m = models.find((model) => model.id === product.model) as TFBModel
+  const m = models.find((model) => model.id === product.model) asTDBModel
   const pt = productTypes.find((pt) => pt.code === product.type) as TProdType
   const c = colors.find((c) => c.code === product.color) as TColor
 
@@ -34,7 +34,7 @@ export const parseProductToBestSeller = ({
 
 type ListParserProps = {
   products: (TBasicProduct & { key: number; count: number })[]
-  models: TFBModel[]
+  models:TDBModel[]
   productTypes: TProdType[]
   colors: TColor[]
 }

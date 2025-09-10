@@ -13,7 +13,7 @@ import {
   parseProductsToBestSeller,
   ParserBastSellerProps,
 } from "../utils/parsers/data/products/betsSeller"
-import { TFBModel } from "../utils/types/data/model"
+import {TDBModel } from "../utils/types/data/model"
 import { TProdType } from "../utils/types/data/prodType"
 import { TColor } from "../utils/types/data/color"
 
@@ -56,7 +56,7 @@ export const getAdminDashboardInfo = async (req: Request, res: Response) => {
 
     const baseModels = parseFbDocs(
       await fb.getDocs(fb.query(collections.models))
-    ) as TFBModel[]
+    ) asTDBModel[]
 
     const baseColors = parseFbDocs(
       await fb.getDocs(fb.query(collections.colors))

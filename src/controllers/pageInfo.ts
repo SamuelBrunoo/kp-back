@@ -12,12 +12,12 @@ import { TBasicProduct, TProduct } from "../utils/types/data/product"
 import { TProdType } from "../utils/types/data/prodType"
 import { TColor } from "../utils/types/data/color"
 import { TEmmitter } from "../utils/types/data/emmiter"
-import { TFBModel, TModel, TModelDetails } from "../utils/types/data/model"
+import {TDBModel, TModel, TModelDetails } from "../utils/types/data/model"
 import { getCustomError } from "../utils/helpers/getCustomError"
 import { TBasicOrder, TOrder } from "../utils/types/data/order"
 import parseModel from "../utils/parsers/parseModel"
 import parseProduct from "../utils/parsers/data/products/parseProduct"
-import { TState } from "../utils/types/data/state"
+import { TState } from "../utils/types/data/address/state"
 import parseClient from "../utils/parsers/parseClient"
 import { parseRepresentative } from "../utils/parsers/parseRepresentatives"
 import parseProducts from "../utils/parsers/parseProducts"
@@ -122,7 +122,7 @@ export const getModelFormData = async (req: Request, res: Response) => {
     if (modelId) {
       const colModels = parseFbDocs(
         await fb.getDocs(fb.query(collections.models))
-      ) as TFBModel[]
+      ) asTDBModel[]
       const colOrders = parseFbDocs(
         await fb.getDocs(fb.query(collections.orders))
       ) as TOrder[]

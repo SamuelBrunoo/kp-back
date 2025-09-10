@@ -8,3 +8,11 @@ export type TS_Credential = {
   session_state: string
   scope: string
 }
+
+export type TBankCredentials = {
+  username: string
+  password: string
+  cooperativa: string
+  posto: string
+  codigoBeneficiario: string
+}

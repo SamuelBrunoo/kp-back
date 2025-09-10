@@ -1,6 +1,6 @@
 import { TBasicEmmitter } from "../../types/data/emmiter"
 import { TFinalReceiver } from "../../types/data/services/sicredi/data/slip"
-import { TState } from "../../types/data/state"
+import { TState } from "../../types/data/address/state"
 
 export const outputReceiverInfo = (data: {
   emmitter: TBasicEmmitter

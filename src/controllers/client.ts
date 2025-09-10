@@ -7,14 +7,14 @@ import { parseFbDocs } from "../utils/parsers/fbDoc"
 import {
   TBaseClient,
   TClient,
-  TFBClient,
+ TDBClient,
   TNewClient,
 } from "../utils/types/data/client"
 import { getCustomError } from "../utils/helpers/getCustomError"
 import { parseClientsPageList } from "../utils/parsers/listsPages/clients"
 import { TBasicOrder } from "../utils/types/data/order"
 import { TCity } from "../utils/types/data/city"
-import { TState } from "../utils/types/data/state"
+import { TState } from "../utils/types/data/address/state"
 import { TBasicRepresentative } from "../utils/types/data/representative"
 
 export const getClientsListPage = async (req: Request, res: Response) => {
@@ -117,7 +117,7 @@ export const addClient = async (req: Request, res: Response) => {
 
         res.status(201).json({ success: true, data: docData })
       } else {
-        const registeredClient = docsSnap.docs[0].data() as TFBClient
+        const registeredClient = docsSnap.docs[0].data() asTDBClient
 
         let message = ""
 
@@ -221,7 +221,7 @@ export const updateClient = async (req: Request, res: Response) => {
 
           res.status(200).json({ success: true, data: docData })
         } else {
-          const registeredClient = docsSnap.docs[0].data() as TFBClient
+          const registeredClient = docsSnap.docs[0].data() asTDBClient
 
           let message = ""
 

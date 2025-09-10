@@ -1,9 +1,9 @@
 import { TBasicOrder } from "../types/data/order"
-import { TFBRepresentative } from "../types/data/representative"
+import {TDBRepresentative } from "../types/data/representative"
 
 export const getRepMonthOrdersResume = (
   orders: TBasicOrder[],
-  representative: TFBRepresentative
+  representative:TDBRepresentative
 ): {
   sales: number
   total: number
@@ -44,7 +44,7 @@ export const getRepMonthOrdersResume = (
 
 export const getRepYearOrdersResume = (
   orders: TBasicOrder[],
-  representative: TFBRepresentative
+  representative:TDBRepresentative
 ): {
   sales: number
   total: number

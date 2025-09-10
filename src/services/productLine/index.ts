@@ -4,8 +4,8 @@ import { getCustomError } from "../../utils/helpers/getCustomError"
 import { TBasicOrder } from "../../utils/types/data/order"
 import { TProduct } from "../../utils/types/data/product"
 import {
-  TFBLineProductGroup,
-  TFBProductionLine,
+ TDBLineProductGroup,
+ TDBProductionLine,
   TProductionLine,
 } from "../../utils/types/data/productionLine"
 import { generateProductionGroup } from "./helpers/generateProductionGroup"
@@ -18,7 +18,7 @@ const registerProductionLine = async (
 > => {
   return new Promise(async (resolve) => {
     try {
-      let newProductionLine: TFBProductionLine = {
+      let newProductionLine:TDBProductionLine = {
         order: newOrder.id,
         client: newOrder.client,
         status: "queued",
@@ -35,7 +35,7 @@ const registerProductionLine = async (
           if (!hasInStorage) {
             const missing = product.quantity - prodObj.storage.quantity
 
-            const plProdGroup: TFBLineProductGroup = generateProductionGroup(
+            const plProdGroup:TDBLineProductGroup = generateProductionGroup(
               prodObj.id,
               missing
             )

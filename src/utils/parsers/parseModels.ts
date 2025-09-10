@@ -1,11 +1,11 @@
 import { TColor } from "../types/data/color"
-import { TFBModel, TModel } from "../types/data/model"
+import {TDBModel, TModel } from "../types/data/model"
 import { TOrder } from "../types/data/order"
 import { TProdType } from "../types/data/prodType"
 import { TProduct } from "../types/data/product"
 
 type Props = {
-  models: TFBModel[]
+  models:TDBModel[]
   colors: TColor[]
   prodTypes: TProdType[]
   products: TProduct[]

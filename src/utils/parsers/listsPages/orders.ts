@@ -14,7 +14,7 @@ import { TProdType } from "../../types/data/prodType"
 import { TBasicProduct } from "../../types/data/product"
 import { TProductionLine } from "../../types/data/productionLine"
 import { TBasicRepresentative } from "../../types/data/representative"
-import { TState } from "../../types/data/state"
+import { TState } from "../../types/data/address/state"
 import dateFns from "date-fns"
 
 type Props = {

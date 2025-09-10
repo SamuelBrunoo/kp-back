@@ -1,3 +1,6 @@
+import { TNewOrderPaymentConfig } from "../payment/configNewOrder"
+import { TNewOrderProduct } from "../product/newOrder"
+import { TShipping } from "../shipping"
 
 export type TNewOrder = {
   client: string
@@ -16,7 +19,5 @@ export type TNewOrder = {
     ship: number
   }
   payment: TNewOrderPaymentConfig
-  shippingType: TShipping["type"]
-  shippingMode: TShipping["method"]
   shipping: TShipping
 }
