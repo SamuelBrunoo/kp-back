@@ -1,5 +1,5 @@
 import { TOPStatus } from "../status/orderProduct"
-import { TProductionLineProductGroup } from "./productGroup/productionLineGroup"
+import { TProductionLineBelt } from "./productGroup/productionLineBelt"
 
 export type TProductionLine = {
   id: string
@@ -7,5 +7,5 @@ export type TProductionLine = {
   order: string
   status: TOPStatus
   quantity: number
-  products: TProductionLineProductGroup[]
+  products: TProductionLineBelt[]
 }

@@ -1,5 +1,14 @@
-import { TBasicEmmitter } from "../../types/data/emmiter"
+/*
+ *  Typing
+ */
+
+/* Emmitter */
+import { TBasicEmmitter } from "../../types/data/accounts/emmitter/basicEmmitter"
+
+/* BANK */
 import { TFinalReceiver } from "../../types/data/services/sicredi/data/slip"
+
+/* State */
 import { TState } from "../../types/data/address/state"
 
 export const outputReceiverInfo = (data: {

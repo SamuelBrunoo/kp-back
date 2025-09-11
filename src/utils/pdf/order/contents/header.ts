@@ -1,12 +1,18 @@
-import pdfLib, { rgb, StandardFonts } from "pdf-lib"
-import { TOrder } from "../../../types/data/order"
+import pdfLib, { StandardFonts } from "pdf-lib"
 import { formatDate } from "date-fns"
-
-const companyLogo = "../../../../assets/images/logo192.png"
 
 import fs from "fs"
 import path from "path"
 import { pdfColors } from ".."
+
+/*
+ *  Typing
+ */
+
+/* Order */
+import { TOrder } from "../../../types/data/order"
+
+const companyLogo = "../../../../assets/images/logo192.png"
 
 export const getPdfHeader = async (
   page: pdfLib.PDFPage,
@@ -46,7 +52,7 @@ export const getPdfHeader = async (
   }
 
   const imagePath = path.join(__dirname, companyLogo)
-  const imageBytes = fs.readFileSync(imagePath)
+  const imageBytes = fs.readFileSync(imagePath).buffer
 
   const logoImage = await pdfDoc.embedPng(imageBytes)
 

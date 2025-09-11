@@ -1,16 +1,40 @@
 import * as fb from "firebase/firestore"
 import { collections } from "../firebase"
 import { parseFbDocs } from "../../utils/parsers/fbDoc"
-import { TBasicOrder } from "../../utils/types/data/order"
+
+/*
+ *  Typing
+ */
+
+/* Order */
+import { TBasicOrder } from "../../utils/types/data/order/basicOrder"
+
+/* Client */
 import { TClient } from "../../utils/types/data/client"
-import { TEmmitter } from "../../utils/types/data/emmiter"
-import { TRepresentative } from "../../utils/types/data/representative"
+
+/* Emmitter */
+import { TEmmitter } from "../../utils/types/data/accounts/emmitter"
+
+/* Representative */
+import { TRepresentative } from "../../utils/types/data/accounts/representative"
+
+/* Worker */
+import { TWorker } from "../../utils/types/data/accounts/worker"
+
+/* Product Type */
 import { TProdType } from "../../utils/types/data/prodType"
+
+/* Color */
 import { TColor } from "../../utils/types/data/color"
+
+/* Model */
 import { TModel } from "../../utils/types/data/model"
+
+/* Product */
 import { TProduct } from "../../utils/types/data/product"
+
+/* Production Line */
 import { TProductionLine } from "../../utils/types/data/productionLine"
-import { TWorker } from "../../utils/types/data/worker"
 
 type TWantedCollections = keyof typeof collections
 

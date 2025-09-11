@@ -1,7 +1,5 @@
-import {
-  TNewRepresentative,
-  TRepresentative,
-} from "../types/data/representative"
+import { TNewRepresentative } from "../types/data/accounts/representative/newRepresentative"
+import { TRepresentative } from "../types/data/accounts/representative"
 import { TErrorsCheck } from "../types/system/ErrorsCheck"
 
 export const representativeValidator = (data: TRepresentative): boolean => {

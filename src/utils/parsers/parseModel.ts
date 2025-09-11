@@ -1,11 +1,26 @@
+/*
+ *  Typing
+ */
+
+/* Color */
 import { TColor } from "../types/data/color"
-import {TDBModel, TModel, TModelDetails } from "../types/data/model"
+
+/* Model */
+import { TBasicModel } from "../types/data/model/basicModel"
+import { TModel } from "../types/data/model"
+import { TModelDetails } from "../types/data/model/modelDetails"
+
+/* Order */
 import { TOrder } from "../types/data/order"
+
+/* Product Type */
 import { TProdType } from "../types/data/prodType"
+
+/* Product */
 import { TProduct } from "../types/data/product"
 
 type Props = {
-  model:TDBModel
+  model: TBasicModel
   colors: TColor[]
   prodTypes: TProdType[]
   products: TProduct[]

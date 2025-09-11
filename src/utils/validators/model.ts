@@ -1,4 +1,4 @@
-import { TNewModel } from "../types/data/model"
+import { TNewModel } from "../types/data/model/newModel"
 import { TErrorsCheck } from "../types/system/ErrorsCheck"
 
 export const modelValidator = (data: TNewModel): TErrorsCheck => {

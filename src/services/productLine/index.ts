@@ -1,14 +1,22 @@
 import * as fb from "firebase/firestore"
 import { collections } from "../../network/firebase"
 import { getCustomError } from "../../utils/helpers/getCustomError"
-import { TBasicOrder } from "../../utils/types/data/order"
-import { TProduct } from "../../utils/types/data/product"
-import {
- TDBLineProductGroup,
- TDBProductionLine,
-  TProductionLine,
-} from "../../utils/types/data/productionLine"
 import { generateProductionGroup } from "./helpers/generateProductionGroup"
+
+/*
+ *  Typing
+ */
+
+/* Order */
+import { TBasicOrder } from "../../utils/types/data/order/basicOrder"
+
+/* Product */
+import { TProduct } from "../../utils/types/data/product"
+
+/* Production Line */
+import { TProductionLineProductGroup } from "../../utils/types/data/productionLine/productGroup/productionLineGroup"
+import { TDBProductionLine } from "../../utils/types/data/productionLine/dbProductionLine"
+import { TProductionLine } from "../../utils/types/data/productionLine"
 
 const registerProductionLine = async (
   newOrder: TBasicOrder,
@@ -18,7 +26,7 @@ const registerProductionLine = async (
 > => {
   return new Promise(async (resolve) => {
     try {
-      let newProductionLine:TDBProductionLine = {
+      let newProductionLine: TDBProductionLine = {
         order: newOrder.id,
         client: newOrder.client,
         status: "queued",
@@ -35,10 +43,8 @@ const registerProductionLine = async (
           if (!hasInStorage) {
             const missing = product.quantity - prodObj.storage.quantity
 
-            const plProdGroup:TDBLineProductGroup = generateProductionGroup(
-              prodObj.id,
-              missing
-            )
+            const plProdGroup: TProductionLineProductGroup =
+              generateProductionGroup(prodObj.id, missing)
 
             newProductionLine.quantity += plProdGroup.list.length
             newProductionLine.products.push(plProdGroup)

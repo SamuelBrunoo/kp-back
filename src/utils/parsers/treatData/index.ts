@@ -1,9 +1,9 @@
 import { treatNewOrder } from "./newOrder"
 
-export const treatData = (dataType: string, data: any, extra?: any) => {
+export const treatData = <T>(dataType: string, data: any, extra?: any): T => {
   switch (dataType) {
     case "newOrder":
-      return treatNewOrder(data, extra)
+      return treatNewOrder(data, extra) as T
     default:
       return data
   }

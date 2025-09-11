@@ -1,8 +1,7 @@
-import { TPaymentMethod } from "../types/data/payment"
+import { TPaymentMethod } from "../types/data/payment/paymentMethod"
 
 export const paymentRelation: { [key in TPaymentMethod]: string } = {
-  check: "Cheque",
   pix: "Pix",
   slip: "Boleto",
-  ted: "TED",
+  cash: "Dinheiro",
 }

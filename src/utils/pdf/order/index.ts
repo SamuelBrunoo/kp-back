@@ -1,4 +1,4 @@
-import pdfLib, { PDFDocument, rgb, StandardFonts } from "pdf-lib"
+import { PDFDocument, rgb } from "pdf-lib"
 import { TOrder } from "../../types/data/order"
 
 import { getPdfHeader } from "./contents/header"

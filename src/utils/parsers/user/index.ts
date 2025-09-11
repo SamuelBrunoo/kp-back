@@ -1,4 +1,10 @@
-import { TBasicEmmitter, TSafeEmmitter } from "../../types/data/emmiter"
+/*
+ *  Typing
+ */
+
+/* Emmitter */
+import { TBasicEmmitter } from "../../types/data/accounts/emmitter/basicEmmitter"
+import { TSafeEmmitter } from "../../types/data/accounts/emmitter/safeEmmitter"
 
 export const parseSafeEmmitter = (emmitter: TBasicEmmitter) => {
   const safeEmmitter: TSafeEmmitter = {

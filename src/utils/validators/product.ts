@@ -1,4 +1,5 @@
-import { TNewProduct, TProduct } from "../types/data/product"
+import { TNewProduct } from "../types/data/product/newProduct"
+import { TProduct } from "../types/data/product"
 import { TErrorsCheck } from "../types/system/ErrorsCheck"
 
 export const newProductValidator = (data: TNewProduct): TErrorsCheck => {

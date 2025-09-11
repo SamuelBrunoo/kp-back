@@ -1,31 +1,43 @@
-import { paymentRelation } from "../../relations/payment"
-import { orderProductStatusRelation } from "../../relations/status"
-import { TCity } from "../../types/data/city"
-import { TBaseClient, TClient, TPageListClient } from "../../types/data/client"
-import { TColor } from "../../types/data/color"
-import { TBasicEmmitter, TEmmitter } from "../../types/data/emmiter"
-import { TModel } from "../../types/data/model"
-import {
-  TBasicOrder,
-  TOPStatus,
-  TOPStatusWeight,
-  TPageListOrder,
-} from "../../types/data/order"
-import { TProdType } from "../../types/data/prodType"
-import { TBasicProduct } from "../../types/data/product"
-import {
-  TPageListProductionLine,
-  TPageListPLProducts,
-  TProductionLine,
-  TPageListPLProductsDetailsOrders,
-} from "../../types/data/productionLine"
-
 import dateFns from "date-fns"
-import { TWorker } from "../../types/data/worker"
+import { orderProductStatusRelation } from "../../relations/status"
 import { getListOverralStatus } from "../../helpers/getListOverralStatus"
 
+/*
+ *  Typing
+ */
+
+/* Client */
+import { TBasicClient } from "../../types/data/client/basicClient"
+
+/* Color */
+import { TColor } from "../../types/data/color"
+
+/* Model */
+import { TModel } from "../../types/data/model"
+
+/* Order */
+import { TBasicOrder } from "../../types/data/order/basicOrder"
+import { TOPStatus } from "../../types/data/status/orderProduct"
+import { TOPStatusWeight } from "../../types/data/status/orderProductStatusWeight"
+
+/* Product Type */
+import { TProdType } from "../../types/data/prodType"
+
+/* Product */
+import { TBasicProduct } from "../../types/data/product/basicProduct"
+
+/* Production Line */
+import { TPageListProductionLine } from "../../types/data/productionLine/pageList"
+import { TPageListProductionLine_ProductsView } from "../../types/data/productionLine/productsView/index"
+import { TProductionLine } from "../../types/data/productionLine"
+import { TPageListPLProductsDetailsAttribution } from "../../types/data/productionLine/productsView/productAttribution"
+
+/* Worker */
+import { TWorker } from "../../types/data/accounts/worker"
+import { TProductionLine_Product_ProductDetails } from "../../types/data/productionLine/productsView/productDetails"
+
 type Props = {
-  clients: TBaseClient[]
+  clients: TBasicClient[]
   orders: TBasicOrder[]
 
   productTypes: TProdType[]
@@ -150,7 +162,8 @@ export const parseProductionLinePageList = ({
               responsable: worker,
               color: colorName,
               attributedAt: worker
-                ? dateFns.format(worker.attributionDate, "dd/MM/yyyy")
+                ? // ? dateFns.format(worker.attributionDate, "dd/MM/yyyy")
+                  worker.attributionDate
                 : null,
               code: product.code,
               model: modelName,
@@ -204,8 +217,8 @@ export const parseProductionLinePageListByProducts = ({
   productionLines,
 
   workers,
-}: Props): TPageListPLProducts[] => {
-  let list: TPageListPLProducts[] = []
+}: Props): TPageListProductionLine_ProductsView[] => {
+  let list: TPageListProductionLine_ProductsView[] = []
 
   try {
     let modelsIds: string[] = []
@@ -301,7 +314,7 @@ export const parseProductionLinePageListByProducts = ({
       const model = models.find((mod) => mod.id === mid)
       const type = productTypes.find((type) => type.code === model.type)
 
-      const ordersList: TPageListPLProductsDetailsOrders[] = orders
+      const ordersList: TProductionLine_Product_ProductDetails[] = orders
         .filter((o) =>
           o.products.some(
             (p) => products.find((prod) => prod.id === p.id).model === mid
@@ -315,14 +328,14 @@ export const parseProductionLinePageListByProducts = ({
               deadline: dateFns.format(ord.deadline, "dd/MM/yyyy"),
               index: ordKey,
               orderNumber: ord.code,
-            } as TPageListPLProductsDetailsOrders)
+            } as TProductionLine_Product_ProductDetails)
         )
 
       // Order Status
       let currentOrderStatusWeight = 1
 
       // Attributions
-      let attributions: TPageListPLProducts["details"]["attributions"] = []
+      let attributions: TPageListPLProductsDetailsAttribution[] = []
 
       prodOI[mid].forEach((p) => {
         // Readable data
@@ -337,22 +350,22 @@ export const parseProductionLinePageListByProducts = ({
         )
 
         // Attribution
-        const attributionData: TPageListPLProducts["details"]["attributions"][number] =
-          {
-            attributedAt: p.attributedAt,
-            color: color.name,
-            index: p.index,
-            responsable: workers.find((w) => w.id === ""),
-            status: orderProductStatusRelation[p.status],
-          }
+        const attributionData: TPageListPLProductsDetailsAttribution = {
+          attributedAt: p.attributedAt,
+          color: color.name,
+          index: p.index,
+          responsable: workers.find((w) => w.id === ""),
+          status: orderProductStatusRelation[p.status],
+        }
 
         attributions.push(attributionData)
       })
 
-      const resumeStatus: TOPStatus =
-        orderProductStatusRelation[currentOrderStatusWeight]
+      const resumeStatus: TOPStatus = Object.entries(
+        orderProductStatusRelation
+      )[currentOrderStatusWeight][0] as TOPStatus
 
-      const obj: TPageListPLProducts = {
+      const obj: TPageListProductionLine_ProductsView = {
         id: mid,
         details: {
           ordersList: ordersList,

@@ -4,8 +4,7 @@ import { AxiosError } from "axios"
 import { TApi_Params_Slips as TParams } from "./params"
 import { TApi_Responses_Slips as TResponses } from "./responses"
 import { getApiError } from "../../../utils/helpers/api/getApiErrors"
-import { TS_Credential } from "../../../utils/types/data/services/sicredi/data/credential"
-import { TBankCredentials } from "../../../utils/types/data/emmiter"
+import { TBankCredentials, TS_Credential } from "../../../utils/types/data/services/sicredi/data/credential"
 
 const baseURL = "/cobranca/boleto/v1"
 

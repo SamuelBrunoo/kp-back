@@ -2,13 +2,23 @@ import * as fb from "firebase/firestore"
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth"
 import app, { collections } from "../../network/firebase"
 import { parseFbDoc } from "../../utils/parsers/fbDoc"
-import { TUser } from "../../utils/types/data/user"
-import { TWorker } from "../../utils/types/data/worker"
-import { TEmmitter } from "../../utils/types/data/emmiter"
 import { parseSafeEmmitter } from "../../utils/parsers/user"
 import { getCustomError } from "../../utils/helpers/getCustomError"
 import { authMessagesFbRelation } from "../../utils/relations/firebase/authMessages"
 import { generateTokens } from "../../utils/jwt"
+
+/*
+ *  Typing
+ */
+
+/* User */
+import { TUser } from "../../utils/types/data/accounts/user"
+
+/* Worker */
+import { TWorker } from "../../utils/types/data/accounts/worker"
+
+/* Emmitter */
+import { TEmmitter } from "../../utils/types/data/accounts/emmitter"
 
 const authInstance = getAuth(app)
 

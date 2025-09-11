@@ -1,24 +1,51 @@
-import { TCity } from "../../types/data/city"
-import { TBaseClient } from "../../types/data/client"
-import { TColor } from "../../types/data/color"
-import { TBasicEmmitter } from "../../types/data/emmiter"
-import { TModel } from "../../types/data/model"
-import {
-  TBasicOrder,
-  TOPStatusWeight,
-  TOrder,
-  TPageListOrder,
-} from "../../types/data/order"
-import { Slip } from "../../types/data/payment"
-import { TProdType } from "../../types/data/prodType"
-import { TBasicProduct } from "../../types/data/product"
-import { TProductionLine } from "../../types/data/productionLine"
-import { TBasicRepresentative } from "../../types/data/representative"
-import { TState } from "../../types/data/address/state"
 import dateFns from "date-fns"
 
+/*
+ *  Typing
+ */
+
+/* Address */
+import { TCity } from "../../types/data/address/city"
+import { TState } from "../../types/data/address/state"
+
+/* Client */
+import { TBasicClient } from "../../types/data/client/basicClient"
+
+/* Color */
+import { TColor } from "../../types/data/color"
+
+/* Emmitter */
+import { TBasicEmmitter } from "../../types/data/accounts/emmitter/basicEmmitter"
+
+/* Model */
+import { TModel } from "../../types/data/model"
+
+/* Order */
+import { TBasicOrder } from "../../types/data/order/basicOrder"
+import { TOrder } from "../../types/data/order"
+import { TPageListOrder } from "../../types/data/order/pageListOrder"
+
+/* Payment */
+import { OrderSlip } from "../../types/data/payment/slipOrder"
+
+/* Product Type */
+import { TProdType } from "../../types/data/prodType"
+
+/* Product */
+import { TBasicProduct } from "../../types/data/product/basicProduct"
+
+/* Production Line */
+import { TProductionLine } from "../../types/data/productionLine"
+
+/* Representative */
+import { TBasicRepresentative } from "../../types/data/accounts/representative/basicRepresentative"
+
+/* Status */
+import { TOPStatusWeight } from "../../types/data/status/orderProductStatusWeight"
+import { TPaymentConfig } from "../../types/data/payment"
+
 type Props = {
-  clients: TBaseClient[]
+  clients: TBasicClient[]
   orders: TBasicOrder[]
   cities: TCity[]
   states: TState[]
@@ -146,11 +173,10 @@ export const parseOrdersPageList = ({
             valueLiquid: i.totals.liquid,
             valueTotal: i.totals.value,
           },
-          paymentSlips: (i as any as TOrder).payment.slips as Slip[],
+          paymentSlips: (i.payment as TPaymentConfig["order"])
+            .slips as OrderSlip[],
         },
       }
-
-      console.log("Here")
 
       list.push(obj)
     })

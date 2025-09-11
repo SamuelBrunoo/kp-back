@@ -1,4 +1,6 @@
-import { TClient, TClientType, TNewClient } from "../types/data/client"
+import { TClient } from "../types/data/client"
+import { TClientType } from "../types/data/client/clientType"
+import { TNewClient } from "../types/data/client/newClient"
 import { TErrorsCheck } from "../types/system/ErrorsCheck"
 import { addressValidator } from "./address"
 import { emailValidator } from "./email"

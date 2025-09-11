@@ -1,5 +1,5 @@
-import { TDBClient } from "./dbClient"
+import { TBasicClient } from "./basicClient"
 
-export type TClient = TDBClient & {
+export type TClient = TBasicClient & {
   orders: string[]
 }

@@ -2,19 +2,36 @@ import { Request, Response } from "express"
 
 import * as fb from "firebase/firestore"
 import { collections } from "../network/firebase"
-import {TDBProduct, TNewProduct, TProduct } from "../utils/types/data/product"
 import {
   newProductValidator,
   productValidator,
 } from "../utils/validators/product"
 import parseProducts from "../utils/parsers/parseProducts"
 import { parseFbDocs } from "../utils/parsers/fbDoc"
-import { TColor } from "../utils/types/data/color"
-import {TDBModel, TModel } from "../utils/types/data/model"
-import { TProdType } from "../utils/types/data/prodType"
 import { getCustomError } from "../utils/helpers/getCustomError"
-import { TOrder } from "../utils/types/data/order"
 import { parseProductsPageList } from "../utils/parsers/listsPages/products"
+
+/*
+ *  Typing
+ */
+
+/* Product */
+import { TDBProduct } from "../utils/types/data/product/dbProduct"
+import { TNewProduct } from "../utils/types/data/product/newProduct"
+import { TProduct } from "../utils/types/data/product"
+
+/* Color */
+import { TColor } from "../utils/types/data/color"
+
+/* Model */
+import { TModel } from "../utils/types/data/model"
+import { TBasicModel } from "../utils/types/data/model/basicModel"
+
+/* Product Type */
+import { TProdType } from "../utils/types/data/prodType"
+
+/* Order */
+import { TOrder } from "../utils/types/data/order"
 
 export const getProductslistPage = async (req: Request, res: Response) => {
   try {
@@ -26,7 +43,7 @@ export const getProductslistPage = async (req: Request, res: Response) => {
     ) as TColor[]
     const colModels = parseFbDocs(
       await fb.getDocs(fb.query(collections.models))
-    ) asTDBModel[]
+    ) as TBasicModel[]
     const colProdTypes = parseFbDocs(
       await fb.getDocs(fb.query(collections.productTypes))
     ) as TProdType[]
@@ -101,7 +118,7 @@ export const addProduct = async (req: Request, res: Response) => {
       const modelSnap = await fb.getDoc(modelRef)
 
       if (modelSnap.exists()) {
-        const modelData = modelSnap.data() asTDBModel
+        const modelData = modelSnap.data() as TBasicModel
 
         const isColorAvailable = modelData.colors.includes(data.color)
 
@@ -143,7 +160,7 @@ export const updateProduct = async (req: Request, res: Response) => {
 
       // Check if product exists
       if (prodSnap.exists()) {
-        const fbProductData = prodSnap.data() asTDBProduct
+        const fbProductData = prodSnap.data() as TDBProduct
 
         const modelRef = fb.doc(collections.models, data.model)
         const modelSnap = await fb.getDoc(modelRef)

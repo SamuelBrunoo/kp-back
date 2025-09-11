@@ -8,16 +8,25 @@ import {
 } from "../utils/validators/representative"
 import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { parseRepresentatives } from "../utils/parsers/parseRepresentatives"
-import {
- TDBRepresentative,
-  TNewRepresentative,
-  TRepresentative,
-} from "../utils/types/data/representative"
-import { TBaseClient, TClient } from "../utils/types/data/client"
 import { getCustomError } from "../utils/helpers/getCustomError"
-import { TBasicOrder } from "../utils/types/data/order"
 import { parseRepresentativesPageList } from "../utils/parsers/listsPages/representatives"
 import { getRepresentativesQuery } from "../utils/helpers/api/getDateFilteredQuery"
+
+/*
+ *  Typing
+ */
+
+/* Representative */
+import { TDBRepresentative } from "../utils/types/data/accounts/representative/dbRepresentative"
+import { TNewRepresentative } from "../utils/types/data/accounts/representative/newRepresentative"
+import { TRepresentative } from "../utils/types/data/accounts/representative"
+
+/* Client */
+import { TBasicClient } from "../utils/types/data/client/basicClient"
+import { TClient } from "../utils/types/data/client"
+
+/* Order */
+import { TBasicOrder } from "../utils/types/data/order/basicOrder"
 
 export const getRepresentativesListPage = async (
   req: Request,
@@ -38,7 +47,7 @@ export const getRepresentativesListPage = async (
       await fb.getDocs(
         fb.query(collections.clients, fb.where("representative", "!=", null))
       )
-    ) as TBaseClient[]
+    ) as TBasicClient[]
 
     const ordersQuery: fb.Query = getRepresentativesQuery(dateFilter)
 
@@ -144,7 +153,7 @@ export const addRepresentative = async (req: Request, res: Response) => {
         res.status(200).json({ success: true, data: docData })
       } else {
         const registeredRepresentative =
-          docsSnap.docs[0].data() asTDBRepresentative
+          docsSnap.docs[0].data() as TDBRepresentative
 
         let message = ""
 
@@ -217,7 +226,7 @@ export const updateRepresentative = async (req: Request, res: Response) => {
           res.status(200).json({ success: true, data: docData })
         } else {
           const registeredRepresentative =
-            docsSnap.docs[0].data() asTDBRepresentative
+            docsSnap.docs[0].data() as TDBRepresentative
 
           let message = ""
 

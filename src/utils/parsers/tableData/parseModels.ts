@@ -1,4 +1,4 @@
-import { TProductType } from "../../../@types/data/productType"
+import { TProdType } from "../../types/data/prodType"
 
 const parseModels = (data: any[], extra: any) => {
   const prodTypes: any[] = extra.prodTypes
@@ -8,7 +8,7 @@ const parseModels = (data: any[], extra: any) => {
   data.forEach((m) => {
     const obj = {
       ...m,
-      type: (prodTypes.find((pt) => pt.key === m.type) as TProductType).name,
+      type: (prodTypes.find((pt) => pt.key === m.type) as TProdType).name,
     }
 
     list.push(obj)

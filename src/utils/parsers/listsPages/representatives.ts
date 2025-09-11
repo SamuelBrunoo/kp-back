@@ -2,11 +2,17 @@ import {
   getRepMonthOrdersResume,
   getRepYearOrdersResume,
 } from "../../reports/representative"
-import { TBasicOrder } from "../../types/data/order"
-import {
-  TPageListRepresentative,
-  TRepresentative,
-} from "../../types/data/representative"
+
+/*
+ *  Typing
+ */
+
+/* Order */
+import { TBasicOrder } from "../../types/data/order/basicOrder"
+
+/* Representative */
+import { TPageListRepresentative } from "../../types/data/accounts/representative/pageListRepresentative"
+import { TRepresentative } from "../../types/data/accounts/representative"
 
 type Props = {
   clients: {

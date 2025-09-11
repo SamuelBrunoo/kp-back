@@ -1,4 +1,5 @@
-import { TOPStatus, TOPStatusWeight } from "../types/data/order"
+import { TOPStatus } from "../types/data/status/orderProduct"
+import { TOPStatusWeight } from "../types/data/status/orderProductStatusWeight"
 
 export const getListOverralStatus = (list: any): TOPStatus => {
   let currentOrderStatusWeight = 1

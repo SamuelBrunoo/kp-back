@@ -3,19 +3,27 @@ import { Request, Response } from "express"
 import * as fb from "firebase/firestore"
 import { collections } from "../network/firebase"
 
-import { TBasicOrder,TDBOrder, TNewOrder } from "../utils/types/data/order"
-
+import parseOrder from "../utils/parsers/parseOrder"
 import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { newOrderValidator, orderValidator } from "../utils/validators/order"
-import parseOrder from "../utils/parsers/parseOrder"
 import { treatData } from "../utils/parsers/treatData"
-import {TDBProductionLine } from "../utils/types/data/productionLine"
-
+import { getParsedCollections } from "../network/firebase/collectionsHelpers"
 import { getCustomError } from "../utils/helpers/getCustomError"
 import { parseOrdersPageList } from "../utils/parsers/listsPages/orders"
-import { TCity } from "../utils/types/data/city"
+
+/*
+ *  Typing
+ */
+
+/* Address */
+import { TCity } from "../utils/types/data/address/city"
 import { TState } from "../utils/types/data/address/state"
-import { getParsedCollections } from "../network/firebase/collectionsHelpers"
+
+/* Order */
+import { TNewOrder } from "../utils/types/data/order/newOrder"
+import { TDBProductionLine } from "../utils/types/data/productionLine/dbProductionLine"
+import { TDBOrder } from "../utils/types/data/order/dbOrder"
+
 import SERVICES from "../services"
 
 export const getOrdersListPage = async (req: Request, res: Response) => {
@@ -177,7 +185,7 @@ export const addOrder = async (req: Request, res: Response) => {
       const newOrderCode = await SERVICES.Order.getNewOrderCode()
 
       /* 3. Treat data */
-      const orderData = treatData("newOrder", data, {
+      const orderData = treatData<TDBOrder>("newOrder", data, {
         newCode: newOrderCode,
         productsToTreat: orderProducts,
       })
@@ -186,7 +194,7 @@ export const addOrder = async (req: Request, res: Response) => {
       let newOrder = await SERVICES.Order.registerOrder(orderData)
       if (newOrder.success === false) throw new Error(newOrder.error)
 
-      let requiresNewProductLine: Partial<TFBProductionLine> | undefined =
+      let requiresNewProductLine: Partial<TDBProductionLine> | undefined =
         undefined
 
       /* 5. Update products count in storage */

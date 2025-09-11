@@ -1,4 +1,5 @@
-import { TNewOrder, TOrder } from "../types/data/order"
+import { TNewOrder } from "../types/data/order/newOrder"
+import { TOrder } from "../types/data/order"
 import { TErrorsCheck } from "../types/system/ErrorsCheck"
 
 export const newOrderValidator = (data: TNewOrder): TErrorsCheck => {
@@ -30,7 +31,7 @@ export const newOrderValidator = (data: TNewOrder): TErrorsCheck => {
     res.ok = false
     res.fields.push("emissor")
   }
-  if (!data.shippingType || typeof data.shippingType !== "string") {
+  if (!data.shipping.type || typeof data.shipping.type !== "string") {
     res.ok = false
     res.fields.push("envio")
   }

@@ -1,21 +1,36 @@
 import { Api } from "../../api"
-import { TDefaultBodyRes } from "../../api/types"
+
+import * as fb from "firebase/firestore"
 import { collections } from "../../network/firebase"
 import { FACTORY } from "../../utils/factory"
 import { getCustomError } from "../../utils/helpers/getCustomError"
 import { getSlipDue, getSlipsValues } from "../../utils/helpers/slip"
 import { parseFbDoc } from "../../utils/parsers/fbDoc"
-import { TBaseClient } from "../../utils/types/data/client"
-import { TBasicEmmitter } from "../../utils/types/data/emmiter"
-import { TBasicOrder,TDBOrder } from "../../utils/types/data/order"
-import {
-  Slip,
-  TBankSlipRegister,
-  UnfilledSlip,
-} from "../../utils/types/data/payment"
-import { TState } from "../../utils/types/data/address/state"
 
-import * as fb from "firebase/firestore"
+/*
+ *  Typing
+ */
+
+/* API */
+import { TDefaultBodyRes } from "../../api/types"
+
+/* Client */
+import { TBasicClient } from "../../utils/types/data/client/basicClient"
+
+/* Emmitter */
+import { TBasicEmmitter } from "../../utils/types/data/accounts/emmitter/basicEmmitter"
+
+/* Order */
+import { TDBOrder } from "../../utils/types/data/order/dbOrder"
+import { TBasicOrder } from "../../utils/types/data/order/basicOrder"
+
+/* Payment */
+import { OrderSlip } from "../../utils/types/data/payment/slipOrder"
+import { TBankSlipRegister } from "../../utils/types/data/payment/slipBank"
+import { UnfilledSlip } from "../../utils/types/data/payment/slipUnfilled"
+
+/* State */
+import { TState } from "../../utils/types/data/address/state"
 
 export const serviceGenerateOrderPayment = async (
   orderId: string,
@@ -39,7 +54,7 @@ export const serviceGenerateOrderPayment = async (
 
         if (emmitterDoc.exists() && clientDoc.exists()) {
           const emmitter = parseFbDoc(emmitterDoc) as TBasicEmmitter
-          const client = parseFbDoc(clientDoc) as TBaseClient
+          const client = parseFbDoc(clientDoc) as TBasicClient
 
           const emmitterStateRef = fb.doc(
             collections.states,
@@ -138,9 +153,9 @@ export const serviceGenerateOrderPayment = async (
                   if (generatedSlips.length === slipsCount) {
                     // update order to include shippingCost on it's totals
 
-                    const baseData = orderDoc.data() asTDBOrder
+                    const baseData = orderDoc.data() as TDBOrder
 
-                    const completeSlipsInfo: Slip[] = generatedSlips.map(
+                    const completeSlipsInfo: OrderSlip[] = generatedSlips.map(
                       (s, sk) => ({
                         barCode: s.codigoBarras,
                         cleanCode: s.linhaDigitavel,
@@ -164,7 +179,7 @@ export const serviceGenerateOrderPayment = async (
                         ...baseData.payment,
                         slips: completeSlipsInfo,
                       },
-                    } asTDBOrder
+                    } as TDBOrder
 
                     await fb.updateDoc(orderRef, newOrderData)
                     resolve({ ok: true, data: generatedSlips })

@@ -3,18 +3,38 @@ import { Request, Response } from "express"
 import * as fb from "firebase/firestore"
 import { collections } from "../network/firebase"
 import { parseFbDoc, parseFbDocs } from "../utils/parsers/fbDoc"
-import { TClient } from "../utils/types/data/client"
-import { TRepresentative } from "../utils/types/data/representative"
-import { TProduct } from "../utils/types/data/product"
-import { TProdType } from "../utils/types/data/prodType"
-import { TColor } from "../utils/types/data/color"
-import { TEmmitter } from "../utils/types/data/emmiter"
-import { TModel } from "../utils/types/data/model"
 import { getCustomError } from "../utils/helpers/getCustomError"
-import { TBasicOrder } from "../utils/types/data/order"
 import { generateOrderPdf } from "../utils/pdf/order"
-import parseOrders from "../utils/parsers/parseOrders"
 import parseProducts from "../utils/parsers/parseProducts"
+
+/*
+ *  Typing
+ */
+
+/* Client */
+import { TClient } from "../utils/types/data/client"
+
+/* Representative */
+import { TRepresentative } from "../utils/types/data/accounts/representative"
+
+/* Product */
+import { TProduct } from "../utils/types/data/product"
+
+/* Product Type */
+import { TProdType } from "../utils/types/data/prodType"
+
+/* Color */
+import { TColor } from "../utils/types/data/color"
+
+/* Emmitter */
+import { TEmmitter } from "../utils/types/data/accounts/emmitter"
+
+/* Model */
+import { TModel } from "../utils/types/data/model"
+
+/* Order */
+import { TBasicOrder } from "../utils/types/data/order/basicOrder"
+import parseOrder from "../utils/parsers/parseOrder"
 
 export const getOrderPdf = async (req: Request, res: Response) => {
   try {
@@ -66,13 +86,10 @@ export const getOrderPdf = async (req: Request, res: Response) => {
       orderData = orderInfo
     }
 
-    const orderInfo = parseOrders({
-      emmitters: colEmmitters,
-      representatives: colRepresentatives,
-      clients: colClients,
+    const orderInfo = parseOrder({
       colors: colColors,
       models: colModels,
-      orders: [orderData],
+      order: orderData,
       prodTypes: colProdTypes,
       products: colProducts,
     })[0]

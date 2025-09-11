@@ -1,25 +1,48 @@
 import * as fb from "firebase/firestore"
 import { collections } from "../../../network/firebase"
 import { parseFbDocs } from "../../parsers/fbDoc"
-import {TDBOrder, TBasicOrder } from "../../types/data/order"
+
+/*
+ *  Typing
+ */
+
+/* Order */
+import { TDBOrder } from "../../types/data/order/dbOrder"
+import { TBasicOrder } from "../../types/data/order/basicOrder"
+
+/* Client */
 import { TClient } from "../../types/data/client"
-import { TEmmitter } from "../../types/data/emmiter"
-import { TRepresentative } from "../../types/data/representative"
+
+/* Emmitter */
+import { TEmmitter } from "../../types/data/accounts/emmitter"
+
+/* Representative */
+import { TRepresentative } from "../../types/data/accounts/representative"
+
+/* Product Type */
 import { TProdType } from "../../types/data/prodType"
+
+/* Color */
 import { TColor } from "../../types/data/color"
+
+/* Model */
 import { TModel } from "../../types/data/model"
+
+/* Product */
 import { TProduct } from "../../types/data/product"
-import {TDBProductionLine } from "../../types/data/productionLine"
+
+/* Production Line */
+import { TDBProductionLine } from "../../types/data/productionLine/dbProductionLine"
 
 type TWantedCollections = keyof typeof collections
 
 interface ITypedCollections {
   colClients: TClient[]
-  colOrders:TDBOrder[]
+  colOrders: TDBOrder[]
   colEmmitters: TEmmitter[]
   colRepresentatives: TRepresentative[]
   colProdTypes: TProdType[]
-  colProductionLines:TDBProductionLine[]
+  colProductionLines: TDBProductionLine[]
   colColors: TColor[]
   colModels: TModel[]
   colProducts: TProduct[]

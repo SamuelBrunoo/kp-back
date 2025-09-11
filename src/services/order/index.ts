@@ -1,7 +1,14 @@
 import * as fb from "firebase/firestore"
 import { collections } from "../../network/firebase"
-import { TBasicOrder,TDBOrder, TNewOrder } from "../../utils/types/data/order"
 import { getCustomError } from "../../utils/helpers/getCustomError"
+
+/*
+ *  Typing
+ */
+
+/* Order */
+import { TDBOrder } from "../../utils/types/data/order/dbOrder"
+import { TBasicOrder } from "../../utils/types/data/order/basicOrder"
 
 const getLastOrderCode = async (): Promise<string> => {
   return new Promise(async (resolve) => {
@@ -10,7 +17,7 @@ const getLastOrderCode = async (): Promise<string> => {
     )
 
     const lastOrder =
-      lo.docs.length > 0 ? (lo.docs[0].data() asTDBOrder) : null
+      lo.docs.length > 0 ? (lo.docs[0].data() as TDBOrder) : null
 
     const code = lastOrder ? Number(lastOrder.code) : 1
 
@@ -27,13 +34,13 @@ const getNewOrderCode = async (): Promise<string> => {
 }
 
 const registerOrder = async (
-  data: TNewOrder
+  data: TDBOrder
 ): Promise<
   { success: true; data: TBasicOrder } | { success: false; error: string }
 > => {
   return new Promise(async (resolve) => {
     try {
-      const info: TNewOrder = data
+      const info: TDBOrder = data
 
       const doc = await fb.addDoc(collections.orders, info)
       const docData = { ...info, id: doc.id } as TBasicOrder

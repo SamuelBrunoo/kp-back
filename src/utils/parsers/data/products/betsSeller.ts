@@ -1,12 +1,25 @@
-import { TColor } from "../../../types/data/color"
+/*
+ *  Typing
+ */
+
+/* Front */
 import { TFront } from "../../../types/data/frontEnd"
-import {TDBModel, TModel } from "../../../types/data/model"
+
+/* Color */
+import { TColor } from "../../../types/data/color"
+
+/* Model */
+import { TBasicModel } from "../../../types/data/model/basicModel"
+
+/* Product Type */
 import { TProdType } from "../../../types/data/prodType"
-import { TBasicProduct } from "../../../types/data/product"
+
+/* Product */
+import { TBasicProduct } from "../../../types/data/product/basicProduct"
 
 export type ParserBastSellerProps = {
   product: TBasicProduct & { key: number; count: number }
-  models:TDBModel[]
+  models: TBasicModel[]
   productTypes: TProdType[]
   colors: TColor[]
 }
@@ -17,7 +30,7 @@ export const parseProductToBestSeller = ({
   productTypes,
   colors,
 }: ParserBastSellerProps): TFront["cards"]["list"] => {
-  const m = models.find((model) => model.id === product.model) asTDBModel
+  const m = models.find((model) => model.id === product.model) as TBasicModel
   const pt = productTypes.find((pt) => pt.code === product.type) as TProdType
   const c = colors.find((c) => c.code === product.color) as TColor
 
@@ -34,7 +47,7 @@ export const parseProductToBestSeller = ({
 
 type ListParserProps = {
   products: (TBasicProduct & { key: number; count: number })[]
-  models:TDBModel[]
+  models: TBasicModel[]
   productTypes: TProdType[]
   colors: TColor[]
 }

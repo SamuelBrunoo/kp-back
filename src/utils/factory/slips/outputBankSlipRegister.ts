@@ -1,6 +1,15 @@
-import { TBankCredentials } from "../../types/data/emmiter"
-import { TBasicOrder } from "../../types/data/order"
-import { UnfilledSlip } from "../../types/data/payment"
+/*
+ *  Typing
+ */
+
+/* Order */
+import { TBasicOrder } from "../../types/data/order/basicOrder"
+
+/* Order */
+import { UnfilledSlip } from "../../types/data/payment/slipUnfilled"
+
+/* BANK */
+import { TBankCredentials } from "../../types/data/services/sicredi/data/credential"
 import {
   TFinalReceiver,
   TPayer,

@@ -2,11 +2,14 @@ import { Request, Response } from "express"
 
 import * as fb from "firebase/firestore"
 import app from "../network/firebase"
-import { TNewProduct } from "../utils/types/data/product"
-import {
-  newProductValidator,
-  productValidator,
-} from "../utils/validators/product"
+import { newProductValidator } from "../utils/validators/product"
+
+/*
+ *  Typing
+ */
+
+/* Product */
+import { TNewProduct } from "../utils/types/data/product/newProduct"
 
 const firestore = fb.getFirestore(app)
 

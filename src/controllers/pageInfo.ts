@@ -3,24 +3,48 @@ import { Request, Response } from "express"
 import * as fb from "firebase/firestore"
 import { collections } from "../network/firebase"
 import { parseFbDoc, parseFbDocs } from "../utils/parsers/fbDoc"
-import { TBaseClient, TClient } from "../utils/types/data/client"
-import {
-  TBasicRepresentative,
-  TRepresentative,
-} from "../utils/types/data/representative"
-import { TBasicProduct, TProduct } from "../utils/types/data/product"
-import { TProdType } from "../utils/types/data/prodType"
-import { TColor } from "../utils/types/data/color"
-import { TEmmitter } from "../utils/types/data/emmiter"
-import {TDBModel, TModel, TModelDetails } from "../utils/types/data/model"
 import { getCustomError } from "../utils/helpers/getCustomError"
-import { TBasicOrder, TOrder } from "../utils/types/data/order"
 import parseModel from "../utils/parsers/parseModel"
 import parseProduct from "../utils/parsers/data/products/parseProduct"
-import { TState } from "../utils/types/data/address/state"
 import parseClient from "../utils/parsers/parseClient"
 import { parseRepresentative } from "../utils/parsers/parseRepresentatives"
 import parseProducts from "../utils/parsers/parseProducts"
+
+/*
+ *  Typing
+ */
+
+/* Client */
+import { TClient } from "../utils/types/data/client"
+import { TBasicClient } from "../utils/types/data/client/basicClient"
+
+/* Representative */
+import { TRepresentative } from "../utils/types/data/accounts/representative"
+import { TBasicRepresentative } from "../utils/types/data/accounts/representative/basicRepresentative"
+
+/* Product */
+import { TProduct } from "../utils/types/data/product"
+import { TBasicProduct } from "../utils/types/data/product/basicProduct"
+
+/* Model */
+import { TDBModel } from "../utils/types/data/model/dbModel"
+import { TModel } from "../utils/types/data/model"
+import { TModelDetails } from "../utils/types/data/model/modelDetails"
+
+/* Product Type */
+import { TProdType } from "../utils/types/data/prodType"
+
+/* Color */
+import { TColor } from "../utils/types/data/color"
+
+/* Emmitter */
+import { TEmmitter } from "../utils/types/data/accounts/emmitter"
+
+/* Order */
+import { TOrder } from "../utils/types/data/order"
+import { TBasicOrder } from "../utils/types/data/order/basicOrder"
+import { TState } from "../utils/types/data/address/state"
+import { TBasicModel } from "../utils/types/data/model/basicModel"
 
 export const getOrderFormData = async (req: Request, res: Response) => {
   try {
@@ -122,7 +146,7 @@ export const getModelFormData = async (req: Request, res: Response) => {
     if (modelId) {
       const colModels = parseFbDocs(
         await fb.getDocs(fb.query(collections.models))
-      ) asTDBModel[]
+      ) as TBasicModel[]
       const colOrders = parseFbDocs(
         await fb.getDocs(fb.query(collections.orders))
       ) as TOrder[]
@@ -208,7 +232,7 @@ export const getClientFormData = async (req: Request, res: Response) => {
     ) as TRepresentative[]
     const colClients = parseFbDocs(
       await fb.getDocs(fb.query(collections.clients))
-    ) as TBaseClient[]
+    ) as TBasicClient[]
     const colStates = parseFbDocs(
       await fb.getDocs(fb.query(collections.states))
     ) as TState[]
@@ -216,7 +240,7 @@ export const getClientFormData = async (req: Request, res: Response) => {
     let resultInfo: {
       representatives: TRepresentative[]
       states: TState[]
-      client?: TBaseClient
+      client?: TBasicClient
     } = {
       representatives: colRepresentatives,
       states: colStates,
@@ -254,7 +278,7 @@ export const getRepresentativeFormData = async (
     ) as TRepresentative[]
     const colClients = parseFbDocs(
       await fb.getDocs(fb.query(collections.clients))
-    ) as TBaseClient[]
+    ) as TBasicClient[]
     const colStates = parseFbDocs(
       await fb.getDocs(fb.query(collections.states))
     ) as TState[]

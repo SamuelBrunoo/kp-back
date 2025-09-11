@@ -3,23 +3,10 @@ import { Request, Response } from "express"
 import * as fb from "firebase/firestore"
 import { collections } from "../network/firebase"
 
-import { TBaseClient } from "../utils/types/data/client"
-import { TBasicOrder,TDBOrder } from "../utils/types/data/order"
-import { TModel } from "../utils/types/data/model"
-import { TBasicProduct, TProduct } from "../utils/types/data/product"
-import { TProdType } from "../utils/types/data/prodType"
-import { TColor } from "../utils/types/data/color"
-
 import { parseFbDoc, parseFbDocs } from "../utils/parsers/fbDoc"
 import parseOrder from "../utils/parsers/parseOrder"
-import {
-  TAttribution,
- TDBProductionLine,
-  TProductionLine,
-} from "../utils/types/data/productionLine"
 
 import parseProductionLines from "../utils/parsers/parseProductionLines"
-import { TWorker } from "../utils/types/data/worker"
 import {
   parseProductionLinePageList,
   parseProductionLinePageListByProducts,
@@ -28,6 +15,38 @@ import { getCustomError } from "../utils/helpers/getCustomError"
 import { extractProductionUpdates } from "../utils/helpers/productionLine"
 import { extractOrderProductionUpdates } from "../utils/helpers/order"
 import { getParsedCollections } from "../network/firebase/collectionsHelpers"
+
+/*
+ *  Typing
+ */
+
+/* Client */
+import { TBasicClient } from "../utils/types/data/client/basicClient"
+
+/* Order */
+import { TDBOrder } from "../utils/types/data/order/dbOrder"
+import { TBasicOrder } from "../utils/types/data/order/basicOrder"
+
+/* Model */
+import { TModel } from "../utils/types/data/model"
+
+/* Product */
+import { TProduct } from "../utils/types/data/product"
+import { TBasicProduct } from "../utils/types/data/product/basicProduct"
+
+/* Product Type */
+import { TProdType } from "../utils/types/data/prodType"
+
+/* Color */
+import { TColor } from "../utils/types/data/color"
+
+/* Production Line */
+import { TDBProductionLine } from "../utils/types/data/productionLine/dbProductionLine"
+import { TAttribution } from "../utils/types/data/productionLine/attribution"
+import { TProductionLine } from "../utils/types/data/productionLine"
+
+/* Worker */
+import { TWorker } from "../utils/types/data/accounts/worker"
 
 export const getProductionLinesListPage = async (
   req: Request,
@@ -38,7 +57,7 @@ export const getProductionLinesListPage = async (
 
     const colClients = parseFbDocs(
       await fb.getDocs(fb.query(collections.clients))
-    ) as TBaseClient[]
+    ) as TBasicClient[]
     const colOrders = parseFbDocs(
       await fb.getDocs(
         fb.query(collections.orders, fb.where("status", "!=", "done"))
@@ -213,19 +232,19 @@ export const updateProductionLine = async (req: Request, res: Response) => {
     if (fbProductionLineDoc.exists()) {
       const fbProductionLine = parseFbDoc(
         fbProductionLineDoc
-      ) asTDBProductionLine
+      ) as TDBProductionLine
 
       const orderId = fbProductionLine.order
       const orderRef = fb.doc(collections.orders, orderId)
       const fbOrder = await fb.getDoc(orderRef)
 
       if (fbOrder.exists()) {
-        let order:TDBOrder = fbOrder.data() asTDBOrder
+        let order: TDBOrder = fbOrder.data() as TDBOrder
 
-        const newProductionLineObj:TDBProductionLine =
+        const newProductionLineObj: TDBProductionLine =
           extractProductionUpdates(incomingData.products, fbProductionLine)
 
-        const newOrderObj:TDBOrder = extractOrderProductionUpdates(
+        const newOrderObj: TDBOrder = extractOrderProductionUpdates(
           newProductionLineObj.products,
           order
         )

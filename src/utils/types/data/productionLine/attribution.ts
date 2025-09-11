@@ -12,5 +12,5 @@ export type TAttribution = {
   status: TOPStatus
   productionId: string
   productId: string
-  attributedAt: string | null
+  attributedAt: number
 }

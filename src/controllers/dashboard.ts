@@ -3,19 +3,36 @@ import { Request, Response } from "express"
 import * as fb from "firebase/firestore"
 import app from "../network/firebase"
 import { getCustomError } from "../utils/helpers/getCustomError"
-import { TBasicOrder, TOrder } from "../utils/types/data/order"
 import { parseFbDocs } from "../utils/parsers/fbDoc"
 import { sumOrdersValues } from "../utils/helpers/sumOrdersValues"
 import { matchDay, matchYear } from "../utils/helpers/date/index.ts/matchDay"
-import { TBaseClient } from "../utils/types/data/client"
-import { TBasicProduct } from "../utils/types/data/product"
 import {
   parseProductsToBestSeller,
   ParserBastSellerProps,
 } from "../utils/parsers/data/products/betsSeller"
-import {TDBModel } from "../utils/types/data/model"
+
+/*
+ *  Typing
+ */
+
+/* Model */
+import { TBasicModel } from "../utils/types/data/model/basicModel"
+
+/* Product Type */
 import { TProdType } from "../utils/types/data/prodType"
+
+/* Color */
 import { TColor } from "../utils/types/data/color"
+
+/* Client */
+import { TBasicClient } from "../utils/types/data/client/basicClient"
+
+/* Product */
+import { TBasicProduct } from "../utils/types/data/product/basicProduct"
+
+/* Order */
+import { TOrder } from "../utils/types/data/order"
+import { TBasicOrder } from "../utils/types/data/order/basicOrder"
 
 const firestore = fb.getFirestore(app)
 
@@ -42,7 +59,7 @@ export const getAdminDashboardInfo = async (req: Request, res: Response) => {
       await fb.getDocs(
         fb.query(collections.clients, fb.where("__name__", "in", clientsIds))
       )
-    ) as TBaseClient[]
+    ) as TBasicClient[]
 
     const orders = baseOrders.map((o) => ({
       ...o,
@@ -56,7 +73,7 @@ export const getAdminDashboardInfo = async (req: Request, res: Response) => {
 
     const baseModels = parseFbDocs(
       await fb.getDocs(fb.query(collections.models))
-    ) asTDBModel[]
+    ) as TBasicModel[]
 
     const baseColors = parseFbDocs(
       await fb.getDocs(fb.query(collections.colors))
@@ -118,32 +135,39 @@ export const getAdminDashboardInfo = async (req: Request, res: Response) => {
       pastMonth: new Date(d.getFullYear(), d.getMonth() - 2).getTime(),
     }
 
-    const currentMonthSells = orders.filter(
-      (o) =>
+    const currentMonthSells = orders.filter((o) => {
+      const orderDateTime = new Date(o.orderDate).getTime()
+      return (
         o.status === "done" &&
-        datePoints.nextMonth > o.orderDate &&
-        o.orderDate >= datePoints.currentMonth
-    )
+        datePoints.nextMonth > orderDateTime &&
+        orderDateTime >= datePoints.currentMonth
+      )
+    })
 
-    const lastMonthSells = orders.filter(
-      (o) =>
+    const lastMonthSells = orders.filter((o) => {
+      const orderDateTime = new Date(o.orderDate).getTime()
+      return (
         o.status === "done" &&
-        datePoints.currentMonth > o.orderDate &&
-        o.orderDate >= datePoints.lastMonth
-    )
+        datePoints.currentMonth > orderDateTime &&
+        orderDateTime >= datePoints.lastMonth
+      )
+    })
 
-    const pastMonthSells = orders.filter(
-      (o) =>
+    const pastMonthSells = orders.filter((o) => {
+      const orderDateTime = new Date(o.orderDate).getTime()
+      return (
         o.status === "done" &&
-        datePoints.lastMonth > o.orderDate &&
-        o.orderDate >= datePoints.pastMonth
-    )
+        datePoints.lastMonth > orderDateTime &&
+        orderDateTime >= datePoints.pastMonth
+      )
+    })
 
-    const yearSells = orders.filter((o) =>
-      o.status === "done" && o.shippedAt
-        ? matchYear(o.shippedAt, d.getTime())
+    const yearSells = orders.filter((o) => {
+      const orderShippingDateTime = new Date(o.shippedAt).getTime()
+      return o.status === "done" && orderShippingDateTime
+        ? matchYear(orderShippingDateTime, d.getTime())
         : false
-    )
+    })
 
     /* Orders */
 

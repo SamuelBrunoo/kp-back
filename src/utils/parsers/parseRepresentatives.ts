@@ -1,14 +1,24 @@
-import {
-  TBasicRepresentative,
-  TRepresentative,
-} from "../types/data/representative"
-import { TBaseClient, TClient } from "../types/data/client"
+/*
+ *  Typing
+ */
+
+/* Representative */
+import { TBasicRepresentative } from "../types/data/accounts/representative/basicRepresentative"
+import { TRepresentative } from "../types/data/accounts/representative"
+
+/* Client */
+import { TBasicClient } from "../types/data/client/basicClient"
+import { TClient } from "../types/data/client"
+
+/* Address */
 import { TState } from "../types/data/address/state"
-import { TBasicOrder } from "../types/data/order"
+
+/* Order */
+import { TBasicOrder } from "../types/data/order/basicOrder"
 
 type Props = {
   representative: TBasicRepresentative
-  clients: TBaseClient[]
+  clients: TBasicClient[]
   orders: TBasicOrder[]
 }
 

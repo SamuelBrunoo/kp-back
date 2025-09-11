@@ -2,11 +2,14 @@ import parseClients from "./parseClients"
 import parseManufaturing from "./parseManufacturing"
 import parseModels from "./parseModels"
 import parseOrders from "./parseOrders"
-import parseProducts from "./parseProducts"
 
-type TContent = "models" | "products" | "clients" | "orders" | "manufacturing"
+type TContent = "models" | "clients" | "orders" | "manufacturing"
 
-export const parseTableData = (data: any[], contentType: TContent, extra?: any) => {
+export const parseTableData = (
+  data: any[],
+  contentType: TContent,
+  extra?: any
+) => {
   let list: any[] = []
 
   switch (contentType) {
@@ -22,8 +25,6 @@ export const parseTableData = (data: any[], contentType: TContent, extra?: any) 
     case "orders":
       list = parseOrders(data)
       break
-    case "products":
-      list = parseProducts(data, extra)
       break
     default:
       list = data

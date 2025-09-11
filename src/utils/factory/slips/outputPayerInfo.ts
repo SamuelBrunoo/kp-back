@@ -1,9 +1,18 @@
-import { TBaseClient } from "../../types/data/client"
+/*
+ *  Typing
+ */
+
+/* Client */
+import { TBasicClient } from "../../types/data/client/basicClient"
+
+/* BANK */
 import { TPayer } from "../../types/data/services/sicredi/data/slip"
+
+/* State */
 import { TState } from "../../types/data/address/state"
 
 export const outputPayerInfo = (data: {
-  client: TBaseClient
+  client: TBasicClient
   clientState: TState
 }): TPayer => {
   const { client, clientState } = data

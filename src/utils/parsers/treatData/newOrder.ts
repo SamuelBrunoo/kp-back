@@ -1,5 +1,14 @@
 import { getListOverralStatus } from "../../helpers/getListOverralStatus"
-import {TDBOrder, TNewOrder } from "../../types/data/order"
+
+/*
+ *  Typing
+ */
+
+/* Order */
+import { TDBOrder } from "../../types/data/order/dbOrder"
+import { TNewOrder } from "../../types/data/order/newOrder"
+
+/* Product */
 import { TProduct } from "../../types/data/product"
 
 export const treatNewOrder = (
@@ -8,11 +17,11 @@ export const treatNewOrder = (
     newCode: string
     productsToTreat: TProduct[]
   }
-) => {
-  const prods:TDBOrder["products"] = data.products.map((p) => {
+): TDBOrder => {
+  const prods: TDBOrder["products"] = data.products.map((p) => {
     const prod = extra.productsToTreat.find((product) => product.id === p.id)
 
-    const obj:TDBOrder["products"][number] = {
+    const obj: TDBOrder["products"][number] = {
       id: p.id,
       quantity: p.quantity,
       status:
@@ -25,7 +34,7 @@ export const treatNewOrder = (
   })
 
   // @ts-ignore
-  let obj:TDBOrder = {
+  let obj: TDBOrder = {
     ...data,
     representative: !!data.representative ? data.representative : null,
     shippedAt: null,

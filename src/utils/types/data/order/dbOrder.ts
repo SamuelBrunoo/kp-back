@@ -11,7 +11,7 @@ export type TDBOrder = {
   observations: string
   orderDate: string
 
-  payment: TPaymentConfig[]
+  payment: TPaymentConfig["newOrder"] | TPaymentConfig["order"]
 
   products: TNewOrderProduct[]
 

@@ -1,13 +1,23 @@
-import { TBasicOrder,TDBOrder, TNewOrder, TOrder } from "../types/data/order"
-import { TEmmitter } from "../types/data/emmiter"
-import { TRepresentative } from "../types/data/representative"
-import { TClient } from "../types/data/client"
-import { TProduct } from "../types/data/product"
-import { TColor } from "../types/data/color"
-import { TModel } from "../types/data/model"
-import { TProdType } from "../types/data/prodType"
+/*
+ *  Typing
+ */
 
-import { formatSlip } from "../formatters/slip"
+/* Order */
+import { TNewOrder } from "../types/data/order/newOrder"
+import { TBasicOrder } from "../types/data/order/basicOrder"
+import { TOrder } from "../types/data/order"
+
+/* Product */
+import { TProduct } from "../types/data/product"
+
+/* Color */
+import { TColor } from "../types/data/color"
+
+/* Model */
+import { TModel } from "../types/data/model"
+
+/* Product Type */
+import { TProdType } from "../types/data/prodType"
 
 type Props = {
   order: TBasicOrder
@@ -42,10 +52,13 @@ const parseOrder = (props: Props) => {
 
   const obj: TNewOrder = {
     ...order,
+    orderDate: new Date(order.orderDate).getTime(),
+    shippedAt: new Date(order.shippedAt).getTime(),
+    deadline: new Date(order.deadline).getTime(),
     products: pds,
     representative: order.representative ?? "Não definido",
     payment: {
-      ...order.payment as any,
+      ...(order.payment as any),
       installments:
         order.payment.installments !== undefined
           ? order.payment.installments

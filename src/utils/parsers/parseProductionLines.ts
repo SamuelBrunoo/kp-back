@@ -1,12 +1,34 @@
-import {TDBOrder, TOPStatusWeight, TOrder } from "../types/data/order"
-import { TWorker } from "../types/data/worker"
+/*
+ *  Typing
+ */
+
+/* Order */
+import { TDBOrder } from "../types/data/order/dbOrder"
+
+/* Status */
+import { TOPStatusWeight } from "../types/data/status/orderProductStatusWeight"
+
+/* Worker */
+import { TWorker } from "../types/data/accounts/worker"
+
+/* Client */
 import { TClient } from "../types/data/client"
+
+/* Product */
 import { TProduct } from "../types/data/product"
+
+/* Color */
 import { TColor } from "../types/data/color"
+
+/* Model */
 import { TModel } from "../types/data/model"
+
+/* Product Type */
 import { TProdType } from "../types/data/prodType"
 
-import { TLineProduct, TProductionLine } from "../types/data/productionLine"
+/* Production Line */
+import { TProductionLineBeltProduct } from "../types/data/productionLine/productGroup/productionLineBeltProduct"
+import { TProductionLine } from "../types/data/productionLine"
 
 type Props = {
   productionLines: TProductionLine[]
@@ -14,7 +36,7 @@ type Props = {
   prodTypes: TProdType[]
   colors: TColor[]
   models: TModel[]
-  orders: ({ id: string } &TDBOrder)[]
+  orders: ({ id: string } & TDBOrder)[]
   clients: TClient[]
   workers: TWorker[]
 }
@@ -34,7 +56,7 @@ const parseProductionLines = (props: Props) => {
   let list: TProductionLine[] = []
 
   productionLines.forEach((pLine) => {
-    const order = orders.find((ord) => pLine.order === ord.id) asTDBOrder & {
+    const order = orders.find((ord) => pLine.order === ord.id) as TDBOrder & {
       id: string
     }
 
@@ -51,28 +73,30 @@ const parseProductionLines = (props: Props) => {
 
       let pgStatus: TProductionLine["status"] = "queued"
 
-      const list: TLineProduct[] = pGroup.list.map((pd, index) => {
-        const w = pd.inCharge
-          ? workers.find((wk) => wk.id === pd.inCharge.id)
-          : null
+      const list: TProductionLineBeltProduct[] = pGroup.list.map(
+        (pd, index) => {
+          const w = pd.inCharge
+            ? workers.find((wk) => wk.id === pd.inCharge.id)
+            : null
 
-        const prod: TLineProduct = {
-          index: index + 1,
-          inCharge: w
-            ? {
-                id: w.id,
-                name: w.name,
-                attributionDate: new Date().getTime(),
-              }
-            : null,
-          productionId: pd.productionId,
-          status: pd.status,
+          const prod: TProductionLineBeltProduct = {
+            index: index + 1,
+            inCharge: w
+              ? {
+                  id: w.id,
+                  name: w.name,
+                  attributionDate: new Date().getTime(),
+                }
+              : null,
+            productionId: pd.productionId,
+            status: pd.status,
+          }
+
+          if (TOPStatusWeight[pd.status] > TOPStatusWeight[pgStatus])
+            pgStatus = pd.status
+          return prod
         }
-
-        if (TOPStatusWeight[pd.status] > TOPStatusWeight[pgStatus])
-          pgStatus = pd.status
-        return prod
-      })
+      )
 
       const productGroup: TProductionLine["products"][number] = {
         id: pGroup.id,

@@ -1,18 +1,38 @@
-import { TBasicOrder } from "../../utils/types/data/order"
 import { Api } from "../../api"
-import { TS_Slip_Register } from "../../utils/types/data/services/sicredi/data/slip"
-import { TClient } from "../../utils/types/data/client"
-import { Slip, TBankSlipRegister } from "../../utils/types/data/payment"
-import { TBankCredentials, TEmmitter } from "../../utils/types/data/emmiter"
-import { TS_Credential } from "../../utils/types/data/services/sicredi/data/credential"
-import { TDefaultBodyRes } from "../../api/types"
 import { getCustomError } from "../../utils/helpers/getCustomError"
+
+/*
+ *  Typing
+ */
+
+/* API */
+import { TDefaultBodyRes } from "../../api/types"
+
+/* Order */
+import { TBasicOrder } from "../../utils/types/data/order/basicOrder"
+
+/* BANK */
+import { TS_Slip_Register } from "../../utils/types/data/services/sicredi/data/slip"
+import {
+  TBankCredentials,
+  TS_Credential,
+} from "../../utils/types/data/services/sicredi/data/credential"
+
+/* Client */
+import { OrderSlip } from "../../utils/types/data/payment/slipOrder"
+import { TBankSlipRegister } from "../../utils/types/data/payment/slipBank"
+
+/* Client */
+import { TClient } from "../../utils/types/data/client"
+
+/* Emmitter */
+import { TEmmitter } from "../../utils/types/data/accounts/emmitter"
 
 export const generateSlip = async (
   emmitter: TEmmitter,
   order: TBasicOrder,
   client: TClient,
-  slip: Slip
+  slip: OrderSlip
 ): Promise<TDefaultBodyRes<TBankSlipRegister>> => {
   return new Promise(async (resolve, reject) => {
     try {

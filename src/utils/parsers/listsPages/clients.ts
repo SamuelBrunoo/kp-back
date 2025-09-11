@@ -1,12 +1,24 @@
-import { TCity } from "../../types/data/city"
-import { TBaseClient, TClient, TPageListClient } from "../../types/data/client"
-import { TBasicOrder } from "../../types/data/order"
-import { TBasicRepresentative } from "../../types/data/representative"
+/*
+ *  Typing
+ */
+
+/* Client */
+import { TBasicClient } from "../../types/data/client/basicClient"
+import { TPageListClient } from "../../types/data/client/pageListClient"
+
+/* Order */
+import { TBasicOrder } from "../../types/data/order/basicOrder"
+
+/* Representative */
+import { TBasicRepresentative } from "../../types/data/accounts/representative/basicRepresentative"
+
+/* Address */
+import { TCity } from "../../types/data/address/city"
 import { TState } from "../../types/data/address/state"
 
 type Props = {
   representatives: TBasicRepresentative[]
-  clients: TBaseClient[]
+  clients: TBasicClient[]
   orders: TBasicOrder[]
   cities: TCity[]
   states: TState[]
@@ -28,8 +40,9 @@ export const parseClientsPageList = ({
       const ordersCount = clientOrders.length
 
       // Address
-      const state = states.find(s => s.id === i.address.state)
-      
+      const state = states.find((s) => s.id === i.address.state)
+      const city = cities.find((s) => s.id === i.address.city)
+
       // Representative
       const representative = i.representative
         ? representatives.find((r) => r.id === i.representative).name
@@ -53,7 +66,8 @@ export const parseClientsPageList = ({
         details: {
           address: {
             ...i.address,
-            state: state.name
+            state: state.name,
+            city: city.name,
           },
           clientName: i.clientName,
           documents: i.documents,

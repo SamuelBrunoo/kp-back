@@ -4,18 +4,29 @@ import * as fb from "firebase/firestore"
 import { collections } from "../network/firebase"
 import { clientValidator, newClientValidator } from "../utils/validators/client"
 import { parseFbDocs } from "../utils/parsers/fbDoc"
-import {
-  TBaseClient,
-  TClient,
- TDBClient,
-  TNewClient,
-} from "../utils/types/data/client"
+
 import { getCustomError } from "../utils/helpers/getCustomError"
 import { parseClientsPageList } from "../utils/parsers/listsPages/clients"
-import { TBasicOrder } from "../utils/types/data/order"
-import { TCity } from "../utils/types/data/city"
+
+/*
+ *  Typing
+ */
+
+/* Client */
+import { TClient } from "../utils/types/data/client"
+import { TBasicClient } from "../utils/types/data/client/basicClient"
+import { TDBClient } from "../utils/types/data/client/dbClient"
+import { TNewClient } from "../utils/types/data/client/newClient"
+
+/* Order */
+import { TBasicOrder } from "../utils/types/data/order/basicOrder"
+
+/* Address */
+import { TCity } from "../utils/types/data/address/city"
 import { TState } from "../utils/types/data/address/state"
-import { TBasicRepresentative } from "../utils/types/data/representative"
+
+/* Representative */
+import { TBasicRepresentative } from "../utils/types/data/accounts/representative/basicRepresentative"
 
 export const getClientsListPage = async (req: Request, res: Response) => {
   try {
@@ -24,7 +35,7 @@ export const getClientsListPage = async (req: Request, res: Response) => {
     ) as TBasicRepresentative[]
     const colClients = parseFbDocs(
       await fb.getDocs(fb.query(collections.clients))
-    ) as TBaseClient[]
+    ) as TBasicClient[]
     const colOrders = parseFbDocs(
       await fb.getDocs(fb.query(collections.orders))
     ) as TBasicOrder[]
@@ -117,7 +128,7 @@ export const addClient = async (req: Request, res: Response) => {
 
         res.status(201).json({ success: true, data: docData })
       } else {
-        const registeredClient = docsSnap.docs[0].data() asTDBClient
+        const registeredClient = docsSnap.docs[0].data() as TDBClient
 
         let message = ""
 
@@ -221,7 +232,7 @@ export const updateClient = async (req: Request, res: Response) => {
 
           res.status(200).json({ success: true, data: docData })
         } else {
-          const registeredClient = docsSnap.docs[0].data() asTDBClient
+          const registeredClient = docsSnap.docs[0].data() as TDBClient
 
           let message = ""
 
