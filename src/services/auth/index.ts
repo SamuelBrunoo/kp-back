@@ -19,22 +19,30 @@ import { TWorker } from "../../utils/types/data/accounts/worker"
 
 /* Emmitter */
 import { TEmmitter } from "../../utils/types/data/accounts/emmitter"
+import {
+  TBankCredentials,
+  TS_Credential,
+} from "../../utils/types/data/services/sicredi/data/credential"
+import { Api } from "../../api"
+import { TBasicEmmitter } from "../../utils/types/data/accounts/emmitter/basicEmmitter"
 
 const authInstance = getAuth(app)
 
-type TService_LoginResponse =
+type TDefaultServiceResponse<T> =
   | {
       success: true
-      data: {
-        accessToken: string
-        refreshToken: string
-        user: TUser
-      }
+      data: T
     }
   | {
       success: false
       error: string
     }
+
+type TService_LoginResponse = TDefaultServiceResponse<{
+  accessToken: string
+  refreshToken: string
+  user: TUser
+}>
 
 const login = async (
   email: string,
@@ -128,8 +136,61 @@ const login = async (
   })
 }
 
+type TService_CredentialsResponse = TDefaultServiceResponse<TS_Credential>
+
+const getCredentials = async (
+  user: TUser
+): Promise<TService_CredentialsResponse> => {
+  return new Promise(async (resolve) => {
+    let result: TService_CredentialsResponse = {
+      success: false,
+      error: "Ocorreu um erro ao fazer o login.",
+    }
+
+    try {
+      const userDoc = await fb.getDoc(
+        fb.doc(collections.emmitters, user.extraRoleId)
+      )
+
+      if (userDoc.exists()) {
+        const userRoleData = parseFbDoc(userDoc) as TBasicEmmitter
+
+        const credentialsReq = await Api.auth.token({
+          username: userRoleData.bank.username,
+          password: userRoleData.bank.password,
+          scope: "cobranca",
+          grant_type: "password",
+        })
+
+        if (credentialsReq.ok) {
+          const credentials: TS_Credential = credentialsReq.data
+          result = {
+            success: true,
+            data: credentials,
+          }
+        } else {
+          const message = "Erro ao autenticar no banco."
+          throw new Error(message)
+        }
+      }
+    } catch (error) {
+      const errorMessage = getCustomError({
+        message: (error as Error).message,
+      })
+
+      result = {
+        success: false,
+        error: errorMessage.error,
+      }
+    }
+
+    resolve(result)
+  })
+}
+
 const AuthService = {
   login,
+  getCredentials,
 }
 
 export default AuthService

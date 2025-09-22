@@ -31,9 +31,11 @@ export const newOrderValidator = (data: TNewOrder): TErrorsCheck => {
     res.ok = false
     res.fields.push("emissor")
   }
-  if (!data.shipping.type || typeof data.shipping.type !== "string") {
-    res.ok = false
-    res.fields.push("envio")
+  if (data.shipping) {
+    if (!data.shipping.type || typeof data.shipping.type !== "string") {
+      res.ok = false
+      res.fields.push("envio")
+    }
   }
   if (!data.products || !Array.isArray(data.products)) {
     res.ok = false

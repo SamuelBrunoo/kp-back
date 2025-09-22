@@ -35,6 +35,10 @@ import { TModel } from "../utils/types/data/model"
 /* Order */
 import { TBasicOrder } from "../utils/types/data/order/basicOrder"
 import parseOrder from "../utils/parsers/parseOrder"
+import { Api } from "../api"
+import { formatSlip } from "../utils/formatters/slip"
+import AuthService from "../services/auth"
+import { TUser } from "../utils/types/data/accounts/user"
 
 export const getOrderPdf = async (req: Request, res: Response) => {
   try {
@@ -120,7 +124,60 @@ export const getOrderPdf = async (req: Request, res: Response) => {
 
     res.status(200).send(buffer)
   } catch (error) {
-    console.log(error)
     res.status(204).json(getCustomError(error))
+  }
+}
+
+export const getSlipPdf = async (req: Request, res: Response) => {
+  try {
+    const user: TUser = (req as any).user
+
+    const { slipCode } = req.query
+
+    if (typeof slipCode === "string") {
+      if (user.extraRole === "emmitter") {
+        const credentials = await AuthService.getCredentials(user)
+
+        if (credentials.success) {
+          // A API precisa retornar a resposta como arraybuffer ou buffer.
+          const apiResponse = await Api.slips.print(
+            { slipCode: slipCode },
+            credentials.data
+          )
+
+          if (apiResponse.status === 201 && apiResponse.data) {
+            if (apiResponse && apiResponse.status === 201) {
+              if (apiResponse.data.pipe) {
+                const contentType =
+                  apiResponse.headers["content-type"] || "application/pdf"
+                const fileName = `Boleto-${slipCode}.pdf`
+
+                res.setHeader("Content-Type", contentType)
+                res.setHeader(
+                  "Content-Disposition",
+                  `attachment; filename="${fileName}"`
+                )
+
+                apiResponse.data.pipe(res)
+              }
+            } else throw new Error("Erro ao gerar o boleto.")
+          } else {
+            throw new Error(
+              "Não foi possível gerar o arquivo. Tente novamente mais tarde."
+            )
+          }
+        } else {
+          throw new Error("Erro ao autenticar no banco.")
+        }
+      } else {
+        throw new Error("Usuário sem autorização para download de boletos.")
+      }
+    } else {
+      throw new Error(
+        "Código do boleto não recebido. Verifique e tente novamente."
+      )
+    }
+  } catch (error) {
+    res.status(500).json(getCustomError(error as Error))
   }
 }

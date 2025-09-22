@@ -110,5 +110,6 @@ routes.post("/payments/order/generate", PaymentsController.generateOrderPayment)
 
 // # PDF
 routes.get("/pdfs/order", PdfController.getOrderPdf)
+routes.get("/pdfs/slip", PdfController.getSlipPdf)
 
 export default routes

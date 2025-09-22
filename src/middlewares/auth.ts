@@ -15,8 +15,8 @@ export const authenticate = (
   try {
     const payload = verifyAccessToken(token)
 
-    const newReq = { ...req, user: payload }
-    req = newReq as any
+    // @ts-ignore
+    req.user = payload
     next()
   } catch (err) {
     return res.status(403).json({ message: "Token inválido ou expirado" })

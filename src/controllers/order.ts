@@ -60,6 +60,7 @@ export const getOrdersListPage = async (req: Request, res: Response) => {
         "colors",
         "models",
         "products",
+        "productionLines",
       ],
       {
         orders: orderConditions,
@@ -184,37 +185,81 @@ export const addOrder = async (req: Request, res: Response) => {
       /* 2. Get last order code */
       const newOrderCode = await SERVICES.Order.getNewOrderCode()
 
+      console.log(`[DEBUG] New order code ${newOrderCode}`)
+
       /* 3. Treat data */
       const orderData = treatData<TDBOrder>("newOrder", data, {
         newCode: newOrderCode,
         productsToTreat: orderProducts,
       })
 
+      console.log(`[DEBUG] New order ${orderData}`)
+
       /* 4. Register order */
       let newOrder = await SERVICES.Order.registerOrder(orderData)
       if (newOrder.success === false) throw new Error(newOrder.error)
 
-      let requiresNewProductLine: Partial<TDBProductionLine> | undefined =
-        undefined
+      let requiresNewProductionLine = false
+
+      let storageReducesPromises: Promise<void>[] = []
 
       /* 5. Update products count in storage */
-      newOrder.data.products.forEach(async (product) => {
-        const prodObj = orderProducts.find((p) => p.id === product.id)
+      newOrder.data.products.forEach((product) => {
+        const fn: Promise<void> = new Promise(async (resolve, reject) => {
+          try {
+            const prodObj = orderProducts.find((p) => p.id === product.id)
 
-        if (prodObj && prodObj.storage.has) {
-          await SERVICES.Products.reduceStorageCount(
-            product.id,
-            prodObj.storage.quantity - product.quantity
-          )
-        }
+            if (prodObj && prodObj.storage.has) {
+              await SERVICES.Products.reduceStorageCount(
+                product.id,
+                prodObj.storage.quantity - product.quantity
+              )
+
+              console.log(
+                `[DEBUG] ${prodObj.id} [${prodObj.storage.quantity}] - [${product.quantity}]`
+              )
+
+              console.log(`[DEBUG] Product info: ${prodObj}`)
+
+              if (
+                prodObj.storage.quantity - product.quantity < 0 &&
+                !requiresNewProductionLine
+              ) {
+                requiresNewProductionLine = true
+              }
+            }
+
+            resolve()
+          } catch (error) {
+            reject(null)
+          }
+        })
+
+        storageReducesPromises.push(fn)
       })
 
+      await Promise.all(storageReducesPromises)
+
+      console.log(
+        `[DEBUG] Requires new production line ${requiresNewProductionLine}`
+      )
+
       /* 6. Create production line if needed */
-      if (requiresNewProductLine)
-        await SERVICES.ProductionLine.registerProductionLine(
-          newOrder.data,
-          orderProducts
-        )
+      if (requiresNewProductionLine) {
+        const newProductionLine =
+          await SERVICES.ProductionLine.registerProductionLine(
+            newOrder.data,
+            orderProducts
+          )
+
+        console.log(`[DEBUG] New production line `, newProductionLine)
+
+        // if (newProductionLine.success) {
+        //   SERVICES.Order.updateOrder(newOrder.data.id, {
+        //     productionLineId: newProductionLine.data.id
+        //   })
+        // }
+      }
 
       res.status(200).json({ success: true, data: newOrder.data })
     } else {
@@ -222,6 +267,7 @@ export const addOrder = async (req: Request, res: Response) => {
       throw new Error(`Verifique os campos (${fieldsStr}) e tente novamente.`)
     }
   } catch (error) {
+    console.log(`[DEBUG] Error ${error}`)
     res
       .status(400)
       .json({ success: false, error: "Houve um erro. Tente novamente" })
