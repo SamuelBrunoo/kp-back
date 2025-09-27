@@ -88,7 +88,7 @@ export const parseModelsPageList = ({
       list.push(obj)
     })
   } catch (error) {
-    console.log(error)
+    list = []
   }
 
   return list

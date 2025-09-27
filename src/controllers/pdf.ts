@@ -39,48 +39,32 @@ import { Api } from "../api"
 import { formatSlip } from "../utils/formatters/slip"
 import AuthService from "../services/auth"
 import { TUser } from "../utils/types/data/accounts/user"
+import { getParsedCollections } from "../network/firebase/collectionsHelpers"
 
 export const getOrderPdf = async (req: Request, res: Response) => {
   try {
     const { orderId } = req.query
     const forAdmin = req.query.forAdmin && req.query.forAdmin === "true"
 
-    let colClients: TClient[] = []
-    let colEmmitters: TEmmitter[] = []
-    let colRepresentatives: TRepresentative[] = []
-    let colProducts: TProduct[] = []
-
-    let colProdTypes: TProdType[] = []
-    let colModels: TModel[] = []
-    let colColors: TColor[] = []
+    const {
+      colClients,
+      colEmmitters,
+      colRepresentatives,
+      colProducts,
+      colProductTypes,
+      colModels,
+      colColors,
+    } = await getParsedCollections([
+      "clients",
+      "emmitters",
+      "representatives",
+      "products",
+      "productTypes",
+      "models",
+      "colors",
+    ])
 
     let orderData: TBasicOrder | null = null
-
-    const pms = [
-      fb.getDocs(fb.query(collections.clients)).then((res) => {
-        colClients = parseFbDocs(res as any) as TClient[]
-      }),
-      fb.getDocs(fb.query(collections.emmitters)).then((res) => {
-        colEmmitters = parseFbDocs(res as any) as TEmmitter[]
-      }),
-      fb.getDocs(fb.query(collections.representatives)).then((res) => {
-        colRepresentatives = parseFbDocs(res as any) as TRepresentative[]
-      }),
-      fb.getDocs(fb.query(collections.products)).then((res) => {
-        colProducts = parseFbDocs(res as any) as TProduct[]
-      }),
-      fb.getDocs(fb.query(collections.productTypes)).then((res) => {
-        colProdTypes = parseFbDocs(res as any) as TProdType[]
-      }),
-      fb.getDocs(fb.query(collections.models)).then((res) => {
-        colModels = parseFbDocs(res as any) as TModel[]
-      }),
-      fb.getDocs(fb.query(collections.colors)).then((res) => {
-        colColors = parseFbDocs(res as any) as TColor[]
-      }),
-    ]
-
-    await Promise.all(pms)
 
     const ref = fb.doc(collections.orders, orderId as string)
     const fbOrder = await fb.getDoc(ref)
@@ -91,12 +75,13 @@ export const getOrderPdf = async (req: Request, res: Response) => {
     }
 
     const orderInfo = parseOrder({
+      clients: colClients,
       colors: colColors,
       models: colModels,
       order: orderData,
-      prodTypes: colProdTypes,
+      prodTypes: colProductTypes,
       products: colProducts,
-    })[0]
+    })
 
     const productsList = parseProducts({
       products: colProducts,

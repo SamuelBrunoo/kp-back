@@ -113,7 +113,6 @@ export const getOrdersListPage = async (req: Request, res: Response) => {
 
     res.status(200).json({ success: true, data: { list } })
   } catch (error) {
-    console.log("Error", error)
     res.status(400).json(getCustomError(error))
   }
 }
@@ -136,9 +135,10 @@ export const getOrder = async (req: Request, res: Response) => {
     const fbOrder = await fb.getDoc(ref)
 
     if (fbOrder.exists()) {
-      const { colProducts, colColors, colProductTypes, colModels } =
+      const { colProducts, colClients, colColors, colProductTypes, colModels } =
         await getParsedCollections([
           "products",
+          "clients",
           "colors",
           "productTypes",
           "models",
@@ -146,6 +146,7 @@ export const getOrder = async (req: Request, res: Response) => {
 
       const order = parseOrder({
         order: { ...fbOrder.data(), id: fbOrder.id } as any,
+        clients: colClients,
         colors: colColors,
         prodTypes: colProductTypes,
         models: colModels,
@@ -185,15 +186,11 @@ export const addOrder = async (req: Request, res: Response) => {
       /* 2. Get last order code */
       const newOrderCode = await SERVICES.Order.getNewOrderCode()
 
-      console.log(`[DEBUG] New order code ${newOrderCode}`)
-
       /* 3. Treat data */
       const orderData = treatData<TDBOrder>("newOrder", data, {
         newCode: newOrderCode,
         productsToTreat: orderProducts,
       })
-
-      console.log(`[DEBUG] New order ${orderData}`)
 
       /* 4. Register order */
       let newOrder = await SERVICES.Order.registerOrder(orderData)
@@ -215,12 +212,6 @@ export const addOrder = async (req: Request, res: Response) => {
                 prodObj.storage.quantity - product.quantity
               )
 
-              console.log(
-                `[DEBUG] ${prodObj.id} [${prodObj.storage.quantity}] - [${product.quantity}]`
-              )
-
-              console.log(`[DEBUG] Product info: ${prodObj}`)
-
               if (
                 prodObj.storage.quantity - product.quantity < 0 &&
                 !requiresNewProductionLine
@@ -240,10 +231,6 @@ export const addOrder = async (req: Request, res: Response) => {
 
       await Promise.all(storageReducesPromises)
 
-      console.log(
-        `[DEBUG] Requires new production line ${requiresNewProductionLine}`
-      )
-
       /* 6. Create production line if needed */
       if (requiresNewProductionLine) {
         const newProductionLine =
@@ -251,8 +238,6 @@ export const addOrder = async (req: Request, res: Response) => {
             newOrder.data,
             orderProducts
           )
-
-        console.log(`[DEBUG] New production line `, newProductionLine)
 
         // if (newProductionLine.success) {
         //   SERVICES.Order.updateOrder(newOrder.data.id, {
@@ -267,7 +252,6 @@ export const addOrder = async (req: Request, res: Response) => {
       throw new Error(`Verifique os campos (${fieldsStr}) e tente novamente.`)
     }
   } catch (error) {
-    console.log(`[DEBUG] Error ${error}`)
     res
       .status(400)
       .json({ success: false, error: "Houve um erro. Tente novamente" })

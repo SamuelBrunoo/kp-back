@@ -163,32 +163,20 @@ export const getProductionLine = async (req: Request, res: Response) => {
     const fbOrder = await fb.getDoc(ref)
 
     if (fbOrder.exists()) {
-      let colProdTypes: TProdType[] = []
-      let colColors: TColor[] = []
-      let colModels: TModel[] = []
-      let colProducts: TProduct[] = []
-
-      const pms = [
-        fb.getDocs(fb.query(collections.productTypes)).then((res) => {
-          colProdTypes = parseFbDocs(res as any) as TProdType[]
-        }),
-        fb.getDocs(fb.query(collections.colors)).then((res) => {
-          colColors = parseFbDocs(res as any) as TColor[]
-        }),
-        fb.getDocs(fb.query(collections.models)).then((res) => {
-          colModels = parseFbDocs(res as any) as TModel[]
-        }),
-        fb.getDocs(fb.query(collections.products)).then((res) => {
-          colProducts = parseFbDocs(res as any) as TProduct[]
-        }),
-      ]
-
-      await Promise.all(pms)
+      const { colProducts, colClients, colColors, colProductTypes, colModels } =
+        await getParsedCollections([
+          "products",
+          "clients",
+          "colors",
+          "productTypes",
+          "models",
+        ])
 
       const order = parseOrder({
         order: { ...fbOrder.data(), id: fbOrder.id } as any,
+        clients: colClients,
         colors: colColors,
-        prodTypes: colProdTypes,
+        prodTypes: colProductTypes,
         models: colModels,
         products: colProducts,
       })

@@ -181,7 +181,7 @@ export const parseOrdersPageList = ({
       list.push(obj)
     })
   } catch (error) {
-    console.log(error)
+    list = []
   }
 
   const sortedList = list.sort((a, b) => (a.code > b.code ? -1 : 1))

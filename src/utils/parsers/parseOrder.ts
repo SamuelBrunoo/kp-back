@@ -2,6 +2,9 @@
  *  Typing
  */
 
+/* Client */
+import { TBasicClient } from "../types/data/client/basicClient"
+
 /* Order */
 import { TNewOrder } from "../types/data/order/newOrder"
 import { TBasicOrder } from "../types/data/order/basicOrder"
@@ -21,21 +24,22 @@ import { TProdType } from "../types/data/prodType"
 
 type Props = {
   order: TBasicOrder
+  clients: TBasicClient[]
   prodTypes: TProdType[]
   colors: TColor[]
   models: TModel[]
   products: TProduct[]
 }
 
-const parseOrder = (props: Props) => {
-  const { order, prodTypes, colors, models, products } = props
+const parseOrder = (props: Props): TOrder => {
+  const { order, clients, prodTypes, colors, models, products } = props
 
   // @ts-ignore
   const pds: TOrder["products"] = order.products.map((pd) => {
     const product = products.find((p) => p.id === pd.id) as TProduct
 
     const c = colors.find((col) => col.code === product.color) as TColor
-    const m = models.find((mod) => mod.code === product.model) as TModel
+    const m = models.find((mod) => mod.id === product.model) as TModel
     const t = prodTypes.find((pt) => pt.code === m.type) as TProdType
 
     return {
@@ -50,11 +54,15 @@ const parseOrder = (props: Props) => {
     }
   })
 
-  const obj: TNewOrder = {
+  const clientData = clients.find((c) => c.id === order.client)
+
+  const obj: TOrder = {
     ...order,
-    orderDate: new Date(order.orderDate).getTime(),
-    shippedAt: new Date(order.shippedAt).getTime(),
-    deadline: new Date(order.deadline).getTime(),
+    // @ts-ignore
+    client: clientData as TBasicClient,
+    // orderDate: new Date(order.orderDate).getTime(),
+    // shippedAt: new Date(order.shippedAt).getTime(),
+    // deadline: new Date(order.deadline).getTime(),
     products: pds,
     representative: order.representative ?? "Não definido",
     payment: {

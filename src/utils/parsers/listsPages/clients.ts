@@ -86,7 +86,7 @@ export const parseClientsPageList = ({
       list.push(obj)
     })
   } catch (error) {
-    console.log("Erro", error)
+    list = []
   }
 
   return list
