@@ -21,24 +21,20 @@ import { TState } from "../utils/types/data/address/state"
 
 /* Order */
 import { TNewOrder } from "../utils/types/data/order/newOrder"
-import { TDBProductionLine } from "../utils/types/data/productionLine/dbProductionLine"
 import { TDBOrder } from "../utils/types/data/order/dbOrder"
 
 import SERVICES from "../services"
+import { TErrorResponse } from "../api/types"
+import { TOrderStatus } from "../utils/types/data/status/order"
 
 export const getOrdersListPage = async (req: Request, res: Response) => {
   try {
-    const shippingStatus = req.query.shippingStatus as
-      | "todo"
-      | "waitingShip"
-      | "shipped"
+    const shippingStatus: TOrderStatus = req.query
+      .shippingStatus as TOrderStatus
 
-    const orderConditions: fb.QueryFieldFilterConstraint[] =
-      shippingStatus === "todo"
-        ? [fb.where("status", "!=", "done")]
-        : shippingStatus === "shipped"
-        ? [fb.where("status", "==", "done"), fb.where("shippedAt", "!=", null)]
-        : [fb.where("status", "==", "done"), fb.where("shippedAt", "==", null)]
+    const orderConditions: fb.QueryFieldFilterConstraint[] = [
+      fb.where("status", "==", shippingStatus),
+    ]
 
     const {
       colOrders,
@@ -111,7 +107,15 @@ export const getOrdersListPage = async (req: Request, res: Response) => {
       productionLines: colProductionLines,
     })
 
-    res.status(200).json({ success: true, data: { list } })
+    const ordersStatistics =
+      await SERVICES.Statistics.Order.getOrderStatistics()
+
+    if (ordersStatistics.ok) {
+      res.status(200).json({
+        success: true,
+        data: { list, statistics: ordersStatistics.data },
+      })
+    } else throw new Error((ordersStatistics as TErrorResponse).error.message)
   } catch (error) {
     res.status(400).json(getCustomError(error))
   }
@@ -123,7 +127,6 @@ export const getOrders = async (req: Request, res: Response) => {
 
     res.json({ success: true, data: { list: colOrders } })
   } catch (error) {
-    console.error("Error fetching orders:", error)
     res.status(204).json({ success: false, error: true })
   }
 }
@@ -192,16 +195,12 @@ export const addOrder = async (req: Request, res: Response) => {
         productsToTreat: orderProducts,
       })
 
-      /* 4. Register order */
-      let newOrder = await SERVICES.Order.registerOrder(orderData)
-      if (newOrder.success === false) throw new Error(newOrder.error)
-
       let requiresNewProductionLine = false
 
       let storageReducesPromises: Promise<void>[] = []
 
-      /* 5. Update products count in storage */
-      newOrder.data.products.forEach((product) => {
+      /* 4. Update products count in storage */
+      orderData.products.forEach((product) => {
         const fn: Promise<void> = new Promise(async (resolve, reject) => {
           try {
             const prodObj = orderProducts.find((p) => p.id === product.id)
@@ -230,6 +229,14 @@ export const addOrder = async (req: Request, res: Response) => {
       })
 
       await Promise.all(storageReducesPromises)
+
+      /* 5. Register order */
+      let newOrder = await SERVICES.Order.registerOrder(orderData)
+      if (newOrder.success === false) throw new Error(newOrder.error)
+
+      await SERVICES.Statistics.Order.incrementAmountByStatus(
+        newOrder.data.status
+      )
 
       /* 6. Create production line if needed */
       if (requiresNewProductionLine) {

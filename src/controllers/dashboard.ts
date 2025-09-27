@@ -138,7 +138,7 @@ export const getAdminDashboardInfo = async (req: Request, res: Response) => {
     const currentMonthSells = orders.filter((o) => {
       const orderDateTime = new Date(o.orderDate).getTime()
       return (
-        o.status === "done" &&
+        o.productionStatus === "done" &&
         datePoints.nextMonth > orderDateTime &&
         orderDateTime >= datePoints.currentMonth
       )
@@ -147,7 +147,7 @@ export const getAdminDashboardInfo = async (req: Request, res: Response) => {
     const lastMonthSells = orders.filter((o) => {
       const orderDateTime = new Date(o.orderDate).getTime()
       return (
-        o.status === "done" &&
+        o.productionStatus === "done" &&
         datePoints.currentMonth > orderDateTime &&
         orderDateTime >= datePoints.lastMonth
       )
@@ -156,7 +156,7 @@ export const getAdminDashboardInfo = async (req: Request, res: Response) => {
     const pastMonthSells = orders.filter((o) => {
       const orderDateTime = new Date(o.orderDate).getTime()
       return (
-        o.status === "done" &&
+        o.productionStatus === "done" &&
         datePoints.lastMonth > orderDateTime &&
         orderDateTime >= datePoints.pastMonth
       )
@@ -164,7 +164,7 @@ export const getAdminDashboardInfo = async (req: Request, res: Response) => {
 
     const yearSells = orders.filter((o) => {
       const orderShippingDateTime = new Date(o.shippedAt).getTime()
-      return o.status === "done" && orderShippingDateTime
+      return o.productionStatus === "done" && orderShippingDateTime
         ? matchYear(orderShippingDateTime, d.getTime())
         : false
     })
@@ -176,14 +176,16 @@ export const getAdminDashboardInfo = async (req: Request, res: Response) => {
       .sort((a, b) => (a.code >= b.code ? -1 : 1))
 
     const waitingToShip = orders
-      .filter((o) => o.status === "done" && !o.shippedAt)
+      .filter((o) => o.productionStatus === "done" && !o.shippedAt)
       .sort((a, b) => (a.code >= b.code ? -1 : 1))
 
     const onProduction = orders
-      .filter((o) => o.status !== "done" && o.status !== "queued")
+      .filter(
+        (o) => o.productionStatus !== "done" && o.productionStatus !== "queued"
+      )
       .sort((a, b) => (a.code >= b.code ? -1 : 1))
     const lastOrders = orders
-      .filter((o) => o.status === "queued")
+      .filter((o) => o.productionStatus === "queued")
       .sort((a, b) => (a.code >= b.code ? -1 : 1))
 
     /* Result object */

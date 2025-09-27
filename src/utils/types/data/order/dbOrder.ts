@@ -1,6 +1,7 @@
 import { TPaymentConfig } from "../payment"
 import { TNewOrderProduct } from "../product/newOrder"
 import { TShipping } from "../shipping"
+import { TOrderStatus } from "../status/order"
 import { TOPStatus } from "../status/orderProduct"
 
 export type TDBOrder = {
@@ -20,7 +21,8 @@ export type TDBOrder = {
   shippedAt?: string
   shipping: TShipping
 
-  status: TOPStatus
+  status: TOrderStatus
+  productionStatus: TOPStatus
 
   totals: {
     value: number

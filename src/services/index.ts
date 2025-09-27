@@ -3,6 +3,7 @@ import OrderService from "./order"
 import PaymentsService from "./payments"
 import ProductionLineService from "./productLine"
 import ProductsService from "./products"
+import StatisticsService from "./statistics"
 
 const SERVICES = {
   Auth: AuthService,
@@ -10,6 +11,7 @@ const SERVICES = {
   Payments: PaymentsService,
   ProductionLine: ProductionLineService,
   Products: ProductsService,
+  Statistics: StatisticsService,
 }
 
 export default SERVICES

@@ -31,6 +31,14 @@ export const collections = {
   // Locations
   cities: fb.collection(firestore, "cities"),
   states: fb.collection(firestore, "states"),
+
+  // Statistics
+  statistics: fb.collection(firestore, "statistics"),
+}
+
+// # Statistics documents
+export const statisticsDocumentsNames = {
+  orders: "orders",
 }
 
 export default app

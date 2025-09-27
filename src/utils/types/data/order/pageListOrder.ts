@@ -1,5 +1,6 @@
 import { OrderSlip } from "../payment/slipOrder"
 import { TOrderDetailsProduct } from "../product/orderPageList"
+import { TOrderStatus } from "../status/order"
 import { TOPStatus } from "../status/orderProduct"
 
 export type TPageListOrder = {
@@ -9,7 +10,8 @@ export type TPageListOrder = {
   orderDate: string
   value: number
   quantity: number
-  status: TOPStatus
+  status: TOrderStatus
+  productionStatus: TOPStatus
   details: {
     productionLineId: string | null
     products: TOrderDetailsProduct[]

@@ -148,6 +148,7 @@ export const parseOrdersPageList = ({
           .map((p) => p.quantity)
           .reduce((prev, next) => prev + next),
         status: i.status,
+        productionStatus: i.productionStatus,
         value: i.totals.value,
         details: {
           productionLineId: productionLine ? productionLine.id : null,

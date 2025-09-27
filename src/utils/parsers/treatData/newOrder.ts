@@ -1,4 +1,7 @@
-import { getListOverralStatus } from "../../helpers/getListOverralStatus"
+import {
+  getListOverralStatus,
+  getOrderStatusFromProductionStatus,
+} from "../../helpers/getListOverralStatus"
 
 /*
  *  Typing
@@ -10,6 +13,8 @@ import { TNewOrder } from "../../types/data/order/newOrder"
 
 /* Product */
 import { TProduct } from "../../types/data/product"
+import { TOrderStatus } from "../../types/data/status/order"
+import { TOPStatus } from "../../types/data/status/orderProduct"
 
 export const treatNewOrder = (
   data: TNewOrder,
@@ -33,13 +38,18 @@ export const treatNewOrder = (
     return obj
   })
 
+  let productionStatus: TOPStatus = getListOverralStatus(prods)
+  let orderStatus: TOrderStatus =
+    getOrderStatusFromProductionStatus(productionStatus)
+
   // @ts-ignore
   let obj: TDBOrder = {
     ...data,
     representative: !!data.representative ? data.representative : null,
     shippedAt: null,
+    status: orderStatus,
     code: Number(extra.newCode),
-    status: getListOverralStatus(prods),
+    productionStatus: productionStatus,
     products: prods,
   }
 

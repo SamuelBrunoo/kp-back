@@ -1,3 +1,4 @@
+import { TOrderStatus } from "../types/data/status/order"
 import { TOPStatus } from "../types/data/status/orderProduct"
 import { TOPStatusWeight } from "../types/data/status/orderProductStatusWeight"
 
@@ -16,4 +17,25 @@ export const getListOverralStatus = (list: any): TOPStatus => {
   const newStatus: TOPStatus = orderStatusName
 
   return newStatus
+}
+
+export const getOrderStatusFromProductionStatus = (
+  productionStatus: TOPStatus
+): TOrderStatus => {
+  let status: TOrderStatus = "todo"
+
+  switch (productionStatus) {
+    case "queued":
+      status = "todo"
+      break
+    case "lor":
+    case "doing":
+      status = "ongoing"
+      break
+    case "done":
+      status = "waitingShip"
+      break
+  }
+
+  return status
 }

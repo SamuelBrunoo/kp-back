@@ -1,4 +1,7 @@
-import { getListOverralStatus } from "./getListOverralStatus"
+import {
+  getListOverralStatus,
+  getOrderStatusFromProductionStatus,
+} from "./getListOverralStatus"
 
 /*
  *  Typing
@@ -35,8 +38,12 @@ export const extractOrderProductionUpdates = (
     } else newList.push(prod)
   })
 
+  const productionStatus = getListOverralStatus(products)
+  const orderStatus = getOrderStatusFromProductionStatus(productionStatus)
+
   newPl.products = newList
-  newPl.status = getListOverralStatus(newList)
+  newPl.productionStatus = productionStatus
+  newPl.status = orderStatus
 
   return newPl
 }
