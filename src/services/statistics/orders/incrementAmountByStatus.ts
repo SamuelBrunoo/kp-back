@@ -2,10 +2,10 @@ import * as fb from "firebase/firestore"
 import {
   collections,
   statisticsDocumentsNames,
-} from "../../../../network/firebase"
-import { getCustomError } from "../../../../utils/helpers/getCustomError"
-import { TStatisticsOrder } from "../../../../utils/types/data/statistics/orders"
-import { TOrderStatus } from "../../../../utils/types/data/status/order"
+} from "../../../network/firebase"
+import { getCustomError } from "../../../utils/helpers/getCustomError"
+import { TStatisticsOrder } from "../../../utils/types/data/statistics/orders"
+import { TOrderStatus } from "../../../utils/types/data/status/order"
 
 export const incrementAmountByStatus = async (status: TOrderStatus) => {
   return new Promise(async (resolve, reject) => {

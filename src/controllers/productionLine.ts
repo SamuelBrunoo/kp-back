@@ -47,6 +47,7 @@ import { TProductionLine } from "../utils/types/data/productionLine"
 
 /* Worker */
 import { TWorker } from "../utils/types/data/accounts/worker"
+import SERVICES from "../services"
 
 export const getProductionLinesListPage = async (
   req: Request,
@@ -239,6 +240,11 @@ export const updateProductionLine = async (req: Request, res: Response) => {
 
         // Update Order
         await fb.updateDoc(orderRef, newOrderObj)
+
+        // Update Order Statistics
+        if (order.status !== newOrderObj.status) {
+          await SERVICES.Statistics.Order.updateAmountForStatuses(order.status, newOrderObj.status)
+        }
 
         // Update Production Line
         await fb.updateDoc(ref, newProductionLineObj)
