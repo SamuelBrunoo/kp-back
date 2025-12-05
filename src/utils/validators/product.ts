@@ -67,11 +67,6 @@ export const productValidator = (data: TProduct): TErrorsCheck => {
     res.fields.push("tipo")
   }
 
-  if (!data.name || typeof data.name !== "string") {
-    res.ok = false
-    res.fields.push("nome")
-  }
-
   if (!data.model || typeof data.model !== "string") {
     res.ok = false
     res.fields.push("modelo")
