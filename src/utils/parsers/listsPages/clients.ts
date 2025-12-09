@@ -66,8 +66,8 @@ export const parseClientsPageList = ({
         details: {
           address: {
             ...i.address,
-            state: state.name,
-            city: city.name,
+            state: state?.name ?? "-",
+            city: city?.name ?? "-",
           },
           clientName: i.clientName,
           documents: i.documents,
@@ -86,6 +86,7 @@ export const parseClientsPageList = ({
       list.push(obj)
     })
   } catch (error) {
+    console.log("Error", error)
     list = []
   }
 

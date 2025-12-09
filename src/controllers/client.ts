@@ -41,18 +41,16 @@ export const getClientsListPage = async (req: Request, res: Response) => {
     ) as TBasicOrder[]
 
     const clientsCities = colClients.map((client) => client.address.city)
-    const clientsStates = colClients.map((client) => client.address.state)
 
-    const cities = parseFbDocs(
-      await fb.getDocs(
-        fb.query(collections.cities, fb.where("code", "in", clientsCities))
-      )
-    ) as TCity[]
+    const citiesQuery =
+      clientsCities.length > 0
+        ? fb.query(collections.cities, fb.where("code", "in", clientsCities))
+        : fb.query(collections.cities)
+
+    const cities = parseFbDocs(await fb.getDocs(citiesQuery)) as TCity[]
 
     const states = parseFbDocs(
-      await fb.getDocs(
-        fb.query(collections.states, fb.where("__name__", "in", clientsStates))
-      )
+      await fb.getDocs(fb.query(collections.states))
     ) as TState[]
 
     const list = parseClientsPageList({
@@ -125,6 +123,8 @@ export const addClient = async (req: Request, res: Response) => {
       if (!alreadyExists) {
         const doc = await fb.addDoc(collections.clients, data)
         const docData = { ...data, id: doc.id }
+
+        // Register city
 
         res.status(201).json({ success: true, data: docData })
       } else {
