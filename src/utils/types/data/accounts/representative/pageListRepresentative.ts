@@ -1,3 +1,5 @@
+import { TBasicClient } from "../../client/basicClient"
+
 export type TPageListRepresentative = {
   id: string
   name: string
@@ -7,4 +9,9 @@ export type TPageListRepresentative = {
   yearTotal: number
   yearSells: number
   deletable: boolean
+  details: TRepresentativeDetails
+}
+
+export type TRepresentativeDetails = {
+  clients: TBasicClient[]
 }

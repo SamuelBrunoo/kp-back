@@ -41,7 +41,7 @@ export const getRepresentativesListPage = async (
     }
 
     const colRepresentatives = parseFbDocs(
-      await fb.getDocs(fb.query(collections.representatives))
+      await fb.getDocs(collections.representatives)
     ) as TRepresentative[]
     const colClients = parseFbDocs(
       await fb.getDocs(
@@ -62,7 +62,7 @@ export const getRepresentativesListPage = async (
 
     const list = parseRepresentativesPageList({
       representatives: colRepresentatives,
-      clients: representativesClients,
+      clients: colClients,
       orders: colOrders,
     })
 

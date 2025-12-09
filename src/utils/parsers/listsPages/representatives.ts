@@ -13,12 +13,10 @@ import { TBasicOrder } from "../../types/data/order/basicOrder"
 /* Representative */
 import { TPageListRepresentative } from "../../types/data/accounts/representative/pageListRepresentative"
 import { TRepresentative } from "../../types/data/accounts/representative"
+import { TBasicClient } from "../../types/data/client/basicClient"
 
 type Props = {
-  clients: {
-    id: string
-    representative: string
-  }[]
+  clients: TBasicClient[]
   representatives: TRepresentative[]
   orders: TBasicOrder[]
 }
@@ -59,6 +57,9 @@ export const parseRepresentativesPageList = ({
         yearSells: yearlyData.sales,
         yearTotal: yearlyData.total,
         deletable: isDeletable,
+        details: {
+          clients: repClients,
+        },
       }
 
       list.push(obj)
