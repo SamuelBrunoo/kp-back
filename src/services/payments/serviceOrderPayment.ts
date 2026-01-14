@@ -68,12 +68,7 @@ export const serviceGenerateOrderPayment = async (
           )
           const clientStateDoc = await fb.getDoc(clientStateRef)
 
-          if (
-            emmitterStateDoc.exists() &&
-            !emmitter.address.full.includes(emmitter.address.state) &&
-            clientStateDoc.exists() &&
-            !client.address.full.includes(client.address.state)
-          ) {
+          if (emmitterStateDoc.exists() && clientStateDoc.exists()) {
             const emmitterState = parseFbDoc(emmitterStateDoc) as TState
             const clientState = parseFbDoc(clientStateDoc) as TState
 

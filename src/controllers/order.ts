@@ -26,6 +26,7 @@ import { TDBOrder } from "../utils/types/data/order/dbOrder"
 import SERVICES from "../services"
 import { TErrorResponse } from "../api/types"
 import { TOrderStatus } from "../utils/types/data/status/order"
+import { TBasicOrder } from "../utils/types/data/order/basicOrder"
 
 export const getOrdersListPage = async (req: Request, res: Response) => {
   try {
@@ -295,10 +296,16 @@ export const shipOrder = async (req: Request, res: Response) => {
     const { orderId, shippedAt } = data
 
     if (orderId && shippedAt && !Number.isNaN(+shippedAt)) {
-      const ref = fb.doc(collections.orders, orderId)
-      await fb.updateDoc(ref, { shippedAt })
+      // 1. Update order status
+      const newOrderStatus: TOrderStatus = "shipped"
 
-      // Remove productionLine
+      const ref = fb.doc(collections.orders, orderId)
+      await fb.updateDoc(ref, {
+        shippedAt,
+        status: newOrderStatus,
+      } as TBasicOrder)
+
+      // 2. Remove productionLine
       const productionLineDocs = await fb.getDocs(
         fb.query(collections.productionLines, fb.where("order", "==", orderId))
       )
@@ -309,6 +316,12 @@ export const shipOrder = async (req: Request, res: Response) => {
       }
 
       const docData = data
+
+      // 3. Update statistics
+      await SERVICES.Statistics.Order.updateAmountForStatuses(
+        "waitingShip",
+        "shipped"
+      )
 
       res.status(200).json({ success: true, data: docData })
     } else {
